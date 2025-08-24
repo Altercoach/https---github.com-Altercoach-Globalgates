@@ -1,16 +1,13 @@
+
 "use client";
 
 import React, { createContext, useState, useEffect, useMemo } from 'react';
 import type { SiteData } from '@/lib/types';
 import { DEFAULT_SITE, LS_KEYS } from '@/lib/constants';
 
-type Theme = 'light' | 'dark';
-
 interface SiteContextType {
   site: SiteData;
   setSite: React.Dispatch<React.SetStateAction<SiteData>>;
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
   isMounted: boolean;
 }
 
@@ -25,20 +22,14 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       const raw = localStorage.getItem(LS_KEYS.SITE);
-      return raw ? JSON.parse(raw) : DEFAULT_SITE;
+      const parsed = raw ? JSON.parse(raw) : DEFAULT_SITE;
+      // Basic validation to ensure we don't load corrupted data
+      if (parsed && parsed.brand && parsed.services && parsed.products) {
+        return parsed;
+      }
+      return DEFAULT_SITE;
     } catch {
       return DEFAULT_SITE;
-    }
-  });
-
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') {
-      return 'light';
-    }
-    try {
-      return (localStorage.getItem(LS_KEYS.THEME) as Theme) || 'light';
-    } catch {
-      return 'light';
     }
   });
 
@@ -55,23 +46,8 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [site, isMounted]);
-
-  useEffect(() => {
-    if (isMounted) {
-      try {
-        localStorage.setItem(LS_KEYS.THEME, theme);
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {
-        console.error("Failed to save theme to localStorage", e);
-      }
-    }
-  }, [theme, isMounted]);
   
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-  };
-
-  const value = useMemo(() => ({ site, setSite, theme, setTheme, isMounted }), [site, theme, isMounted]);
+  const value = useMemo(() => ({ site, setSite, isMounted }), [site, isMounted]);
 
   if (!isMounted) {
     return null; 

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -9,9 +10,11 @@ import { useAuth } from '@/hooks/use-auth';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { CurrencySwitcher } from '@/components/currency-switcher';
 import { useLanguage } from '@/hooks/use-language';
+import { useTheme } from 'next-themes';
 
 export function Header() {
-  const { theme, setTheme, site } = useSite();
+  const { theme, setTheme } = useTheme();
+  const { site } = useSite();
   const { translatedSite } = useLanguage();
   const { setIsCartOpen, hasPurchased, cart } = useCart();
   const { auth } = useAuth();

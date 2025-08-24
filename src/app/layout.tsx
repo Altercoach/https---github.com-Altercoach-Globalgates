@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
@@ -6,6 +7,7 @@ import { LanguageProvider } from '@/contexts/language-context';
 import { CurrencyProvider } from '@/contexts/currency-context';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
+import { ThemeProvider } from 'next-themes';
 
 export const metadata: Metadata = {
   title: 'GlobalGate Agency',
@@ -25,18 +27,20 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <SiteProvider>
-          <LanguageProvider>
-            <CurrencyProvider>
-              <CartProvider>
-                <AuthProvider>
-                  {children}
-                  <Toaster />
-                </AuthProvider>
-              </CartProvider>
-            </CurrencyProvider>
-          </LanguageProvider>
-        </SiteProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SiteProvider>
+            <LanguageProvider>
+              <CurrencyProvider>
+                <CartProvider>
+                  <AuthProvider>
+                    {children}
+                    <Toaster />
+                  </AuthProvider>
+                </CartProvider>
+              </CurrencyProvider>
+            </LanguageProvider>
+          </SiteProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
