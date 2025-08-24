@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useSite } from '@/hooks/use-site';
@@ -11,24 +12,24 @@ export function Products() {
   const products = translatedSite.products || site.products;
 
   return (
-    <section id="plans" className="w-full py-12 md:py-24 lg:py-32 bg-primary/5">
+    <section id="plans" className="w-full bg-primary/5 py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Plans and Packages</h2>
+            <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">Planes y Paquetes</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Purchase online. Subscriptions are billed monthly.
+              Compra en línea. Las suscripciones se facturan mensualmente.
             </p>
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-stretch gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3 xl:grid-cols-4 pt-12">
+        <div className="mx-auto grid max-w-5xl items-stretch gap-8 pt-12 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
         <div className="mt-8 text-center text-xs text-muted-foreground">
-            <p>* Branding (4 posts): cost = advertising spend (min $250 USD).</p>
-            <p>* FREE Market Research when you purchase an annual Funnel, Branding, or Content plan.</p>
+            <p>* Branding (4 publicaciones): costo = inversión publicitaria (mínimo $250 USD).</p>
+            <p>* Estudio de Mercado GRATIS al contratar un plan anual de Funnel, Branding o Contenido.</p>
         </div>
       </div>
     </section>

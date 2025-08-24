@@ -45,13 +45,13 @@ export const DEFAULT_SITE: SiteData = {
     ]},
   ],
   products: [
-    { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', price: 300, badge: 'Único', note: 'Incluye integración y pruebas. Ideal para arrancar tu embudo.' },
-    { id: 'p-bot-ia', name: 'Bot Asistente con IA (configuración inicial)', type: 'one', price: 700, badge: 'IA', note: 'Entrenamiento e integración del bot inteligente.' },
-    { id: 'p-research', name: 'Estudio de Mercado Integral', type: 'one', price: 2000, badge: 'Pro', note: 'Gratis si contratas un paquete anual de Marketing.' },
-    { id: 's-bot-maint', name: 'Mantenimiento de Bot (mensual)', type: 'sub', interval: 'month', price: 45, badge: 'Mensual', note: 'Monitoreo y ajustes del bot.' },
-    { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', interval: 'month', price: 350, badge: 'Contenido', note: 'Sin incluir pauta publicitaria.' },
-    { id: 's-brand-8', name: 'Branding (8 publicaciones / mes)', type: 'sub', interval: 'month', price: 200, badge: 'Branding', note: 'Requiere pauta mínima de $250 USD/mes (no incluida).'},
-    { id: 'i-brand-4', name: 'Branding (4 publicaciones / mes)', type: 'info', interval: 'month', price: 0, badge: 'Info', note: 'Costo = monto de pauta publicitaria (mínimo $250 USD).' },
+    { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', price: 300, badge: 'Único', note: 'Incluye integración y pruebas. Ideal para arrancar tu embudo.', description: 'Este paquete de pago único configura tu embudo de ventas inicial. Incluye una landing page optimizada, formularios en la nube para capturar leads y un chat automatizado para interactuar con tus visitantes.' },
+    { id: 'p-bot-ia', name: 'Bot Asistente con IA (configuración inicial)', type: 'one', price: 700, badge: 'IA', note: 'Entrenamiento e integración del bot inteligente.', description: 'Implementamos un bot con Inteligencia Artificial entrenado con tu información para responder preguntas, calificar prospectos y agendar citas. Un único pago para la configuración completa.' },
+    { id: 'p-research', name: 'Estudio de Mercado Integral', type: 'one', price: 2000, badge: 'Pro', note: 'Gratis si contratas un paquete anual de Marketing.', description: 'Análisis profundo de tu competencia, cliente ideal y mercado. Te entregamos un brief publicitario completo y sugerencias de imagen corporativa. Este servicio es gratuito al contratar un plan de marketing anual.' },
+    { id: 's-bot-maint', name: 'Mantenimiento de Bot (mensual)', type: 'sub', interval: 'month', price: 45, badge: 'Mensual', note: 'Monitoreo y ajustes del bot.', description: 'Aseguramos el óptimo funcionamiento de tu bot de IA con monitoreo constante, ajustes y optimizaciones. Este es un plan de suscripción mensual.' },
+    { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', interval: 'month', price: 350, badge: 'Contenido', note: 'Sin incluir pauta publicitaria.', description: 'Creación de 15 publicaciones para Instagram y 15 para Facebook cada mes, incluyendo calendario editorial, copys y diseños. No incluye el costo de la pauta publicitaria.' },
+    { id: 's-brand-8', name: 'Branding (8 publicaciones / mes)', type: 'sub', interval: 'month', price: 200, badge: 'Branding', note: 'Requiere pauta mínima de $250 USD/mes (no incluida).', description: 'Desarrollamos 8 publicaciones de marca al mes para posicionar tu empresa. Este plan requiere una inversión mínima de $250 USD en pauta publicitaria (no incluida en el precio).'},
+    { id: 'i-brand-4', name: 'Branding (4 publicaciones / mes)', type: 'info', interval: 'month', price: 0, badge: 'Info', note: 'Costo = monto de pauta publicitaria (mínimo $250 USD).', description: 'Este es un plan informativo. Creamos 4 publicaciones de branding al mes y el costo del servicio es igual a tu inversión en pauta publicitaria, con un mínimo de $250 USD. Contáctanos para activarlo.' },
   ],
 };
 

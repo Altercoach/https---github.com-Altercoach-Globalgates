@@ -6,6 +6,7 @@ export type Product = {
   price: number;
   badge: string;
   note: string;
+  description: string;
   interval?: 'month';
 };
 
