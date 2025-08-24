@@ -27,7 +27,7 @@ export async function translateSiteContent(input: TranslateSiteContentInput): Pr
 const prompt = ai.definePrompt({
   name: 'translateSiteContentPrompt',
   input: {schema: TranslateSiteContentInputSchema},
-  output: {schema: TranslateSiteContentOutputSchema},
+  output: {schema: z.string().nullable()},
   prompt: `You are a professional translator specializing in website content.  You will be provided with website content in JSON format and must translate it into the target language, preserving the JSON structure. Pay special attention to industry-specific verbiage and ensure it remains relevant and accurate in the translated content. The target language is: {{{targetLanguage}}}. Here is the website content to translate:
 
 {{{siteContent}}}`, safetySettings: [
