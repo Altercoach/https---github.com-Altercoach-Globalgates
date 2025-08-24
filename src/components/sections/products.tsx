@@ -4,6 +4,7 @@
 import { useSite } from '@/hooks/use-site';
 import { useLanguage } from '@/hooks/use-language';
 import { ProductCard } from '@/components/product-card';
+import { PlanRecommender } from '../plan-recommender';
 
 export function Products() {
   const { site } = useSite();
@@ -20,6 +21,9 @@ export function Products() {
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               Compra en línea. Las suscripciones se facturan mensualmente.
             </p>
+          </div>
+           <div className="pt-4">
+            <PlanRecommender />
           </div>
         </div>
         <div className="mx-auto grid max-w-5xl items-stretch gap-8 pt-12 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3 xl:grid-cols-4">
