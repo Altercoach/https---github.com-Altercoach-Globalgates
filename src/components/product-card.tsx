@@ -58,7 +58,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           <CardDescription className="mt-2 min-h-[40px]">{product.note}</CardDescription>
         </CardContent>
-        <CardFooter className="flex flex-col gap-2 sm:flex-row">
+        <CardFooter className="flex flex-col gap-2">
             <DialogTrigger asChild>
                 <Button variant="outline" className="w-full">Ver Detalles</Button>
             </DialogTrigger>
