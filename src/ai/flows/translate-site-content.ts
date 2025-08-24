@@ -54,7 +54,7 @@ const translateSiteContentFlow = ai.defineFlow(
   {
     name: 'translateSiteContentFlow',
     inputSchema: TranslateSiteContentInputSchema,
-    outputSchema: TranslateSiteContentOutputSchema,
+    outputSchema: TranslateSiteContentOutputSchema.nullable(),
   },
   async input => {
     const {output} = await prompt(input);
