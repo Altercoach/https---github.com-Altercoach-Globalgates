@@ -17,6 +17,8 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(un
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
+  const [isMounted, setIsMounted] = useState(false);
+  
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window === 'undefined') return LANGUAGES[0];
     const storedLangCode = localStorage.getItem(LS_KEYS.LANGUAGE);
@@ -27,10 +29,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
       localStorage.setItem(LS_KEYS.LANGUAGE, language.code);
     }
-  }, [language]);
+  }, [language, isMounted]);
 
   const translateContent = useCallback(async (targetLanguage: Language) => {
     if (targetLanguage.code === 'es') {
@@ -43,7 +49,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         siteContent: JSON.stringify(DEFAULT_SITE),
         targetLanguage: targetLanguage.code,
       });
-      setTranslatedSite(JSON.parse(translatedJson));
+      setTranslatedSite(JSON.parse(translatedJson || '{}'));
     } catch (error) {
       console.error('Translation failed:', error);
       toast({
@@ -58,8 +64,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [toast]);
 
   useEffect(() => {
-    translateContent(language);
-  }, [language, translateContent]);
+    if(isMounted) {
+      translateContent(language);
+    }
+  }, [language, translateContent, isMounted]);
 
   const value = useMemo(() => ({
     language,
@@ -68,6 +76,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     isTranslating,
   }), [language, translatedSite, isTranslating]);
 
+  if (!isMounted) {
+    return null;
+  }
+  
   return (
     <LanguageContext.Provider value={value}>
       {children}

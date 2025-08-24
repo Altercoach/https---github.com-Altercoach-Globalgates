@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { useSite } from '@/hooks/use-site';
 import { KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/use-language';
 
 export function Footer() {
   const { site } = useSite();
-  const { translatedSite } = useSite().isMounted && require('@/hooks/use-language').useLanguage();
+  const { translatedSite } = useLanguage();
 
   const siteName = translatedSite?.brand?.name || site.brand.name;
 

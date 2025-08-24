@@ -27,6 +27,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const router = useRouter();
   const { translatedSite } = useLanguage();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const [cart, setCart] = useState<CartItem[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -46,16 +51,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem(LS_KEYS.CART, JSON.stringify(cart));
+    if (isMounted) {
+      localStorage.setItem(LS_KEYS.CART, JSON.stringify(cart));
     }
-  }, [cart]);
+  }, [cart, isMounted]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isMounted) {
       localStorage.setItem(LS_KEYS.PURCHASED, hasPurchased ? '1' : '0');
     }
-  }, [hasPurchased]);
+  }, [hasPurchased, isMounted]);
 
   const addToCart = useCallback((prod: Product) => {
     if (!prod || prod.type === 'info') {
@@ -124,5 +129,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsCartOpen,
   }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen]);
 
+  if (!isMounted) {
+    return null; 
+  }
+  
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

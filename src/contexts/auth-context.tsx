@@ -15,6 +15,8 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
   const [auth, setAuth] = useState<AuthState>(() => {
     if (typeof window === 'undefined') return { loggedIn: false, user: null };
     try {
@@ -26,10 +28,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    if(typeof window !== 'undefined'){
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if(isMounted){
       localStorage.setItem(LS_KEYS.AUTH, JSON.stringify(auth));
     }
-  }, [auth]);
+  }, [auth, isMounted]);
 
   const login = (email: string) => {
     setAuth({ loggedIn: true, user: { email } });
@@ -43,6 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(() => ({ auth, login, logout }), [auth]);
 
+  if (!isMounted) {
+    return null;
+  }
+  
   return (
     <AuthContext.Provider value={value}>
       {children}

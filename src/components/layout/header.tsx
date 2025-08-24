@@ -8,10 +8,11 @@ import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/hooks/use-auth';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { CurrencySwitcher } from '@/components/currency-switcher';
+import { useLanguage } from '@/hooks/use-language';
 
 export function Header() {
   const { theme, setTheme, site } = useSite();
-  const { translatedSite } = useSite().isMounted && require('@/hooks/use-language').useLanguage();
+  const { translatedSite } = useLanguage();
   const { setIsCartOpen, hasPurchased, cart } = useCart();
   const { auth } = useAuth();
   
