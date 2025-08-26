@@ -68,9 +68,9 @@ export default function ProductsEditorPage() {
       <div className="space-y-4">
         {draft.products.map(product => (
             <Card key={product.id}>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">Editar Producto</CardTitle>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => removeProduct(product.id)}>
+                <CardHeader className="flex flex-row items-start justify-between">
+                    <CardTitle className="text-lg leading-tight">{product.name}</CardTitle>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
                         <Trash2 />
                     </Button>
                 </CardHeader>

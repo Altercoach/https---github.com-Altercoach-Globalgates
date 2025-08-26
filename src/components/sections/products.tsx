@@ -32,7 +32,8 @@ export function Products() {
           ))}
         </div>
         <div className="mt-8 text-center text-xs text-muted-foreground">
-            <p>* Branding (4 publicaciones): costo = inversión publicitaria (mínimo $250 USD).</p>
+            <p>* Branding (8 publicaciones): el costo de pauta publicitaria no está incluido (inversión mínima de $250 USD).</p>
+            <p>* Branding (4 publicaciones): el costo del servicio es igual al monto de la pauta publicitaria (inversión mínima de $250 USD).</p>
             <p>* Estudio de Mercado GRATIS al contratar un plan anual de Funnel, Branding o Contenido.</p>
         </div>
       </div>

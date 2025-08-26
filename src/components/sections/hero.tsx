@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -36,11 +37,11 @@ export function Hero() {
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Embudos de Venta Medibles</span>
+                    <span>Embudos de Venta (Funnels) Medibles</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Branding + Contenido + Anuncios</span>
+                    <span>Marca, Contenido y Anuncios</span>
                 </li>
             </ul>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
