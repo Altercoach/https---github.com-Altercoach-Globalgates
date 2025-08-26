@@ -32,20 +32,20 @@ export function Hero() {
             <ul className="grid gap-2 text-lg">
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>AI-Powered Automation</span>
+                    <span>Automatización con IA</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Measurable Sales Funnels</span>
+                    <span>Embudos de Venta Medibles</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Branding + Content + Ads</span>
+                    <span>Branding + Contenido + Anuncios</span>
                 </li>
             </ul>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button onClick={scrollToPlans} className="bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
-                Explore Plans
+                Explorar Planes
               </Button>
             </div>
           </div>
