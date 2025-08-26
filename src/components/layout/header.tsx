@@ -20,9 +20,9 @@ export function Header() {
   const { auth } = useAuth();
   
   const navItems = [
-    { label: 'Services', id: 'services' },
-    { label: 'Plans', id: 'plans' },
-    { label: 'Contact', id: 'contact' },
+    { label: 'Servicios', id: 'services' },
+    { label: 'Planes', id: 'plans' },
+    { label: 'Contacto', id: 'contact' },
   ];
 
   const scrollTo = (id: string) => {
@@ -52,7 +52,7 @@ export function Header() {
                <>
                 <Button asChild variant="ghost"><Link href="/login">Login</Link></Button>
                 <Button asChild variant="ghost" disabled={!hasPurchased}>
-                  <Link href="/signup" aria-disabled={!hasPurchased} tabIndex={!hasPurchased ? -1 : undefined}>Sign Up</Link>
+                  <Link href="/signup" aria-disabled={!hasPurchased} tabIndex={!hasPurchased ? -1 : undefined}>Crear Cuenta</Link>
                 </Button>
                </>
             )}
@@ -70,12 +70,12 @@ export function Header() {
                   {cart.length}
                 </span>
               )}
-              <span className="sr-only">Open Cart</span>
+              <span className="sr-only">Abrir Carrito</span>
             </Button>
             
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">Cambiar tema</span>
             </Button>
           </div>
         </div>

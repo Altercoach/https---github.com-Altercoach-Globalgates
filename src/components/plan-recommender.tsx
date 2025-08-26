@@ -22,6 +22,8 @@ import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { formatCurrency } from '@/lib/utils';
+import { useCurrency } from '@/hooks/use-currency';
 
 export function PlanRecommender() {
     const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +34,7 @@ export function PlanRecommender() {
     const { site } = useSite();
     const { toast } = useToast();
     const { addToCart } = useCart();
+    const { currency } = useCurrency();
 
     const handleGetRecommendation = async () => {
         if (!businessDescription.trim()) {
@@ -147,7 +150,7 @@ export function PlanRecommender() {
                                     {recommendedProducts.map(p => (
                                         <div key={p.id} className="flex justify-between items-center rounded-md border p-2 bg-background">
                                             <span>{p.name} <Badge variant="secondary" className="ml-2">{p.badge}</Badge></span>
-                                            <span className="font-bold">${p.price}</span>
+                                            <span className="font-bold">{formatCurrency(p.price, currency)}</span>
                                         </div>
                                     ))}
                                 </div>

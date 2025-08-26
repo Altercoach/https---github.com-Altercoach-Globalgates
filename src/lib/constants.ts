@@ -1,3 +1,4 @@
+
 import type { SiteData, Language, Currency } from '@/lib/types';
 
 export const LS_KEYS = {
@@ -14,7 +15,7 @@ export const DEFAULT_SITE: SiteData = {
   brand: {
     name: 'GlobalGate Agency',
     tagline: 'Marketing estratégico, automatización e IA que abre puertas a tu crecimiento',
-    heroTitle: 'Impulsa tu marca con funnels y automatización inteligente',
+    heroTitle: 'Impulsa tu marca con funnels (embudos de venta) y automatización inteligente',
     heroSubtitle: 'Branding, contenido y embudos de ventas integrados para atraer, convertir y fidelizar.',
     heroImage: '',
     colors: {

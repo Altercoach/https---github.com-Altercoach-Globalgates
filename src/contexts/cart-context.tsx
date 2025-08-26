@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
@@ -65,8 +66,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = useCallback((prod: Product) => {
     if (!prod || prod.type === 'info') {
       toast({
-        title: 'Informational Plan',
-        description: 'This is an informational plan. Contact us to activate it.',
+        title: 'Plan Informativo',
+        description: 'Este es un plan informativo. Contáctanos para activarlo.',
       });
       return;
     }
@@ -74,14 +75,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) => {
       const exists = prev.find((x) => x.id === prod.id);
       if (exists) {
+        if (exists.type === 'sub') {
+          toast({ description: 'La suscripción ya está en tu carrito.' });
+          return prev;
+        }
         return prev.map((x) =>
-          x.id === prod.id ? { ...x, qty: prod.type === 'sub' ? 1 : clampQty((x.qty || 1) + 1) } : x
+          x.id === prod.id ? { ...x, qty: clampQty(x.qty + 1) } : x
         );
       }
       return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type, interval: prod.interval || null, qty: 1 }];
     });
     
-    toast({ description: 'Added to cart.' });
+    toast({ description: 'Añadido al carrito.' });
     setIsCartOpen(true);
   }, [toast]);
 
@@ -91,7 +96,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totals = useMemo(() => {
     const one = cart.filter((i) => i.type === 'one');
     const sub = cart.filter((i) => i.type === 'sub');
-    const oneTotal = one.reduce((s, i) => s + (i.price * (i.qty || 1)), 0);
+    const oneTotal = one.reduce((s, i) => s + (i.price * i.qty), 0);
     const subTotal = sub.reduce((s, i) => s + i.price, 0);
     return { oneTotal, subTotal, total: oneTotal + subTotal };
   }, [cart]);
@@ -99,7 +104,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const checkout = async () => {
     try {
       if (totals.total <= 0) {
-        toast({ title: 'Your cart is empty.' });
+        toast({ title: 'Tu carrito está vacío.' });
         return;
       }
       await new Promise((res) => setTimeout(res, 600));
@@ -107,13 +112,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setCart([]);
       setIsCartOpen(false);
       toast({
-        title: 'Payment Successful!',
-        description: 'You can now create your account.',
+        title: '¡Pago Exitoso!',
+        description: 'Ahora puedes crear tu cuenta.',
       });
       router.push('/signup');
     } catch (err) {
       console.error('checkout', err);
-      toast({ title: 'Error processing payment', variant: 'destructive' });
+      toast({ title: 'Error procesando el pago', variant: 'destructive' });
     }
   };
 
@@ -127,11 +132,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     hasPurchased,
     isCartOpen,
     setIsCartOpen,
-  }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen]);
-
-  if (!isMounted) {
-    return null; 
-  }
+  }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen, removeFromCart, setQty]);
   
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

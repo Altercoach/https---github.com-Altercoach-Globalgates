@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -23,11 +24,11 @@ export function CartDrawer() {
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>Your Cart</SheetTitle>
+          <SheetTitle>Tu Carrito</SheetTitle>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto py-4">
           {cart.length === 0 ? (
-            <p className="text-muted-foreground">Your cart is empty.</p>
+            <p className="text-muted-foreground">Tu carrito está vacío.</p>
           ) : (
             <div className="space-y-4">
               {cart.map((item) => (
@@ -35,11 +36,11 @@ export function CartDrawer() {
                   <div className="flex-1">
                     <p className="font-semibold">{item.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {item.type === 'sub' ? 'Monthly Subscription' : 'One-time Payment'}
+                      {item.type === 'sub' ? 'Suscripción Mensual' : 'Pago Único'}
                     </p>
                     {item.type === 'one' && (
                       <div className="mt-2 flex items-center gap-2">
-                        <label htmlFor={`qty-${item.id}`} className="text-sm">Qty:</label>
+                        <label htmlFor={`qty-${item.id}`} className="text-sm">Cant:</label>
                         <Input
                           id={`qty-${item.id}`}
                           type="number"
@@ -64,7 +65,7 @@ export function CartDrawer() {
                       onClick={() => removeFromCart(item.id)}
                     >
                       <X className="h-4 w-4" />
-                      <span className="sr-only">Remove item</span>
+                      <span className="sr-only">Eliminar artículo</span>
                     </Button>
                   </div>
                 </div>
@@ -75,12 +76,12 @@ export function CartDrawer() {
         <SheetFooter className="mt-auto border-t pt-4">
           <div className="w-full space-y-2 text-sm">
             <div className="flex justify-between">
-              <span>One-time payments</span>
+              <span>Pagos únicos</span>
               <span>{formatCurrency(totals.oneTotal, currency)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Subscriptions</span>
-              <span>{formatCurrency(totals.subTotal, currency)}/month</span>
+              <span>Suscripciones</span>
+              <span>{formatCurrency(totals.subTotal, currency)}/mes</span>
             </div>
             <div className="flex justify-between text-base font-bold">
               <span>Total</span>
@@ -90,9 +91,9 @@ export function CartDrawer() {
                 className="w-full bg-accent hover:bg-accent/90" 
                 onClick={checkout}
                 disabled={cart.length === 0}>
-              Checkout
+              Finalizar Compra
             </Button>
-            <p className="text-xs text-muted-foreground">Subscriptions renew automatically. You can cancel anytime in your dashboard.</p>
+            <p className="text-xs text-muted-foreground">Las suscripciones se renuevan automáticamente. Puedes cancelar en cualquier momento en tu panel de control.</p>
           </div>
         </SheetFooter>
       </SheetContent>
