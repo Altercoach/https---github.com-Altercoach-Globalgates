@@ -11,13 +11,12 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose
 } from "@/components/ui/dialog";
 import { Textarea } from './ui/textarea';
 import { useSite } from '@/hooks/use-site';
 import { recommendPlan } from '@/ai/flows/recommend-plan-flow';
 import type { RecommendPlanOutput } from '@/ai/flows/recommend-plan-flow';
-import { Loader, Wand, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Loader, Wand, ShoppingCart, CheckCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/hooks/use-cart';
 import type { Product } from '@/lib/types';
@@ -50,11 +49,12 @@ export function PlanRecommender() {
             });
             setRecommendation(result);
 
-            const products = result.productIds
-                .map(id => site.products.find(p => p.id === id))
-                .filter((p): p is Product => Boolean(p));
-
-            setRecommendedProducts(products);
+            if (result.productIds.length > 0) {
+              const products = result.productIds
+                  .map(id => site.products.find(p => p.id === id))
+                  .filter((p): p is Product => Boolean(p));
+              setRecommendedProducts(products);
+            }
 
         } catch (error) {
             console.error('Failed to get recommendation:', error);
@@ -84,6 +84,9 @@ export function PlanRecommender() {
       setRecommendedProducts([]);
     }
 
+    const hasRecommendation = recommendation && recommendation.productIds.length > 0;
+    const isAskingQuestion = recommendation && recommendation.productIds.length === 0;
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => {
             setIsOpen(open);
@@ -105,23 +108,33 @@ export function PlanRecommender() {
                     </DialogDescription>
                 </DialogHeader>
                 
-                {!recommendation ? (
-                    <div className="py-4 space-y-4">
-                        <Textarea
-                            placeholder="Ej: Somos una nueva cafetería en el centro, queremos atraer más clientes y construir una marca sólida en redes sociales."
-                            rows={6}
-                            value={businessDescription}
-                            onChange={(e) => setBusinessDescription(e.target.value)}
-                            disabled={isLoading}
-                        />
-                        <Button onClick={handleGetRecommendation} disabled={isLoading} className="w-full">
-                            {isLoading ? <Loader className="animate-spin mr-2" /> : <Wand className="mr-2" />}
-                            {isLoading ? 'Analizando tu negocio...' : 'Obtener Recomendación'}
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="py-4 space-y-4">
+                <div className="py-4 space-y-4">
+                    {isAskingQuestion && (
                         <Card className="bg-primary/5">
+                             <CardContent className="pt-6">
+                                <p className="text-muted-foreground">{recommendation.reasoning}</p>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {!hasRecommendation && (
+                        <div className="space-y-4">
+                            <Textarea
+                                placeholder="Ej: Somos una nueva cafetería en el centro, queremos atraer más clientes y construir una marca sólida en redes sociales."
+                                rows={isAskingQuestion ? 3 : 6}
+                                value={businessDescription}
+                                onChange={(e) => setBusinessDescription(e.target.value)}
+                                disabled={isLoading}
+                            />
+                            <Button onClick={handleGetRecommendation} disabled={isLoading || !businessDescription.trim()} className="w-full">
+                                {isLoading ? <Loader className="animate-spin mr-2" /> : <Wand className="mr-2" />}
+                                {isLoading ? 'Analizando...' : (isAskingQuestion ? 'Enviar información' : 'Obtener Recomendación')}
+                            </Button>
+                        </div>
+                    )}
+                    
+                    {hasRecommendation && (
+                         <Card className="bg-primary/5">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
                                     <CheckCircle className="text-accent" />
@@ -140,15 +153,23 @@ export function PlanRecommender() {
                                 </div>
                             </CardContent>
                         </Card>
-                        <DialogFooter className="gap-2 sm:gap-0">
-                            <Button variant="ghost" onClick={() => setRecommendation(null)}>Probar de Nuevo</Button>
+                    )}
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                    {hasRecommendation && (
+                        <>
+                            <Button variant="ghost" onClick={resetState}>
+                                <RefreshCw className="mr-2"/>
+                                Empezar de Nuevo
+                            </Button>
                             <Button onClick={handleAddToCart}>
                                 <ShoppingCart className="mr-2" />
                                 Añadir al Carrito
                             </Button>
-                        </DialogFooter>
-                    </div>
-                )}
+                        </>
+                    )}
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
