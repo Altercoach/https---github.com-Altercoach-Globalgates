@@ -1,3 +1,5 @@
+'use client';
+
 import { Hero } from '@/components/sections/hero';
 import { Services } from '@/components/sections/services';
 import { Products } from '@/components/sections/products';
