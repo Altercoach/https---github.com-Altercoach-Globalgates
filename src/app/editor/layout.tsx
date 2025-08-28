@@ -36,6 +36,7 @@ export default function EditorLayout({
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <div className="bg-background">
         <SidebarProvider>
         <Sidebar side="left" variant="sidebar" collapsible="icon">
             <SidebarHeader>
@@ -77,6 +78,7 @@ export default function EditorLayout({
             <main className="flex-1 overflow-auto p-4">{children}</main>
         </SidebarInset>
         </SidebarProvider>
+      </div>
     </ThemeProvider>
   );
 }
