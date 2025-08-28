@@ -48,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg">{product.name}</CardTitle>
-              <Badge variant="secondary" className="shrink-0 bg-accent/20 text-accent-foreground">{product.badge}</Badge>
+              <Badge variant="secondary" className="shrink-0 border-transparent bg-accent/20 text-accent">{product.badge}</Badge>
           </div>
         </CardHeader>
         <CardContent className="flex-grow">
@@ -77,7 +77,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
           <DialogDescription>
-            <Badge variant="secondary" className="bg-accent/20 text-accent-foreground">{product.badge}</Badge>
+            <Badge variant="secondary" className="border-transparent bg-accent/20 text-accent">{product.badge}</Badge>
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
