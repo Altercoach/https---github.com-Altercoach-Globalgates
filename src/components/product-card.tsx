@@ -92,7 +92,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Button variant="outline">Cerrar</Button>
             </DialogClose>
            {isInfo ? (
-                <Button variant="default" className="bg-accent hover:bg-accent/90" onClick={() => { handleInfoClick(); }}>Solicitar Info</Button>
+                <Button variant="default" className="w-full bg-accent hover:bg-accent/hove-90" onClick={() => { handleInfoClick(); }}>Solicitar Info</Button>
             ) : (
                 <DialogClose asChild>
                     <Button onClick={handleAddToCart}>
