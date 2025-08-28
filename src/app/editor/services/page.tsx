@@ -83,7 +83,7 @@ export default function ServicesEditorPage() {
           <Card key={service.id}>
             <CardHeader>
               <Input 
-                className="text-lg font-bold"
+                className="text-lg font-bold border-0 px-0"
                 value={service.title} 
                 onChange={e => handleServiceTitleChange(service.id, e.target.value)} 
               />
@@ -93,6 +93,7 @@ export default function ServicesEditorPage() {
                 <div key={b_idx} className="flex items-center gap-2">
                     <Input 
                         value={bullet} 
+                        className="border-0 px-0"
                         onChange={e => handleBulletChange(service.id, b_idx, e.target.value)}
                     />
                     <Button variant="ghost" size="icon" className="shrink-0 text-destructive hover:text-destructive" onClick={() => removeBullet(service.id, b_idx)}>
