@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { KeyRound, LayoutGrid, ShoppingBag, Store } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 
@@ -30,6 +30,7 @@ export default function EditorLayout({
     { href: '/editor/brand', label: 'Brand', icon: <Store /> },
     { href: '/editor/services', label: 'Services', icon: <LayoutGrid /> },
     { href: '/editor/products', label: 'Products', icon: <ShoppingBag /> },
+    { href: '/editor/integrations', label: 'Integrations', icon: <Puzzle /> },
   ];
 
   return (
