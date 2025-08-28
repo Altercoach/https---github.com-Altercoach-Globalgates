@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import type { SiteData } from '@/lib/types';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { Upload } from 'lucide-react';
 
 export default function BrandEditorPage() {
   const { site, setSite } = useSite();
@@ -37,6 +38,11 @@ export default function BrandEditorPage() {
     };
     reader.readAsDataURL(file);
   };
+  
+  const triggerFilePicker = () => {
+    document.getElementById('heroImagePicker')?.click();
+  }
+
 
   return (
     <div className="space-y-6">
@@ -51,8 +57,8 @@ export default function BrandEditorPage() {
                 <CardDescription>This information is used across your site.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div><Label>Brand Name</Label><Input value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
-                <div><Label>Tagline</Label><Input value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
+                <div><Label>Brand Name</Label><Input className="border-0 px-0" value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
+                <div><Label>Tagline</Label><Input className="border-0 px-0" value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
             </CardContent>
         </Card>
 
@@ -63,16 +69,34 @@ export default function BrandEditorPage() {
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                    <div><Label>Hero Title</Label><Input value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
-                    <div><Label>Hero Subtitle</Label><Textarea value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
+                    <div><Label>Hero Title</Label><Input className="border-0 px-0" value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
+                    <div><Label>Hero Subtitle</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
                 </div>
                  <div className="space-y-2">
                     <Label>Hero Image</Label>
-                    <Input type="file" accept="image/*" onChange={handleImagePick} />
-                    <p className="text-sm text-muted-foreground">Recommended size: 1200x800px.</p>
-                    {draft.brand.heroImage && (
-                        <div className="mt-2 rounded-md border p-2">
-                            <Image src={draft.brand.heroImage} alt="Hero Preview" width={300} height={200} className="rounded-md object-contain" />
+                    <Card className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
+                      {draft.brand.heroImage ? (
+                          <div className="relative h-full w-full">
+                              <Image src={draft.brand.heroImage} alt="Hero Preview" fill className="rounded-md object-contain p-2" />
+                          </div>
+                      ) : (
+                        <div className="text-center">
+                            <p className="text-sm text-muted-foreground">Recommended size: 1200x800px.</p>
+                            <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
+                                <Upload className="mr-2"/>
+                                Upload Image
+                            </Button>
+                            <Input id="heroImagePicker" type="file" accept="image/*" onChange={handleImagePick} className="hidden"/>
+                        </div>
+                      )}
+                    </Card>
+                     {draft.brand.heroImage && (
+                        <div className="text-center">
+                            <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
+                                <Upload className="mr-2"/>
+                                Change Image
+                            </Button>
+                            <Input id="heroImagePicker" type="file" accept="image/*" onChange={handleImagePick} className="hidden"/>
                         </div>
                     )}
                 </div>
