@@ -56,6 +56,7 @@ export function Hero() {
             height={400}
             className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
             data-ai-hint="business marketing"
+            priority
           />
         </div>
       </div>

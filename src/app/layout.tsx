@@ -8,7 +8,6 @@ import { LanguageProvider } from '@/contexts/language-context';
 import { CurrencyProvider } from '@/contexts/currency-context';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
-import { ThemeProvider } from 'next-themes';
 
 export const metadata: Metadata = {
   title: 'GlobalGate Agency',
@@ -29,25 +28,18 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased">
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <SiteProvider>
-              <LanguageProvider>
-                <CurrencyProvider>
-                  <CartProvider>
-                    <AuthProvider>
-                      {children}
-                      <Toaster />
-                    </AuthProvider>
-                  </CartProvider>
-                </CurrencyProvider>
-              </LanguageProvider>
-            </SiteProvider>
-          </ThemeProvider>
+          <SiteProvider>
+            <LanguageProvider>
+              <CurrencyProvider>
+                <CartProvider>
+                  <AuthProvider>
+                    {children}
+                    <Toaster />
+                  </AuthProvider>
+                </CartProvider>
+              </CurrencyProvider>
+            </LanguageProvider>
+          </SiteProvider>
       </body>
     </html>
   );

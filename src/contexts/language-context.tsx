@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
@@ -5,6 +6,7 @@ import type { SiteData, Language } from '@/lib/types';
 import { DEFAULT_SITE, LANGUAGES, LS_KEYS } from '@/lib/constants';
 import { translateSiteContent } from '@/ai/flows/translate-site-content';
 import { useToast } from '@/hooks/use-toast';
+import { useSite } from '@/hooks/use-site';
 
 interface LanguageContextType {
   language: Language;
@@ -17,6 +19,7 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(un
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
+  const { site } = useSite(); 
   const [isMounted, setIsMounted] = useState(false);
   
   const [language, setLanguageState] = useState<Language>(() => {
@@ -25,7 +28,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return LANGUAGES.find(l => l.code === storedLangCode) || LANGUAGES[0];
   });
   
-  const [translatedSite, setTranslatedSite] = useState<SiteData>(DEFAULT_SITE);
+  const [translatedSite, setTranslatedSite] = useState<SiteData>(site);
   const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
@@ -38,15 +41,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [language, isMounted]);
 
-  const translateContent = useCallback(async (targetLanguage: Language) => {
+  const translateContent = useCallback(async (targetLanguage: Language, currentSite: SiteData) => {
     if (targetLanguage.code === 'es') {
-      setTranslatedSite(DEFAULT_SITE);
+      setTranslatedSite(currentSite);
       return;
     }
     setIsTranslating(true);
     try {
       const translatedJson = await translateSiteContent({
-        siteContent: JSON.stringify(DEFAULT_SITE),
+        siteContent: JSON.stringify(currentSite),
         targetLanguage: targetLanguage.code,
       });
       setTranslatedSite(JSON.parse(translatedJson || '{}'));
@@ -57,7 +60,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         description: 'Failed to translate content. Please try again.',
         variant: 'destructive',
       });
-      setTranslatedSite(DEFAULT_SITE); // Revert to default
+      setTranslatedSite(currentSite); // Revert to current site
     } finally {
       setIsTranslating(false);
     }
@@ -65,9 +68,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if(isMounted) {
-      translateContent(language);
+      translateContent(language, site);
     }
-  }, [language, translateContent, isMounted]);
+  }, [language, site, translateContent, isMounted]);
 
   const value = useMemo(() => ({
     language,
