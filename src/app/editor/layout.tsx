@@ -65,7 +65,7 @@ export default function EditorLayout({
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset className="bg-background">
+      <SidebarInset>
         <header className="flex h-14 items-center justify-between border-b bg-background p-2">
           <SidebarTrigger />
           <Button asChild variant="outline">
