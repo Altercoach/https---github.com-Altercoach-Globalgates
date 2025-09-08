@@ -14,8 +14,8 @@ export function Contact() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toast({
-      title: 'Message Sent!',
-      description: 'Thank you for contacting us. We will get back to you shortly.',
+      title: '¡Mensaje Enviado!',
+      description: 'Gracias por contactarnos. Te responderemos en breve.',
     });
     (e.target as HTMLFormElement).reset();
   };
@@ -24,9 +24,9 @@ export function Contact() {
     <section id="contact" className="w-full py-12 md:py-24 lg:py-32">
       <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
         <div className="space-y-3">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">Ready to Open New Doors?</h2>
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">¿Listo para Abrir Nuevas Puertas?</h2>
           <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-            Write to us and schedule a call. Let's discuss how we can elevate your brand.
+            Escríbenos y agenda una llamada. Hablemos de cómo podemos elevar tu marca.
           </p>
         </div>
         <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
@@ -48,18 +48,18 @@ export function Contact() {
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-left block">Name</Label>
-                  <Input id="name" placeholder="Your Name" required />
+                  <Label htmlFor="name" className="text-left block">Nombre</Label>
+                  <Input id="name" placeholder="Tu Nombre" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-left block">Email</Label>
-                  <Input id="email" type="email" placeholder="your@email.com" required />
+                  <Input id="email" type="email" placeholder="tu@email.com" required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="message" className="text-left block">Tell us about your project</Label>
-                  <Textarea id="message" placeholder="Your message..." required />
+                  <Label htmlFor="message" className="text-left block">Cuéntanos sobre tu proyecto</Label>
+                  <Textarea id="message" placeholder="Tu mensaje..." required />
                 </div>
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Send Message</Button>
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Enviar Mensaje</Button>
               </form>
             </CardContent>
           </Card>
