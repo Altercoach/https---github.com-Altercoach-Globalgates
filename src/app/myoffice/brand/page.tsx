@@ -24,7 +24,7 @@ export default function BrandEditorPage() {
 
   const saveChanges = () => {
     setSite(draft);
-    toast({ title: 'Changes saved!', description: 'Your brand details have been updated.' });
+    toast({ title: '¡Cambios guardados!', description: 'Los detalles de tu marca han sido actualizados.' });
   };
   
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,44 +47,44 @@ export default function BrandEditorPage() {
   return (
     <div className="space-y-6">
         <header>
-            <h1 className="text-3xl font-bold font-headline">Brand & Hero</h1>
-            <p className="text-muted-foreground">Manage your brand identity and hero section content.</p>
+            <h1 className="text-3xl font-bold font-headline">Marca y Héroe</h1>
+            <p className="text-muted-foreground">Gestiona tu identidad de marca y el contenido de la sección principal.</p>
         </header>
 
         <Card>
             <CardHeader>
-                <CardTitle>Brand Details</CardTitle>
-                <CardDescription>This information is used across your site.</CardDescription>
+                <CardTitle>Detalles de la Marca</CardTitle>
+                <CardDescription>Esta información se utiliza en todo tu sitio.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div><Label>Brand Name</Label><Input className="border-0 px-0" value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
-                <div><Label>Tagline</Label><Input className="border-0 px-0" value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
+                <div><Label>Nombre de la Marca</Label><Input className="border-0 px-0" value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
+                <div><Label>Eslogan</Label><Input className="border-0 px-0" value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
             </CardContent>
         </Card>
 
          <Card>
             <CardHeader>
-                <CardTitle>Hero Section</CardTitle>
-                <CardDescription>This is the first thing visitors see on your homepage.</CardDescription>
+                <CardTitle>Sección Héroe</CardTitle>
+                <CardDescription>Esto es lo primero que ven los visitantes en tu página de inicio.</CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                    <div><Label>Hero Title</Label><Input className="border-0 px-0" value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
-                    <div><Label>Hero Subtitle</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
+                    <div><Label>Título del Héroe</Label><Input className="border-0 px-0" value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
+                    <div><Label>Subtítulo del Héroe</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
                 </div>
                  <div className="space-y-2">
-                    <Label>Hero Image</Label>
+                    <Label>Imagen del Héroe</Label>
                     <Card className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
                       {draft.brand.heroImage ? (
                           <div className="relative h-full w-full">
-                              <Image src={draft.brand.heroImage} alt="Hero Preview" fill className="rounded-md object-contain p-2" />
+                              <Image src={draft.brand.heroImage} alt="Vista previa del Héroe" fill className="rounded-md object-contain p-2" />
                           </div>
                       ) : (
                         <div className="text-center">
-                            <p className="text-sm text-muted-foreground">Recommended size: 1200x800px.</p>
+                            <p className="text-sm text-muted-foreground">Tamaño recomendado: 1200x800px.</p>
                             <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
                                 <Upload className="mr-2"/>
-                                Upload Image
+                                Subir Imagen
                             </Button>
                             <Input id="heroImagePicker" type="file" accept="image/*" onChange={handleImagePick} className="hidden"/>
                         </div>
@@ -94,7 +94,7 @@ export default function BrandEditorPage() {
                         <div className="text-center">
                             <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
                                 <Upload className="mr-2"/>
-                                Change Image
+                                Cambiar Imagen
                             </Button>
                             <Input id="heroImagePicker" type="file" accept="image/*" onChange={handleImagePick} className="hidden"/>
                         </div>
@@ -104,7 +104,7 @@ export default function BrandEditorPage() {
         </Card>
 
         <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>Save Changes</Button>
+            <Button onClick={saveChanges}>Guardar Cambios</Button>
         </div>
     </div>
   );

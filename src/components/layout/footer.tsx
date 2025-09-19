@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -23,7 +24,7 @@ export function Footer() {
         </div>
         <div className="flex items-center gap-2">
             <Button variant="ghost" asChild><Link href="/">Home</Link></Button>
-            <Button variant="ghost" asChild><Link href="/editor">Editor</Link></Button>
+            <Button variant="ghost" asChild><Link href="/myoffice">My Office</Link></Button>
             <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
         </div>
       </div>

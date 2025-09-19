@@ -22,7 +22,7 @@ export default function ServicesEditorPage() {
 
   const saveChanges = () => {
     setSite(draft);
-    toast({ title: 'Changes saved!', description: 'Your services have been updated.' });
+    toast({ title: '¡Cambios guardados!', description: 'Tus servicios han sido actualizados.' });
   };
   
   const handleServiceTitleChange = (serviceId: string, newTitle: string) => {
@@ -51,7 +51,7 @@ export default function ServicesEditorPage() {
         ...prev,
         services: prev.services.map(s => {
             if(s.id === serviceId) {
-                return {...s, bullets: [...s.bullets, 'New feature']}
+                return {...s, bullets: [...s.bullets, 'Nueva característica']}
             }
             return s;
         })
@@ -74,8 +74,8 @@ export default function ServicesEditorPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-3xl font-bold font-headline">Services</h1>
-        <p className="text-muted-foreground">Manage the services you showcase on your homepage.</p>
+        <h1 className="text-3xl font-bold font-headline">Servicios</h1>
+        <p className="text-muted-foreground">Gestiona los servicios que muestras en tu página de inicio.</p>
       </header>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -102,7 +102,7 @@ export default function ServicesEditorPage() {
                 </div>
               ))}
               <Button variant="outline" size="sm" onClick={() => addBullet(service.id)}>
-                <PlusCircle className="mr-2 h-4 w-4"/> Add Bullet
+                <PlusCircle className="mr-2 h-4 w-4"/> Añadir Característica
               </Button>
             </CardContent>
           </Card>
@@ -110,7 +110,7 @@ export default function ServicesEditorPage() {
       </div>
       
        <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>Save Changes</Button>
+            <Button onClick={saveChanges}>Guardar Cambios</Button>
         </div>
     </div>
   );

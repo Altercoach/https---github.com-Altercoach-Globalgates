@@ -18,7 +18,7 @@ import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck } from 'l
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 
-export default function EditorLayout({
+export default function MyOfficeLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -27,10 +27,10 @@ export default function EditorLayout({
   const { site } = useSite();
 
   const menuItems = [
-    { href: '/editor/brand', label: 'Brand', icon: <Store /> },
-    { href: '/editor/services', label: 'Services', icon: <LayoutGrid /> },
-    { href: '/editor/products', label: 'Products', icon: <ShoppingBag /> },
-    { href: '/editor/integrations', label: 'Integrations', icon: <Puzzle /> },
+    { href: '/myoffice/brand', label: 'Marca', icon: <Store /> },
+    { href: '/myoffice/services', label: 'Servicios', icon: <LayoutGrid /> },
+    { href: '/myoffice/products', label: 'Productos', icon: <ShoppingBag /> },
+    { href: '/myoffice/integrations', label: 'Integraciones', icon: <Puzzle /> },
     { href: '/admin', label: 'Admin', icon: <ShieldCheck /> },
   ];
 
@@ -70,7 +70,7 @@ export default function EditorLayout({
         <header className="flex h-14 items-center justify-between border-b bg-background p-2">
           <SidebarTrigger />
           <Button asChild variant="outline">
-            <Link href="/">View Site</Link>
+            <Link href="/">Ver Sitio</Link>
           </Button>
         </header>
         <main className="flex-1 overflow-auto p-4 bg-muted/20">

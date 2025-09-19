@@ -56,7 +56,7 @@ export function Header() {
                 </Button>
                </>
             )}
-             <Button asChild variant="ghost"><Link href="/editor">Editor</Link></Button>
+             <Button asChild variant="ghost"><Link href="/myoffice">My Office</Link></Button>
           </nav>
           
           <div className="flex items-center">

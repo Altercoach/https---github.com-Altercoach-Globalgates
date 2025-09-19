@@ -4,15 +4,15 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function EditorRedirectPage() {
+export default function MyOfficeRedirectPage() {
   const router = useRouter();
   useEffect(() => {
-    router.replace('/editor/brand');
+    router.replace('/myoffice/brand');
   }, [router]);
 
   return (
      <div className="flex h-full w-full items-center justify-center">
-      <p>Loading Editor...</p>
+      <p>Cargando Oficina...</p>
     </div>
   );
 }
