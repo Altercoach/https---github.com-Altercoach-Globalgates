@@ -23,9 +23,9 @@ export function Footer() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-            <Button variant="ghost" asChild><Link href="/">Home</Link></Button>
-            <Button variant="ghost" asChild><Link href="/myoffice">My Office</Link></Button>
-            <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
+            <Button variant="ghost" asChild><Link href="/">Inicio</Link></Button>
+            <Button variant="ghost" asChild><Link href="/myoffice">Mi Oficina</Link></Button>
+            <Button variant="ghost" asChild><Link href="/login">Iniciar Sesión</Link></Button>
         </div>
       </div>
     </footer>

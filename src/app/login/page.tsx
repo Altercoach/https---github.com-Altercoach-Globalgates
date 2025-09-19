@@ -23,8 +23,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Access your client dashboard.</CardDescription>
+          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+          <CardDescription>Accede a tu panel de cliente.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -42,7 +42,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 name="password"
@@ -54,10 +54,10 @@ export default function LoginPage() {
               />
             </div>
             <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
-              Login
+              Iniciar Sesión
             </Button>
             <Button variant="outline" className="w-full" asChild>
-              <Link href="/">Back to Home</Link>
+              <Link href="/">Volver al Inicio</Link>
             </Button>
           </form>
         </CardContent>

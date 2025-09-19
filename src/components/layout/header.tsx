@@ -47,16 +47,16 @@ export function Header() {
               </Button>
             ))}
             {auth.loggedIn ? (
-              <Button asChild variant="ghost"><Link href="/dashboard">Dashboard</Link></Button>
+              <Button asChild variant="ghost"><Link href="/dashboard">Panel</Link></Button>
             ) : (
                <>
-                <Button asChild variant="ghost"><Link href="/login">Login</Link></Button>
+                <Button asChild variant="ghost"><Link href="/login">Iniciar Sesión</Link></Button>
                 <Button asChild variant="ghost" disabled={!hasPurchased}>
                   <Link href="/signup" aria-disabled={!hasPurchased} tabIndex={!hasPurchased ? -1 : undefined}>Crear Cuenta</Link>
                 </Button>
                </>
             )}
-             <Button asChild variant="ghost"><Link href="/myoffice">My Office</Link></Button>
+             <Button asChild variant="ghost"><Link href="/myoffice">Mi Oficina</Link></Button>
           </nav>
           
           <div className="flex items-center">
