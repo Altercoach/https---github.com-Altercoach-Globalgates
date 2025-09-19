@@ -30,26 +30,18 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MoreHorizontal, DollarSign, Users, ShoppingCart, Search, Filter, XCircle, PlayCircle, Trash2 } from 'lucide-react';
+import { MoreHorizontal, DollarSign, Users, ShoppingCart, Search, Filter, XCircle, PlayCircle, Trash2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
-
-type Customer = {
-  id: string;
-  name: string;
-  email: string;
-  plan: string;
-  status: 'Active' | 'Suspended' | 'Canceled';
-  signupDate: Date;
-  revenue: number;
-};
+import type { Customer } from '@/lib/types';
+import Link from 'next/link';
 
 const initialCustomers: Customer[] = [
   { id: 'cus_001', name: 'John Doe', email: 'john.doe@example.com', plan: 'Marketing de Contenido', status: 'Active', signupDate: new Date('2023-10-15'), revenue: 350 },
-  { id: 'cus_002', name: 'Jane Smith', email: 'jane.smith@example.com', plan: 'Setup Funnel', status: 'Active', signupDate: new Date('2023-11-01'), revenue: 300 },
+  { id: 'cus_002', name: 'Jane Smith', email: 'demo@cliente.com', plan: 'Setup Funnel + Contenido', status: 'Active', signupDate: new Date('2023-11-01'), revenue: 650 },
   { id: 'cus_003', name: 'Mike Johnson', email: 'mike.j@example.com', plan: 'Branding (8 pub)', status: 'Suspended', signupDate: new Date('2023-09-20'), revenue: 200 },
   { id: 'cus_004', name: 'Emily Brown', email: 'emily.b@example.com', plan: 'Marketing de Contenido', status: 'Active', signupDate: new Date('2023-12-05'), revenue: 350 },
   { id: 'cus_005', name: 'Chris Wilson', email: 'chris.w@example.com', plan: 'Agente de IA', status: 'Canceled', signupDate: new Date('2023-08-10'), revenue: 700 },
@@ -273,7 +265,11 @@ export default function AdminDashboardPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                           <DropdownMenuItem>Ver detalles</DropdownMenuItem>
+                           <DropdownMenuItem asChild>
+                            <Link href={`/myoffice/admin/${customer.id}`} className="flex items-center">
+                              <Eye className="mr-2"/>Ver detalles
+                            </Link>
+                           </DropdownMenuItem>
                            <DropdownMenuItem>Enviar mensaje</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

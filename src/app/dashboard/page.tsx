@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart, FileText, ShoppingBag, Edit } from 'lucide-react';
+import { LogOut, BarChart, FileText, ShoppingBag, Edit, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
@@ -32,6 +32,32 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const pendingActions = [
+    {
+        id: 'brief-marketing',
+        title: 'Brief de Marketing Profesional',
+        description: 'Completa este formulario para que podamos crear tu estrategia.',
+        href: '/questionnaire/brief-marketing',
+    },
+    {
+        id: 'eval-negocio',
+        title: 'Evaluación de Negocio (Doctor RX)',
+        description: 'Ayúdanos a entender tu negocio para un diagnóstico preciso.',
+        href: '/questionnaire/eval-001',
+    },
+    {
+        id: 'agent-training',
+        title: 'Entrenamiento de Agente de IA',
+        description: 'Proporciona la información para configurar tu asistente virtual.',
+        href: '/questionnaire/agent-training',
+    },
+     {
+        id: 'satisfaction-survey',
+        title: 'Encuesta de Satisfacción',
+        description: 'Tu opinión nos ayuda a mejorar nuestros servicios.',
+        href: '/questionnaire/satisfaction-survey',
+    },
+];
 
 export default function DashboardPage() {
   const { auth, logout } = useAuth();
@@ -91,19 +117,28 @@ export default function DashboardPage() {
                 <CardHeader>
                     <CardTitle>Acciones Pendientes</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
-                        <div>
-                            <h4 className="font-semibold">Brief de Marketing Profesional</h4>
-                            <p className="text-sm text-muted-foreground">Completa este formulario para que podamos crear tu estrategia.</p>
-                        </div>
-                        <Button asChild>
-                            <Link href="/questionnaire/brief-marketing">
-                                <Edit className="mr-2" />
-                                Completar Ahora
-                            </Link>
-                        </Button>
-                    </div>
+                <CardContent className="space-y-4">
+                    {pendingActions.map(action => (
+                      <div key={action.id} className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
+                          <div>
+                              <h4 className="font-semibold">{action.title}</h4>
+                              <p className="text-sm text-muted-foreground">{action.description}</p>
+                          </div>
+                          <Button asChild>
+                              <Link href={action.href}>
+                                  <Edit className="mr-2" />
+                                  Completar Ahora
+                              </Link>
+                          </Button>
+                      </div>
+                    ))}
+                     <div className="flex items-center justify-between p-4 border border-dashed rounded-lg">
+                          <div>
+                              <h4 className="font-semibold text-muted-foreground line-through">Onboarding Inicial</h4>
+                              <p className="text-sm text-muted-foreground">Has completado todos los pasos iniciales.</p>
+                          </div>
+                          <CheckCircle className="h-6 w-6 text-green-500" />
+                      </div>
                 </CardContent>
             </Card>
 

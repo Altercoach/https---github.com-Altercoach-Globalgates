@@ -56,9 +56,14 @@ export type CartItem = {
 
 export type AuthRole = 'admin' | 'customer';
 
+export type User = { 
+  email: string, 
+  role: AuthRole 
+}
+
 export type AuthState = {
   loggedIn: boolean;
-  user: { email: string, role: AuthRole } | null;
+  user: User | null;
 };
 
 export type Language = {
@@ -71,3 +76,14 @@ export type Currency = {
   name: string;
   rate: number; // Rate against USD
 };
+
+export type Customer = {
+  id: string;
+  name: string;
+  email: string;
+  plan: string;
+  status: 'Active' | 'Suspended' | 'Canceled';
+  signupDate: Date;
+  revenue: number;
+};
+

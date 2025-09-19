@@ -109,7 +109,7 @@ export default function MyOfficeLayout({
             </Button>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 bg-muted/20">
+        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-muted/20">
           {children}
         </main>
       </SidebarInset>
