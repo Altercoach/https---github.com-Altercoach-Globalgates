@@ -39,7 +39,7 @@ const initialIntegrations: Integration[] = [
     },
     { 
         id: 'aiagent', 
-        name: 'Agente de Chat IA', 
+        name: 'Agente de IA', 
         description: 'Automatiza la atención al cliente con un asistente virtual inteligente.',
         enabled: true, 
         apiKey: '********',

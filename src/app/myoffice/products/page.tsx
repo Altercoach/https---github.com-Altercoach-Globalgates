@@ -34,11 +34,19 @@ export default function ProductsEditorPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Ensure all products have a features array
+    // Ensure all products have a features array by merging with defaults
     const siteWithFeatures = JSON.parse(JSON.stringify(site));
     siteWithFeatures.products.forEach((p: Product) => {
       if (!p.features) {
         p.features = JSON.parse(JSON.stringify(defaultFeatures));
+      } else {
+        // Ensure all default features are present
+        const featureIds = p.features.map(f => f.id);
+        defaultFeatures.forEach(df => {
+          if (!featureIds.includes(df.id)) {
+            p.features!.push(JSON.parse(JSON.stringify(df)));
+          }
+        });
       }
     });
     setDraft(siteWithFeatures);

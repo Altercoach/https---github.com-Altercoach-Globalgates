@@ -52,7 +52,7 @@ const initialCustomers: Customer[] = [
   { id: 'cus_002', name: 'Jane Smith', email: 'jane.smith@example.com', plan: 'Setup Funnel', status: 'Active', signupDate: new Date('2023-11-01'), revenue: 300 },
   { id: 'cus_003', name: 'Mike Johnson', email: 'mike.j@example.com', plan: 'Branding (8 pub)', status: 'Suspended', signupDate: new Date('2023-09-20'), revenue: 200 },
   { id: 'cus_004', name: 'Emily Brown', email: 'emily.b@example.com', plan: 'Marketing de Contenido', status: 'Active', signupDate: new Date('2023-12-05'), revenue: 350 },
-  { id: 'cus_005', name: 'Chris Wilson', email: 'chris.w@example.com', plan: 'Bot Asistente con IA', status: 'Canceled', signupDate: new Date('2023-08-10'), revenue: 700 },
+  { id: 'cus_005', name: 'Chris Wilson', email: 'chris.w@example.com', plan: 'Agente de IA', status: 'Canceled', signupDate: new Date('2023-08-10'), revenue: 700 },
   { id: 'cus_006', name: 'Sara Miller', email: 'sara.m@example.com', plan: 'Branding (8 pub)', status: 'Active', signupDate: new Date('2024-01-02'), revenue: 200 },
 ];
 

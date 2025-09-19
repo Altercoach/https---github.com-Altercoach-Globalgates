@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -49,7 +50,7 @@ const questions = {
   'Sección 5: Estrategias de Publicidad y Generación de contactos': [
     '¿Utilizan alguna herramienta para captar clientes potenciales actualmente? (mencione)',
     '¿Está interesado en alguna forma específica para captar contactos para ventas?',
-    '¿Prefiere que los conatctos se gestionen de manera automática (chatbots) o manual?'
+    '¿Prefiere que los contactos se gestionen de manera automática (Agentes de IA) o manual?'
   ],
 
   'Sección 6: Contenidos y Mensajes Publicitarios': [
