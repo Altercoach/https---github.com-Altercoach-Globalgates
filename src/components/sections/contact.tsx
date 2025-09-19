@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -49,15 +50,15 @@ export function Contact() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-left block">Nombre</Label>
-                  <Input id="name" placeholder="Tu Nombre" required />
+                  <Input id="name" name="name" autoComplete="name" placeholder="Tu Nombre" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-left block">Email</Label>
-                  <Input id="email" type="email" placeholder="tu@email.com" required />
+                  <Input id="email" name="email" type="email" autoComplete="email" placeholder="tu@email.com" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="message" className="text-left block">Cuéntanos sobre tu proyecto</Label>
-                  <Textarea id="message" placeholder="Tu mensaje..." required />
+                  <Textarea id="message" name="message" placeholder="Tu mensaje..." required />
                 </div>
                 <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Enviar Mensaje</Button>
               </form>
