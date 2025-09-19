@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import type { CartItem, Product } from '@/lib/types';
 import { LS_KEYS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/hooks/use-language';
 
 const clampQty = (n: number) => Math.max(1, Math.min(99, Number.isFinite(n) ? Math.floor(n) : 1));
 
@@ -27,7 +26,6 @@ export const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const router = useRouter();
-  const { translatedSite } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -134,5 +132,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsCartOpen,
   }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen, removeFromCart, setQty]);
   
+  if (!isMounted) {
+    return null;
+  }
+
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
