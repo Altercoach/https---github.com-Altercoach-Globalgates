@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { KeyRound, LogOut, BarChart, FileText, ShoppingBag, TrendingUp } from 'lucide-react';
+import { LogOut, BarChart, FileText, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
@@ -121,7 +121,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><BarChart /> Analíticas de Leads</CardTitle>
                  <CardDescription>Rendimiento de los últimos 6 meses.</CardDescription>
-              </Header>
+              </CardHeader>
               <CardContent>
                  <ChartContainer config={chartConfig} className="h-[250px] w-full">
                     <RechartsBarChart accessibilityLayer data={chartData}>
