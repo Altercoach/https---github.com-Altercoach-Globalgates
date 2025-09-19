@@ -76,9 +76,9 @@ export function ProductCard({ product }: ProductCardProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
-          <DialogDescription>
+          <div className="!mt-2">
             <Badge variant="secondary" className="border-transparent bg-accent/20 text-accent">{product.badge}</Badge>
-          </DialogDescription>
+          </div>
         </DialogHeader>
         <div className="py-4">
           <p>{product.description}</p>
