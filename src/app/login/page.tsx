@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('demo@globalgate.agency');
+  const [email, setEmail] = useState('demo@cliente.com');
   const [password, setPassword] = useState('demo1234');
   const { login } = useAuth();
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="m@example.com"
+                placeholder="tu@email.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

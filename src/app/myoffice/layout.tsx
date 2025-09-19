@@ -11,10 +11,11 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 
@@ -63,6 +64,19 @@ export default function MyOfficeLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+             <SidebarSeparator />
+             <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.startsWith('/dashboard')}
+                  tooltip={{ children: 'Vista Cliente' }}
+                >
+                  <Link href="/dashboard">
+                    <User />
+                    <span>Vista Cliente</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
@@ -80,5 +94,3 @@ export default function MyOfficeLayout({
     </SidebarProvider>
   );
 }
-
-    

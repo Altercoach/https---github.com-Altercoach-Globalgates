@@ -17,12 +17,12 @@ import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
 
 const chartData = [
-  { month: "January", leads: 186 },
-  { month: "February", leads: 305 },
-  { month: "March", leads: 237 },
-  { month: "April", leads: 273 },
-  { month: "May", leads: 209 },
-  { month: "June", leads: 214 },
+  { month: "Enero", leads: 186 },
+  { month: "Febrero", leads: 305 },
+  { month: "Marzo", leads: 237 },
+  { month: "Abril", leads: 273 },
+  { month: "Mayo", leads: 209 },
+  { month: "Junio", leads: 214 },
 ];
 
 const chartConfig = {
@@ -62,7 +62,7 @@ export default function DashboardPage() {
       { id: 'INV001', date: new Date(), item: 'Setup Funnel + Content Marketing', amount: 650, status: 'Pagado'},
       { id: 'INV002', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), item: 'Content Marketing', amount: 350, status: 'Pagado'},
     ]
-  }, [hasPurchased])
+  }, [hasPurchased, currency])
 
   if (!auth.loggedIn) {
     return (
