@@ -31,7 +31,7 @@ export default function MyOfficeLayout({
     { href: '/myoffice/services', label: 'Servicios', icon: <LayoutGrid /> },
     { href: '/myoffice/products', label: 'Productos', icon: <ShoppingBag /> },
     { href: '/myoffice/integrations', label: 'Integraciones', icon: <Puzzle /> },
-    { href: '/admin', label: 'Admin', icon: <ShieldCheck /> },
+    { href: '/myoffice/admin', label: 'Admin', icon: <ShieldCheck /> },
   ];
 
   return (
@@ -80,3 +80,5 @@ export default function MyOfficeLayout({
     </SidebarProvider>
   );
 }
+
+    
