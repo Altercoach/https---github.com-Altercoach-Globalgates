@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -41,6 +41,7 @@ export default function MyOfficeLayout({
     { href: '/myoffice/brand', label: 'Marca', icon: <Store /> },
     { href: '/myoffice/services', label: 'Servicios', icon: <LayoutGrid /> },
     { href: '/myoffice/products', label: 'Productos', icon: <ShoppingBag /> },
+    { href: '/myoffice/questionnaires', label: 'Cuestionarios', icon: <FileText /> },
     { href: '/myoffice/integrations', label: 'Integraciones', icon: <Puzzle /> },
     { href: '/myoffice/admin', label: 'Admin', icon: <ShieldCheck /> },
   ];
