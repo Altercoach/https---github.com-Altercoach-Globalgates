@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { SiteData, Language } from '@/lib/types';
-import { DEFAULT_SITE, LANGUAGES, LS_KEYS } from '@/lib/constants';
+import { LANGUAGES, LS_KEYS } from '@/lib/constants';
 import { translateSiteContent } from '@/ai/flows/translate-site-content';
 import { useToast } from '@/hooks/use-toast';
 import { useSite } from '@/hooks/use-site';
@@ -48,11 +48,24 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
     setIsTranslating(true);
     try {
+      // Exclude the hero image from the translation payload to save tokens
+      const { heroImage, ...siteContentToTranslate } = currentSite.brand;
+      const payload = { ...currentSite, brand: siteContentToTranslate };
+
       const translatedJson = await translateSiteContent({
-        siteContent: JSON.stringify(currentSite),
+        siteContent: JSON.stringify(payload),
         targetLanguage: targetLanguage.code,
       });
-      setTranslatedSite(JSON.parse(translatedJson || '{}'));
+      
+      const translatedData = JSON.parse(translatedJson || '{}') as SiteData;
+
+      // Restore the hero image to the translated data
+      if (translatedData.brand) {
+        translatedData.brand.heroImage = currentSite.brand.heroImage;
+      }
+
+      setTranslatedSite(translatedData);
+
     } catch (error) {
       console.error('Translation failed:', error);
       toast({
