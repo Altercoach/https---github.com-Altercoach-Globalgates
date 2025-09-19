@@ -3,12 +3,12 @@
 
 import React, { createContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import type { AuthState } from '@/lib/types';
+import type { AuthState, AuthRole } from '@/lib/types';
 import { LS_KEYS } from '@/lib/constants';
 
 interface AuthContextType {
   auth: AuthState;
-  login: (email: string) => void;
+  login: (email: string, role: AuthRole) => void;
   logout: () => void;
 }
 
@@ -22,7 +22,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === 'undefined') return { loggedIn: false, user: null };
     try {
       const raw = localStorage.getItem(LS_KEYS.AUTH);
-      return raw ? JSON.parse(raw) : { loggedIn: false, user: null };
+      const parsed = raw ? JSON.parse(raw) : { loggedIn: false, user: null };
+      // Basic validation
+      if (parsed.user && parsed.user.role) {
+        return parsed;
+      }
+      return { loggedIn: false, user: null };
     } catch {
       return { loggedIn: false, user: null };
     }
@@ -38,9 +43,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [auth, isMounted]);
 
-  const login = (email: string) => {
-    setAuth({ loggedIn: true, user: { email } });
-    router.push('/dashboard');
+  const login = (email: string, role: AuthRole) => {
+    setAuth({ loggedIn: true, user: { email, role } });
+    if (role === 'admin') {
+      router.push('/myoffice');
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   const logout = () => {

@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Moon, Sun, ShoppingCart, KeyRound } from 'lucide-react';
+import { Moon, Sun, ShoppingCart, KeyRound, User, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useCart } from '@/hooks/use-cart';
@@ -16,7 +16,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { site } = useSite();
   const { translatedSite } = useLanguage();
-  const { setIsCartOpen, hasPurchased, cart } = useCart();
+  const { setIsCartOpen, cart } = useCart();
   const { auth } = useAuth();
   
   const navItems = [
@@ -47,16 +47,17 @@ export function Header() {
               </Button>
             ))}
             {auth.loggedIn ? (
-              <Button asChild variant="ghost"><Link href="/dashboard">Panel</Link></Button>
+              <>
+                {auth.user?.role === 'admin' && (
+                  <Button asChild variant="ghost"><Link href="/myoffice"><Shield/> Mi Oficina</Link></Button>
+                )}
+                {auth.user?.role === 'customer' && (
+                   <Button asChild variant="ghost"><Link href="/dashboard"><User/> Panel</Link></Button>
+                )}
+              </>
             ) : (
-               <>
-                <Button asChild variant="ghost"><Link href="/login">Iniciar Sesión</Link></Button>
-                <Button asChild variant="ghost" disabled={!hasPurchased}>
-                  <Link href="/signup" aria-disabled={!hasPurchased} tabIndex={!hasPurchased ? -1 : undefined}>Crear Cuenta</Link>
-                </Button>
-               </>
+               <Button asChild variant="ghost"><Link href="/login">Iniciar Sesión</Link></Button>
             )}
-             <Button asChild variant="ghost"><Link href="/myoffice">Mi Oficina</Link></Button>
           </nav>
           
           <div className="flex items-center">

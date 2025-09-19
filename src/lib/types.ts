@@ -46,9 +46,11 @@ export type CartItem = {
   qty: number;
 };
 
+export type AuthRole = 'admin' | 'customer';
+
 export type AuthState = {
   loggedIn: boolean;
-  user: { email: string } | null;
+  user: { email: string, role: AuthRole } | null;
 };
 
 export type Language = {

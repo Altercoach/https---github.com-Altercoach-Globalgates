@@ -35,20 +35,19 @@ const chartConfig = {
 
 export default function DashboardPage() {
   const { auth, logout } = useAuth();
-  const { cart, hasPurchased } = useCart();
+  const { hasPurchased } = useCart();
   const { currency } = useCurrency();
   const router = useRouter();
 
   useEffect(() => {
-    if (!auth.loggedIn) {
+    if (auth.user?.role !== 'customer') {
       router.push('/login');
     }
-  }, [auth.loggedIn, router]);
+  }, [auth, router]);
 
   const activeServices = useMemo(() => {
     if (!hasPurchased) return [];
-    // Simulating purchased items from the last cart checkout for demonstration
-    // In a real app, this would come from a database.
+    // Simulating purchased items for demonstration
     const purchasedItems = [
       { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', status: 'Activo' },
       { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', status: 'Completado' },
@@ -64,10 +63,10 @@ export default function DashboardPage() {
     ]
   }, [hasPurchased, currency])
 
-  if (!auth.loggedIn) {
+  if (auth.user?.role !== 'customer') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p>Redirigiendo al login...</p>
+        <p>Redirigiendo...</p>
       </div>
     );
   }
@@ -122,7 +121,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><BarChart /> Analíticas de Leads</CardTitle>
                  <CardDescription>Rendimiento de los últimos 6 meses.</CardDescription>
-              </CardHeader>
+              </Header>
               <CardContent>
                  <ChartContainer config={chartConfig} className="h-[250px] w-full">
                     <RechartsBarChart accessibilityLayer data={chartData}>

@@ -6,10 +6,12 @@ import { useSite } from '@/hooks/use-site';
 import { KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
+import { useAuth } from '@/hooks/use-auth';
 
 export function Footer() {
   const { site } = useSite();
   const { translatedSite } = useLanguage();
+  const { auth } = useAuth();
 
   const siteName = translatedSite?.brand?.name || site.brand.name;
 
@@ -24,8 +26,11 @@ export function Footer() {
         </div>
         <div className="flex items-center gap-2">
             <Button variant="ghost" asChild><Link href="/">Inicio</Link></Button>
-            <Button variant="ghost" asChild><Link href="/myoffice">Mi Oficina</Link></Button>
-            <Button variant="ghost" asChild><Link href="/login">Iniciar Sesión</Link></Button>
+            {auth.user?.role === 'admin' ? (
+               <Button variant="ghost" asChild><Link href="/myoffice">Mi Oficina</Link></Button>
+            ) : (
+               <Button variant="ghost" asChild><Link href="/login">Iniciar Sesión</Link></Button>
+            )}
         </div>
       </div>
     </footer>

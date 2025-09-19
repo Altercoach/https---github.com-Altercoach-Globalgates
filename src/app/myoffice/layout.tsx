@@ -14,10 +14,12 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function MyOfficeLayout({
   children,
@@ -25,7 +27,15 @@ export default function MyOfficeLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { site } = useSite();
+  const { auth, logout } = useAuth();
+
+  useEffect(() => {
+    if (auth.user?.role !== 'admin') {
+      router.push('/login');
+    }
+  }, [auth, router]);
 
   const menuItems = [
     { href: '/myoffice/brand', label: 'Marca', icon: <Store /> },
@@ -34,6 +44,14 @@ export default function MyOfficeLayout({
     { href: '/myoffice/integrations', label: 'Integraciones', icon: <Puzzle /> },
     { href: '/myoffice/admin', label: 'Admin', icon: <ShieldCheck /> },
   ];
+
+  if (auth.user?.role !== 'admin') {
+     return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <p>Redirigiendo...</p>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -83,9 +101,13 @@ export default function MyOfficeLayout({
       <SidebarInset>
         <header className="flex h-14 items-center justify-between border-b bg-background p-2">
           <SidebarTrigger />
-          <Button asChild variant="outline">
-            <Link href="/">Ver Sitio</Link>
-          </Button>
+           <div>
+            <span className="text-sm text-muted-foreground mr-4">Conectado como: {auth.user.email}</span>
+            <Button onClick={logout} variant="outline" size="sm">Cerrar Sesión</Button>
+            <Button asChild variant="outline" size="sm" className="ml-2">
+              <Link href="/">Ver Sitio</Link>
+            </Button>
+          </div>
         </header>
         <main className="flex-1 overflow-auto p-4 bg-muted/20">
           {children}
