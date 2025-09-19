@@ -9,9 +9,24 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { SiteData, Product } from '@/lib/types';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import type { SiteData, Product, ProductFeature } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, FileText } from 'lucide-react';
+
+const defaultFeatures: ProductFeature[] = [
+  { id: 'business-evaluation', name: 'Evaluación de Negocio (Doctor RX)', stage: 'onboarding', enabled: false },
+  { id: 'brief-marketing', name: 'Brief de Marketing Profesional', stage: 'onboarding', enabled: false },
+  { id: 'satisfaction-survey', name: 'Encuesta de Satisfacción', stage: 'campaign_end', enabled: false },
+];
+
+const stageOptions = [
+    { value: 'onboarding', label: 'Al contratar' },
+    { value: 'campaign_start', label: 'Al iniciar campaña' },
+    { value: 'campaign_end', label: 'Al finalizar campaña' },
+    { value: 'on_demand', label: 'Bajo demanda' },
+];
 
 export default function ProductsEditorPage() {
   const { site, setSite } = useSite();
@@ -19,7 +34,14 @@ export default function ProductsEditorPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    setDraft(JSON.parse(JSON.stringify(site)));
+    // Ensure all products have a features array
+    const siteWithFeatures = JSON.parse(JSON.stringify(site));
+    siteWithFeatures.products.forEach((p: Product) => {
+      if (!p.features) {
+        p.features = JSON.parse(JSON.stringify(defaultFeatures));
+      }
+    });
+    setDraft(siteWithFeatures);
   }, [site]);
 
   const saveChanges = () => {
@@ -34,6 +56,36 @@ export default function ProductsEditorPage() {
     }));
   };
 
+  const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
+    setDraft(prev => {
+        const newProducts = prev.products.map(p => {
+            if (p.id === productId && p.features) {
+                const newFeatures = p.features.map(f => 
+                    f.id === featureId ? { ...f, enabled } : f
+                );
+                return { ...p, features: newFeatures };
+            }
+            return p;
+        });
+        return { ...prev, products: newProducts };
+    });
+  };
+
+  const handleFeatureStageChange = (productId: string, featureId: string, stage: ProductFeature['stage']) => {
+     setDraft(prev => {
+        const newProducts = prev.products.map(p => {
+            if (p.id === productId && p.features) {
+                const newFeatures = p.features.map(f => 
+                    f.id === featureId ? { ...f, stage } : f
+                );
+                return { ...p, features: newFeatures };
+            }
+            return p;
+        });
+        return { ...prev, products: newProducts };
+    });
+  }
+
   const addNewProduct = () => {
     const newProduct: Product = {
         id: `prod_${Date.now()}`,
@@ -43,7 +95,8 @@ export default function ProductsEditorPage() {
         badge: 'Nuevo',
         note: 'Una breve descripción.',
         description: 'Descripción detallada del nuevo producto.',
-        interval: 'month'
+        interval: 'month',
+        features: JSON.parse(JSON.stringify(defaultFeatures))
     };
     setDraft(prev => ({...prev, products: [...prev.products, newProduct]}));
   };
@@ -94,6 +147,41 @@ export default function ProductsEditorPage() {
                     <div>
                       <Label>Descripción Completa</Label>
                       <Textarea value={product.description} onChange={e => handleProductUpdate(product.id, 'description', e.target.value)} rows={4} />
+                    </div>
+                    
+                    <Separator className="my-6" />
+
+                    <div>
+                        <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> Formularios Incluidos y Disparadores</h4>
+                        <div className="space-y-4">
+                            {(product.features || []).map(feature => (
+                                <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border p-4">
+                                    <Label htmlFor={`switch-${product.id}-${feature.id}`} className="font-normal flex flex-col">
+                                        {feature.name}
+                                        <span className="text-xs text-muted-foreground">ID: {feature.id}</span>
+                                    </Label>
+                                    <Switch
+                                        id={`switch-${product.id}-${feature.id}`}
+                                        checked={feature.enabled}
+                                        onCheckedChange={(checked) => handleFeatureToggle(product.id, feature.id, checked)}
+                                    />
+                                     <Select
+                                        value={feature.stage}
+                                        onValueChange={(value: ProductFeature['stage']) => handleFeatureStageChange(product.id, feature.id, value)}
+                                        disabled={!feature.enabled}
+                                    >
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue placeholder="Etapa de activación" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {stageOptions.map(opt => (
+                                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </CardContent>
             </Card>

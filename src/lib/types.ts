@@ -1,5 +1,12 @@
 
 
+export type ProductFeature = {
+  id: string; // e.g., 'brief-marketing', 'business-evaluation'
+  name: string;
+  stage: 'onboarding' | 'campaign_start' | 'campaign_end' | 'on_demand';
+  enabled: boolean;
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -9,6 +16,7 @@ export type Product = {
   note: string;
   description: string;
   interval?: 'month';
+  features?: ProductFeature[];
 };
 
 export type Service = {
