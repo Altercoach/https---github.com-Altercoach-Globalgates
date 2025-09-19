@@ -50,8 +50,8 @@ export default function DashboardPage() {
     // Simulating purchased items from the last cart checkout for demonstration
     // In a real app, this would come from a database.
     const purchasedItems = [
-      { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', status: 'Active' },
-      { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', status: 'Completed' },
+      { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', status: 'Activo' },
+      { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', status: 'Completado' },
     ];
     return purchasedItems;
   }, [hasPurchased]);
@@ -59,8 +59,8 @@ export default function DashboardPage() {
   const billingHistory = useMemo(() => {
     if(!hasPurchased) return [];
     return [
-      { id: 'INV001', date: new Date(), item: 'Setup Funnel + Content Marketing', amount: 650, status: 'Paid'},
-      { id: 'INV002', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), item: 'Content Marketing', amount: 350, status: 'Paid'},
+      { id: 'INV001', date: new Date(), item: 'Setup Funnel + Content Marketing', amount: 650, status: 'Pagado'},
+      { id: 'INV002', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), item: 'Content Marketing', amount: 350, status: 'Pagado'},
     ]
   }, [hasPurchased])
 

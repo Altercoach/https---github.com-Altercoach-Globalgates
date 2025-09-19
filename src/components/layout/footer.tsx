@@ -19,7 +19,7 @@ export function Footer() {
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <KeyRound className="h-6 w-6 text-accent" />
           <p className="text-center text-sm leading-loose md:text-left">
-            © {new Date().getFullYear()} {siteName}. All rights reserved.
+            © {new Date().getFullYear()} {siteName}. Todos los derechos reservados.
           </p>
         </div>
         <div className="flex items-center gap-2">
