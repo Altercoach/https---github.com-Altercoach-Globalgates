@@ -1,12 +1,13 @@
 
 'use client';
 
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Bot } from 'lucide-react';
+import { CheckCircle, Bot, Upload, Paperclip, X } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -29,15 +30,59 @@ const YesNoQuestion = ({ label, descriptionLabel }: { label: string; description
     <div className="space-y-2">
         <div className="flex items-center space-x-2">
             <Checkbox id={label.replace(/\s/g, '')} />
-            <Label htmlFor={label.replace(/\s/g, '')}>{label}</Label>
+            <Label htmlFor={label.replace(/\s/g, '')} className="font-normal">{label}</Label>
         </div>
         <Question label={descriptionLabel}><Textarea /></Question>
     </div>
 )
 
+const FileUpload = ({ label, files, onFileChange, onFileRemove }: { label: string; files: File[], onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void, onFileRemove: (fileName: string) => void }) => (
+    <div className="space-y-2">
+        <Label>{label}</Label>
+        <div className="flex items-center justify-center w-full">
+            <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Haz clic para subir</span> o arrastra y suelta</p>
+                    <p className="text-xs text-muted-foreground">PDF, XLS, DOC, TXT (MAX. 5MB)</p>
+                </div>
+                <Input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} multiple />
+            </label>
+        </div>
+        {files.length > 0 && (
+            <div className="pt-2 space-y-2">
+                {files.map(file => (
+                    <div key={file.name} className="flex items-center justify-between bg-muted/50 p-2 rounded-md text-sm">
+                        <div className='flex items-center gap-2'>
+                           <Paperclip className="h-4 w-4"/>
+                           <span className="font-medium">{file.name}</span> 
+                           <span className="text-muted-foreground text-xs">({(file.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onFileRemove(file.name)}>
+                            <X className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+)
 
 export default function AgentTrainingPage() {
   const { toast } = useToast();
+  const [files, setFiles] = useState<File[]>([]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const newFiles = Array.from(event.target.files);
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
+  const handleFileRemove = (fileName: string) => {
+    setFiles(prev => prev.filter(f => f.name !== fileName));
+  };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +252,21 @@ export default function AgentTrainingPage() {
                  <YesNoQuestion label="Benchmarking interno con historial de leads, ventas y citas:" descriptionLabel="¿Qué datos históricos usar?"/>
                  <YesNoQuestion label="Recomendaciones estratégicas para mejorar ventas y atención:" descriptionLabel="¿Basadas en qué análisis?"/>
              </Section>
+
+            <Section title="Sección 14: Entrenamiento Específico y Base de Conocimiento">
+                <Question label="URLs de referencia (página de precios, FAQ, sobre nosotros, etc.):">
+                    <Textarea placeholder="https://ejemplo.com/precios&#10;https://ejemplo.com/faq" />
+                </Question>
+                <FileUpload 
+                    label="Archivos de conocimiento (PDF con políticas, XLS con inventario, etc.)"
+                    files={files}
+                    onFileChange={handleFileChange}
+                    onFileRemove={handleFileRemove}
+                />
+                <Question label="Información adicional clave (horarios, detalles de productos, etc.):">
+                    <Textarea placeholder="Nuestro horario es de 9am a 6pm. El producto 'X' está hecho de material reciclado." />
+                </Question>
+            </Section>
 
             <CardFooter className="px-0 pt-8">
               <Button type="submit" className="w-full" size="lg">Enviar Información de Entrenamiento</Button>

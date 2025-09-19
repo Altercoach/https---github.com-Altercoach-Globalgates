@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -66,7 +67,7 @@ export default function AdminDashboardPage() {
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
       const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || customer.status === statusFilter;
+      const matchesStatus = statusFilter === 'all' || customer.status.toLowerCase() === statusFilter;
       const matchesPlan = planFilter === 'all' || customer.plan === planFilter;
       return matchesSearch && matchesStatus && matchesPlan;
     });
@@ -180,9 +181,9 @@ export default function AdminDashboardPage() {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">Todos los estados</SelectItem>
-                    <SelectItem value="Active">Activo</SelectItem>
-                    <SelectItem value="Suspended">Suspendido</SelectItem>
-                    <SelectItem value="Canceled">Cancelado</SelectItem>
+                    <SelectItem value="active">Activo</SelectItem>
+                    <SelectItem value="suspended">Suspendido</SelectItem>
+                    <SelectItem value="canceled">Cancelado</SelectItem>
                 </SelectContent>
             </Select>
             <Select value={planFilter} onValueChange={setPlanFilter}>
@@ -220,7 +221,7 @@ export default function AdminDashboardPage() {
                 <TableHead className="w-[40px]">
                    <Checkbox
                     checked={selectedCustomerIds.length === filteredCustomers.length && filteredCustomers.length > 0}
-                    onCheckedChange={handleSelectAll}
+                    onCheckedChange={(checked) => handleSelectAll(!!checked)}
                     aria-label="Seleccionar todo"
                   />
                 </TableHead>
@@ -266,7 +267,7 @@ export default function AdminDashboardPage() {
                         <DropdownMenuContent align="end">
                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                            <DropdownMenuItem asChild>
-                            <Link href={`/myoffice/admin/${customer.id}`} className="flex items-center">
+                            <Link href={`/myoffice/admin/${customer.id}`} className="flex items-center cursor-pointer">
                               <Eye className="mr-2"/>Ver detalles
                             </Link>
                            </DropdownMenuItem>

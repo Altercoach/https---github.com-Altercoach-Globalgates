@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, FileText, Upload } from 'lucide-react';
+import { CheckCircle, FileText, Upload, Paperclip, X } from 'lucide-react';
 import Link from 'next/link';
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -25,13 +25,35 @@ const Question = ({ label, children }: { label: string; children: React.ReactNod
   </div>
 );
 
-const FileUpload = ({ label }: { label: string }) => (
-    <div className="flex items-center justify-between rounded-lg border p-3">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <Button variant="outline" size="sm" onClick={() => alert('File upload functionality to be implemented.')}>
-            <Upload className="mr-2 h-4 w-4" />
-            Subir Archivo
-        </Button>
+const FileUpload = ({ label, files, onFileChange, onFileRemove }: { label: string; files: File[], onFileChange: (event: React.ChangeEvent<HTMLInputElement>, field: string) => void, onFileRemove: (fileName: string, field: string) => void, field: string }) => (
+    <div className="space-y-2">
+        <Label>{label}</Label>
+        <div className="flex items-center justify-center w-full">
+            <label htmlFor={`dropzone-${label}`} className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
+                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Haz clic para subir</span></p>
+                    <p className="text-xs text-muted-foreground">PDF, JPG, PNG, etc.</p>
+                </div>
+                <Input id={`dropzone-${label}`} type="file" className="hidden" onChange={(e) => onFileChange(e, label)} />
+            </label>
+        </div>
+         {files.length > 0 && (
+            <div className="pt-2 space-y-2">
+                {files.map(file => (
+                    <div key={file.name} className="flex items-center justify-between bg-muted/50 p-2 rounded-md text-sm">
+                        <div className='flex items-center gap-2'>
+                           <Paperclip className="h-4 w-4"/>
+                           <span className="font-medium">{file.name}</span> 
+                           <span className="text-muted-foreground text-xs">({(file.size / 1024).toFixed(1)} KB)</span>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onFileRemove(file.name, label)}>
+                            <X className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                ))}
+            </div>
+        )}
     </div>
 )
 
@@ -39,6 +61,25 @@ export default function BriefMarketingPage() {
   const { toast } = useToast();
   const [showEcommerce, setShowEcommerce] = useState(false);
   const [showOffline, setShowOffline] = useState(false);
+
+  const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File[]}>({});
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    if (event.target.files) {
+      const newFile = event.target.files[0];
+      setUploadedFiles(prev => ({
+        ...prev,
+        [field]: [newFile]
+      }));
+    }
+  };
+
+  const handleFileRemove = (fileName: string, field: string) => {
+    setUploadedFiles(prev => ({
+      ...prev,
+      [field]: prev[field]?.filter(f => f.name !== fileName) || []
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +123,7 @@ export default function BriefMarketingPage() {
             <Section title="B. Datos comerciales y operativos">
                 <Question label="Giro o industria principal"><Input /></Question>
                 <div className="flex items-center space-x-2">
-                    <Checkbox id="has-locals" onCheckedChange={(checked) => setShowEcommerce(!!checked)} />
+                    <Checkbox id="has-locals" onCheckedChange={(checked) => setShowOffline(!!checked)} />
                     <label htmlFor="has-locals" className="text-sm font-medium">¿El negocio tiene local(es) y/o sucursales?</label>
                 </div>
                 <Question label="Ciudades / regiones / países donde opera"><Input /></Question>
@@ -108,16 +149,40 @@ export default function BriefMarketingPage() {
             </Section>
 
             <Section title="D. Marca e identidad (branding)">
-                <FileUpload label="¿La empresa cuenta con manual de identidad / brandbook?" />
+                <FileUpload 
+                  label="¿La empresa cuenta con manual de identidad / brandbook?" 
+                  field="brandbook" 
+                  files={uploadedFiles['brandbook'] || []} 
+                  onFileChange={handleFileChange} 
+                  onFileRemove={handleFileRemove} 
+                />
                 <Question label="Nombre de la tipografía corporativa"><Input /></Question>
                 <Question label="Colores corporativos (HEX / Pantone)"><Input /></Question>
-                <FileUpload label="Logotipo (subir versiones: color, blanco y negro, SVG/AI/EPS)" />
+                <FileUpload 
+                  label="Logotipo (subir versiones: color, blanco y negro, SVG/AI/EPS)" 
+                  field="logo"
+                  files={uploadedFiles['logo'] || []} 
+                  onFileChange={handleFileChange} 
+                  onFileRemove={handleFileRemove} 
+                />
                 <Question label="¿Qué elementos visuales deben evitarse?"><Textarea /></Question>
                 <Question label="¿Cómo describirías la personalidad de la marca? (ej. formal, cercana, técnica, divertida)"><Input /></Question>
                 <Question label="Tono de comunicación (voz de marca): (ej. experto, cercano, inspirador, humorístico)"><Input /></Question>
                 <Question label="Ejemplos de marcas o referencias gráficas que te gustan (links y breve explicación)"><Textarea /></Question>
-                <FileUpload label="¿Cuenta con fotografías reales de producto o servicio?" />
-                <FileUpload label="¿Disponen de videos corporativos o promocionales?" />
+                <FileUpload 
+                  label="¿Cuenta con fotografías reales de producto o servicio?" 
+                  field="photos"
+                  files={uploadedFiles['photos'] || []} 
+                  onFileChange={handleFileChange} 
+                  onFileRemove={handleFileRemove} 
+                />
+                <FileUpload 
+                  label="¿Disponen de videos corporativos o promocionales?" 
+                  field="videos"
+                  files={uploadedFiles['videos'] || []} 
+                  onFileChange={handleFileChange} 
+                  onFileRemove={handleFileRemove} 
+                />
             </Section>
             
             {/* Secciones E a Q se omiten por brevedad en este ejemplo, pero se añadirían siguiendo el mismo patrón */}
