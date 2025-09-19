@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -65,6 +65,11 @@ export default function AdminDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
@@ -118,6 +123,10 @@ export default function AdminDashboardPage() {
   }), [customers]);
   
   const uniquePlans = ['all', ...Array.from(new Set(initialCustomers.map(c => c.plan)))];
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -285,3 +294,5 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
+
+    
