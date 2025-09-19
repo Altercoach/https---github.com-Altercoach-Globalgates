@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Bot, Download } from 'lucide-react';
 import Link from 'next/link';
+import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
+import { useState, useEffect } from 'react';
 
 // Datos de ejemplo para las respuestas. En el futuro, esto vendrá de la base de datos.
 const sampleAnswers = {
@@ -17,28 +19,51 @@ const sampleAnswers = {
   }
 };
 
-const sampleAnalysis = `
-**Análisis FODA (Fortalezas, Oportunidades, Debilidades, Amenazas)**
-
-*   **Fortalezas:** Producto estrella bien definido (cold brew, pastel de zanahoria) que puede ser un gran gancho de marketing. Oferta de productos artesanales que apela a un público que valora la calidad.
-*   **Oportunidades:** Posicionar la marca en la zona centro, donde puede haber alta afluencia de oficinistas y residentes con poder adquisitivo. El café de especialidad es un mercado en crecimiento.
-*   **Debilidades:** (Requiere más información) No se menciona la presencia online actual ni la capacidad de producción para un aumento del 20% en ventas.
-*   **Amenazas:** (Requiere más información) Competencia en la zona centro, sensibilidad al precio por parte de los consumidores.
-
-**Recomendaciones Estratégicas Iniciales:**
-
-1.  **Estrategia de Contenido:** Enfocar las redes sociales en la calidad artesanal de los productos. Mostrar el proceso de preparación del "cold brew", destacar los ingredientes del pastel de zanahoria, etc. Crear contenido visualmente atractivo que genere antojo.
+const sampleAnalysis: AnalyzeBusinessEvaluationOutput = {
+  swot: {
+    strengths: 'Producto estrella bien definido (cold brew, pastel de zanahoria) que puede ser un gran gancho de marketing. Oferta de productos artesanales que apela a un público que valora la calidad.',
+    weaknesses: '(Requiere más información) No se menciona la presencia online actual ni la capacidad de producción para un aumento del 20% en ventas.',
+    opportunities: 'Posicionar la marca en la zona centro, donde puede haber alta afluencia de oficinistas y residentes con poder adquisitivo. El café de especialidad es un mercado en crecimiento.',
+    threats: '(Requiere más información) Competencia en la zona centro, sensibilidad al precio por parte de los consumidores.'
+  },
+  recommendations: `1.  **Estrategia de Contenido:** Enfocar las redes sociales en la calidad artesanal de los productos. Mostrar el proceso de preparación del "cold brew", destacar los ingredientes del pastel de zanahoria, etc. Crear contenido visualmente atractivo que genere antojo.
 2.  **Campaña de Posicionamiento Local (Branding):** Lanzar anuncios geolocalizados en Facebook e Instagram dirigidos a personas que viven o trabajan en la zona centro. Ofrecer una promoción de lanzamiento (ej. 2x1 en cold brew) para atraer a los primeros clientes.
 3.  **Captura de Leads:** Implementar un Funnel sencillo. Ofrecer un pequeño descuento (10% en la primera compra) a cambio del correo electrónico del cliente en la landing page para construir una base de datos y fomentar la fidelización.
 
 **Plan Sugerido:**
 *   **Setup Funnel (Pago Único):** Para capturar los datos de los clientes interesados en la promoción.
 *   **Marketing de Contenido (Suscripción):** Para construir la marca y mantener el interés en redes sociales.
-*   **Branding (8 pubs/mes) (Suscripción):** Para ejecutar las campañas de posicionamiento local.
-`;
+*   **Branding (8 pubs/mes) (Suscripción):** Para ejecutar las campañas de posicionamiento local.`
+};
+
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
   const isCompleted = params.id === 'brief-001';
+  const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(sampleAnalysis); // Placeholder
+  const [isLoading, setIsLoading] = useState(false);
+
+  /*
+  // Descomentar cuando la entrada de datos esté conectada
+  useEffect(() => {
+    if (isCompleted) {
+      const getAnalysis = async () => {
+        setIsLoading(true);
+        try {
+          // En el futuro, las 'sampleAnswers' vendrían de la base de datos
+          const result = await analyzeBusinessEvaluation({ answersJson: JSON.stringify(sampleAnswers) });
+          setAnalysis(result);
+        } catch (error) {
+          console.error("Analysis failed", error);
+          // Manejar el error en la UI
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      getAnalysis();
+    }
+  }, [isCompleted]);
+  */
+
 
   return (
     <div className="space-y-6">
@@ -83,17 +108,25 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
             <CardTitle className="flex items-center gap-2"><Bot /> Análisis y Recomendación de IA</CardTitle>
           </CardHeader>
           <CardContent>
-            {isCompleted ? (
+            {isLoading ? (
+              <p className="text-center py-8 text-muted-foreground">La IA está analizando las respuestas...</p>
+            ) : analysis ? (
               <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground">
-                <pre className="whitespace-pre-wrap font-sans bg-transparent p-0">{sampleAnalysis}</pre>
+                <h4>Análisis FODA</h4>
+                <p><strong>Fortalezas:</strong> {analysis.swot.strengths}</p>
+                <p><strong>Oportunidades:</strong> {analysis.swot.opportunities}</p>
+                <p><strong>Debilidades:</strong> {analysis.swot.weaknesses}</p>
+                <p><strong>Amenazas:</strong> {analysis.swot.threats}</p>
+                <h4>Recomendaciones Estratégicas</h4>
+                <pre className="whitespace-pre-wrap font-sans bg-transparent p-0">{analysis.recommendations}</pre>
               </div>
             ) : (
                <div className="text-center py-8 text-muted-foreground">
-                 <p>El análisis se generará automáticamente una vez que el cliente envíe sus respuestas.</p>
+                 <p>{isCompleted ? 'No se pudo generar el análisis.' : 'El análisis se generará automáticamente una vez que el cliente envíe sus respuestas.'}</p>
                </div>
             )}
           </CardContent>
-           {isCompleted && (
+           {isCompleted && analysis && (
             <CardFooter>
                 <Button variant="secondary" className="w-full">
                     <Download className="mr-2" />
