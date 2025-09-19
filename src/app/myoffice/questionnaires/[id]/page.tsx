@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -30,6 +29,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     if (isCompleted) {
       const getAnalysis = async () => {
         setIsLoading(true);
+        setAnalysis(null);
         try {
           // Usamos las respuestas de ejemplo para llamar al flujo de IA real
           const result = await analyzeBusinessEvaluation({ answersJson: JSON.stringify(sampleAnswers) });
@@ -106,9 +106,10 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
                 </div>
                 <h4 className="mt-4">Recomendaciones Estratégicas</h4>
                 <div 
-                    className="whitespace-pre-wrap font-sans bg-transparent p-0" 
-                    dangerouslySetInnerHTML={{ __html: analysis.recommendations.replace(/(\d\.)/g, '<br/>$1') }}
+                  className="whitespace-pre-wrap font-sans text-sm" 
+                  dangerouslySetInnerHTML={{ __html: analysis.recommendations.replace(/\* /g, '• ').replace(/\n/g, '<br />') }}
                 />
+
               </div>
             ) : (
                <div className="text-center py-8 text-muted-foreground">
@@ -130,5 +131,3 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     </div>
   );
 }
-
-    
