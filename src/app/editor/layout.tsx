@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 
@@ -31,6 +31,7 @@ export default function EditorLayout({
     { href: '/editor/services', label: 'Services', icon: <LayoutGrid /> },
     { href: '/editor/products', label: 'Products', icon: <ShoppingBag /> },
     { href: '/editor/integrations', label: 'Integrations', icon: <Puzzle /> },
+    { href: '/admin', label: 'Admin', icon: <ShieldCheck /> },
   ];
 
   return (
@@ -52,7 +53,7 @@ export default function EditorLayout({
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === item.href}
+                  isActive={pathname.startsWith(item.href)}
                   tooltip={{ children: item.label }}
                 >
                   <Link href={item.href}>
@@ -72,7 +73,9 @@ export default function EditorLayout({
             <Link href="/">View Site</Link>
           </Button>
         </header>
-        <main className="flex-1 overflow-auto p-4">{children}</main>
+        <main className="flex-1 overflow-auto p-4 bg-muted/20">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
