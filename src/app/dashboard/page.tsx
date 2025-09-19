@@ -94,11 +94,11 @@ export default function DashboardPage() {
                 <CardContent>
                     <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
                         <div>
-                            <h4 className="font-semibold">Evaluación de Negocio</h4>
+                            <h4 className="font-semibold">Brief de Marketing Profesional</h4>
                             <p className="text-sm text-muted-foreground">Completa este formulario para que podamos crear tu estrategia.</p>
                         </div>
                         <Button asChild>
-                            <Link href="/questionnaire/eval-cliente-demo">
+                            <Link href="/questionnaire/brief-marketing">
                                 <Edit className="mr-2" />
                                 Completar Ahora
                             </Link>

@@ -6,6 +6,7 @@ import { ArrowLeft, Bot, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/hooks/use-language';
 
 // Datos de ejemplo para las respuestas. En el futuro, esto vendrá de la base de datos.
 const sampleAnswers = {
@@ -23,6 +24,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
   const isCompleted = params.id === 'brief-001';
   const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { language } = useLanguage();
 
   
   useEffect(() => {
@@ -32,7 +34,10 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
         setAnalysis(null);
         try {
           // Usamos las respuestas de ejemplo para llamar al flujo de IA real
-          const result = await analyzeBusinessEvaluation({ answersJson: JSON.stringify(sampleAnswers) });
+          const result = await analyzeBusinessEvaluation({ 
+            answersJson: JSON.stringify(sampleAnswers),
+            targetLanguage: language.code,
+          });
           setAnalysis(result);
         } catch (error) {
           console.error("Analysis failed", error);
@@ -43,7 +48,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
       };
       getAnalysis();
     }
-  }, [isCompleted]);
+  }, [isCompleted, language]);
   
 
 

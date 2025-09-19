@@ -13,6 +13,7 @@ import { z } from 'genkit';
 
 const AnalyzeBusinessEvaluationInputSchema = z.object({
   answersJson: z.string().describe('The JSON string representing the questionnaire answers.'),
+  targetLanguage: z.string().describe('The target language for the analysis (e.g., es, en).'),
 });
 export type AnalyzeBusinessEvaluationInput = z.infer<typeof AnalyzeBusinessEvaluationInputSchema>;
 
@@ -36,7 +37,7 @@ const prompt = ai.definePrompt({
   name: 'analyzeBusinessEvaluationPrompt',
   input: { schema: AnalyzeBusinessEvaluationInputSchema },
   output: { schema: AnalyzeBusinessEvaluationOutputSchema },
-  prompt: `You are an expert business consultant and marketing strategist named "Business Doctor RX". Your task is to analyze a client's answers from a business evaluation questionnaire and provide a comprehensive, insightful analysis.
+  prompt: `You are an expert business consultant and marketing strategist named "Business Doctor RX". Your task is to analyze a client's answers from a business evaluation questionnaire and provide a comprehensive, insightful analysis in the specified language.
 
   **Client's Answers (JSON format):**
   {{{answersJson}}}
@@ -58,7 +59,9 @@ const prompt = ai.definePrompt({
 
   4.  **Tone and Style:** Your tone should be professional, encouraging, and expert. You are "Business Doctor RX", providing a diagnosis and a prescription for growth.
 
-  5.  **Output Format:** Ensure your entire response is in the requested JSON format, with separate fields for the SWOT analysis and the recommendations.`,
+  5.  **Language**: The entire output, including headings and all analysis text, MUST be in the target language: **{{{targetLanguage}}}**.
+
+  6.  **Output Format:** Ensure your entire response is in the requested JSON format, with separate fields for the SWOT analysis and the recommendations.`,
   safetySettings: [
     {
       category: 'HARM_CATEGORY_HATE_SPEECH',

@@ -21,9 +21,9 @@ const sampleQuestionnaires = [
     date: new Date('2024-05-10'),
   },
   {
-    id: 'brief-002',
+    id: 'brief-marketing-002',
     clientEmail: 'cliente.b@example.com',
-    type: 'Evaluación de Negocio',
+    type: 'Brief de Marketing Profesional',
     status: 'Pendiente',
     date: new Date('2024-05-15'),
   },
@@ -49,7 +49,7 @@ export default function QuestionnairesPage() {
         <FileText className="h-4 w-4" />
         <AlertTitle>Gestión de Plantillas</AlertTitle>
         <AlertDescription>
-          Actualmente, solo está disponible la plantilla "Evaluación de Negocio". En el futuro, desde aquí podrás crear y gestionar tus propias plantillas de formularios.
+          Actualmente, puedes asignar la "Evaluación de Negocio" o el "Brief de Marketing". En el futuro, desde aquí podrás crear y gestionar tus propias plantillas de formularios.
         </AlertDescription>
       </Alert>
 
@@ -97,5 +97,3 @@ export default function QuestionnairesPage() {
     </div>
   );
 }
-
-    
