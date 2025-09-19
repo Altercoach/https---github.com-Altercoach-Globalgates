@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { PlusCircle, FileText, CheckCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Datos de ejemplo
 const sampleQuestionnaires = [
@@ -42,6 +44,14 @@ export default function QuestionnairesPage() {
           </Link>
         </Button>
       </header>
+
+      <Alert>
+        <FileText className="h-4 w-4" />
+        <AlertTitle>Gestión de Plantillas</AlertTitle>
+        <AlertDescription>
+          Actualmente, solo está disponible la plantilla "Evaluación de Negocio". En el futuro, desde aquí podrás crear y gestionar tus propias plantillas de formularios.
+        </AlertDescription>
+      </Alert>
 
       <Card>
         <CardHeader>
@@ -87,3 +97,5 @@ export default function QuestionnairesPage() {
     </div>
   );
 }
+
+    

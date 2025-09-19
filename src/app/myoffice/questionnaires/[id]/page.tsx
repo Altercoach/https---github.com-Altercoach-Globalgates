@@ -1,8 +1,9 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ArrowLeft, Bot, Download } from 'lucide-react';
+import { ArrowLeft, Bot, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { useState, useEffect } from 'react';
@@ -18,37 +19,19 @@ const sampleAnswers = {
   }
 };
 
-const sampleAnalysis: AnalyzeBusinessEvaluationOutput = {
-  swot: {
-    strengths: 'Producto estrella bien definido (cold brew, pastel de zanahoria) que puede ser un gran gancho de marketing. Oferta de productos artesanales que apela a un público que valora la calidad.',
-    weaknesses: '(Requiere más información) No se menciona la presencia online actual ni la capacidad de producción para un aumento del 20% en ventas.',
-    opportunities: 'Posicionar la marca en la zona centro, donde puede haber alta afluencia de oficinistas y residentes con poder adquisitivo. El café de especialidad es un mercado en crecimiento.',
-    threats: '(Requiere más información) Competencia en la zona centro, sensibilidad al precio por parte de los consumidores.'
-  },
-  recommendations: `1.  **Estrategia de Contenido:** Enfocar las redes sociales en la calidad artesanal de los productos. Mostrar el proceso de preparación del "cold brew", destacar los ingredientes del pastel de zanahoria, etc. Crear contenido visualmente atractivo que genere antojo.
-2.  **Campaña de Posicionamiento Local (Branding):** Lanzar anuncios geolocalizados en Facebook e Instagram dirigidos a personas que viven o trabajan en la zona centro. Ofrecer una promoción de lanzamiento (ej. 2x1 en cold brew) para atraer a los primeros clientes.
-3.  **Captura de Leads:** Implementar un Funnel sencillo. Ofrecer un pequeño descuento (10% en la primera compra) a cambio del correo electrónico del cliente en la landing page para construir una base de datos y fomentar la fidelización.
-
-**Plan Sugerido:**
-*   **Setup Funnel (Pago Único):** Para capturar los datos de los clientes interesados en la promoción.
-*   **Marketing de Contenido (Suscripción):** Para construir la marca y mantener el interés en redes sociales.
-*   **Branding (8 pubs/mes) (Suscripción):** Para ejecutar las campañas de posicionamiento local.`
-};
-
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
   const isCompleted = params.id === 'brief-001';
-  const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(sampleAnalysis); // Placeholder
+  const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  /*
-  // Descomentar cuando la entrada de datos esté conectada
+  
   useEffect(() => {
     if (isCompleted) {
       const getAnalysis = async () => {
         setIsLoading(true);
         try {
-          // En el futuro, las 'sampleAnswers' vendrían de la base de datos
+          // Usamos las respuestas de ejemplo para llamar al flujo de IA real
           const result = await analyzeBusinessEvaluation({ answersJson: JSON.stringify(sampleAnswers) });
           setAnalysis(result);
         } catch (error) {
@@ -61,7 +44,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
       getAnalysis();
     }
   }, [isCompleted]);
-  */
+  
 
 
   return (
@@ -108,16 +91,24 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p className="text-center py-8 text-muted-foreground">La IA está analizando las respuestas...</p>
+              <div className="flex flex-col items-center justify-center text-center py-8 text-muted-foreground">
+                <Loader2 className="h-8 w-8 animate-spin mb-4" />
+                <p>La IA está analizando las respuestas...</p>
+              </div>
             ) : analysis ? (
               <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground">
                 <h4>Análisis FODA</h4>
-                <p><strong>Fortalezas:</strong> {analysis.swot.strengths}</p>
-                <p><strong>Oportunidades:</strong> {analysis.swot.opportunities}</p>
-                <p><strong>Debilidades:</strong> {analysis.swot.weaknesses}</p>
-                <p><strong>Amenazas:</strong> {analysis.swot.threats}</p>
-                <h4>Recomendaciones Estratégicas</h4>
-                <pre className="whitespace-pre-wrap font-sans bg-transparent p-0">{analysis.recommendations}</pre>
+                <div className="grid grid-cols-2 gap-x-4">
+                  <p><strong>Fortalezas:</strong> {analysis.swot.strengths}</p>
+                  <p><strong>Oportunidades:</strong> {analysis.swot.opportunities}</p>
+                  <p><strong>Debilidades:</strong> {analysis.swot.weaknesses}</p>
+                  <p><strong>Amenazas:</strong> {analysis.swot.threats}</p>
+                </div>
+                <h4 className="mt-4">Recomendaciones Estratégicas</h4>
+                <div 
+                    className="whitespace-pre-wrap font-sans bg-transparent p-0" 
+                    dangerouslySetInnerHTML={{ __html: analysis.recommendations.replace(/(\d\.)/g, '<br/>$1') }}
+                />
               </div>
             ) : (
                <div className="text-center py-8 text-muted-foreground">
@@ -139,3 +130,5 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     </div>
   );
 }
+
+    

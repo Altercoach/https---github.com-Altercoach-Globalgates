@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart, FileText, ShoppingBag } from 'lucide-react';
+import { LogOut, BarChart, FileText, ShoppingBag, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
@@ -15,6 +15,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '
 import { Bar, BarChart as RechartsBarChart, CartesianGrid, XAxis } from "recharts";
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
+import Link from 'next/link';
 
 const chartData = [
   { month: "Enero", leads: 186 },
@@ -87,6 +88,26 @@ export default function DashboardPage() {
         
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Acciones Pendientes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center justify-between p-4 bg-accent/10 rounded-lg">
+                        <div>
+                            <h4 className="font-semibold">Evaluación de Negocio</h4>
+                            <p className="text-sm text-muted-foreground">Completa este formulario para que podamos crear tu estrategia.</p>
+                        </div>
+                        <Button asChild>
+                            <Link href="/questionnaire/eval-cliente-demo">
+                                <Edit className="mr-2" />
+                                Completar Ahora
+                            </Link>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
              <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><ShoppingBag /> Servicios Activos</CardTitle>
@@ -121,7 +142,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><BarChart /> Analíticas de Leads</CardTitle>
                  <CardDescription>Rendimiento de los últimos 6 meses.</CardDescription>
-              </CardHeader>
+              </header>
               <CardContent>
                  <ChartContainer config={chartConfig} className="h-[250px] w-full">
                     <RechartsBarChart accessibilityLayer data={chartData}>
@@ -182,3 +203,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
