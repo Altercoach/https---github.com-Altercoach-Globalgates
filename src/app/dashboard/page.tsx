@@ -61,7 +61,7 @@ export default function DashboardPage() {
       { id: 'INV001', date: new Date(), item: 'Setup Funnel + Content Marketing', amount: 650, status: 'Pagado'},
       { id: 'INV002', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), item: 'Content Marketing', amount: 350, status: 'Pagado'},
     ]
-  }, [hasPurchased, currency])
+  }, [hasPurchased, currency]);
 
   if (auth.user?.role !== 'customer') {
     return (
