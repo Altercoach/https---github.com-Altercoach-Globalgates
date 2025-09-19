@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
@@ -142,7 +141,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><BarChart /> Analíticas de Leads</CardTitle>
                  <CardDescription>Rendimiento de los últimos 6 meses.</CardDescription>
-              </header>
+              </CardHeader>
               <CardContent>
                  <ChartContainer config={chartConfig} className="h-[250px] w-full">
                     <RechartsBarChart accessibilityLayer data={chartData}>
@@ -203,5 +202,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
