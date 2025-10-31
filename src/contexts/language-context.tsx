@@ -42,31 +42,35 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [language, isMounted]);
 
   const translateContent = useCallback(async (targetLanguage: Language, currentSite: SiteData) => {
-    // The source of truth for base content is the default English site.
-    const sourceContent = DEFAULT_SITE;
+    setIsTranslating(true);
 
-    // However, we merge in the user's live customizations from `currentSite`.
-    // This ensures user edits are not lost during translation.
+    // 1. Start with the default English content as the ultimate source of truth.
+    const baseContent = { ...DEFAULT_SITE };
+
+    // 2. Merge user's customizations from `currentSite` (live site data) into the base.
+    // This ensures user edits are not lost.
     const siteToTranslate: SiteData = {
-        ...sourceContent,
+        ...baseContent,
         brand: {
-            ...sourceContent.brand,
+            ...baseContent.brand,
             name: currentSite.brand.name,
             tagline: currentSite.brand.tagline,
             heroTitle: currentSite.brand.heroTitle,
             heroSubtitle: currentSite.brand.heroSubtitle,
+            heroImage: currentSite.brand.heroImage,
         },
         services: currentSite.services,
         products: currentSite.products,
     };
     
+    // 3. If target language is English, no translation is needed. Just use the merged content.
     if (targetLanguage.code === 'en') {
-      // If the target is English, just use the merged site data.
       setTranslatedSite(siteToTranslate);
+      setIsTranslating(false);
       return;
     }
 
-    setIsTranslating(true);
+    // 4. For other languages, perform translation.
     try {
       const { heroImage, ...brandContentToTranslate } = siteToTranslate.brand;
       const payload: Omit<SiteData, 'brand'> & { brand: Omit<SiteData['brand'], 'heroImage'> } = { 
@@ -81,14 +85,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       let translatedData = JSON.parse(translatedJson || '{}') as Partial<SiteData>;
 
-      // Re-assemble the final, translated site data
+      // 5. Re-assemble the final, translated site data
       const finalTranslatedSite: SiteData = {
+          ...siteToTranslate, // Start with the merged base
           brand: {
-              ...(translatedData.brand || sourceContent.brand),
+              ...(translatedData.brand || siteToTranslate.brand),
               heroImage: currentSite.brand.heroImage, // Always preserve user's hero image
           },
-          services: translatedData.services || currentSite.services,
-          products: translatedData.products || currentSite.products,
+          services: translatedData.services || siteToTranslate.services,
+          products: translatedData.products || siteToTranslate.products,
       };
 
       setTranslatedSite(finalTranslatedSite);
