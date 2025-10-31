@@ -8,14 +8,34 @@ import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/hooks/use-language';
+
+const labels = {
+  es: {
+    title: "Panel de Cliente",
+    dashboard: "Dashboard",
+    settings: "Configuración",
+    logout: "Cerrar Sesión",
+    redirecting: "Redirigiendo...",
+    backToSite: "Volver al Sitio"
+  },
+  en: {
+    title: "Customer Dashboard",
+    dashboard: "Dashboard",
+    settings: "Settings",
+    logout: "Logout",
+    redirecting: "Redirecting...",
+    backToSite: "Back to Site"
+  },
+  fr: {
+    title: "Tableau de Bord Client",
+    dashboard: "Tableau de bord",
+    settings: "Paramètres",
+    logout: "Se déconnecter",
+    redirecting: "Redirection...",
+    backToSite: "Retour au site"
+  }
+}
 
 export default function DashboardLayout({
   children,
@@ -25,6 +45,8 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { auth, logout } = useAuth();
   const router = useRouter();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
 
   useEffect(() => {
     if (auth.user?.role !== 'customer') {
@@ -33,14 +55,14 @@ export default function DashboardLayout({
   }, [auth, router]);
 
   const navItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: BarChart },
-    { href: '/dashboard/settings', label: 'Configuración', icon: Settings },
+    { href: '/dashboard', label: t.dashboard, icon: BarChart },
+    { href: '/dashboard/settings', label: t.settings, icon: Settings },
   ];
 
   if (auth.user?.role !== 'customer') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p>Redirigiendo...</p>
+        <p>{t.redirecting}</p>
       </div>
     );
   }
@@ -51,7 +73,7 @@ export default function DashboardLayout({
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
                 <Link href="/" className="flex items-center gap-2 font-semibold">
                     <User className="h-6 w-6" />
-                    <span>Panel de Cliente</span>
+                    <span>{t.title}</span>
                 </Link>
             </div>
             <div className="flex-1">
@@ -71,7 +93,7 @@ export default function DashboardLayout({
              <div className="mt-auto p-4">
                 <Button size="sm" className="w-full" onClick={logout}>
                    <LogOut className="mr-2 h-4 w-4" />
-                    Cerrar Sesión
+                    {t.logout}
                 </Button>
             </div>
         </div>
@@ -94,7 +116,7 @@ export default function DashboardLayout({
                         className="flex items-center gap-2 text-lg font-semibold mb-4"
                     >
                         <User className="h-6 w-6" />
-                        <span>Panel de Cliente</span>
+                        <span>{t.title}</span>
                     </Link>
                     {navItems.map(item => (
                          <Link
@@ -110,7 +132,7 @@ export default function DashboardLayout({
                  <div className="mt-auto">
                     <Button size="sm" className="w-full" onClick={logout}>
                        <LogOut className="mr-2 h-4 w-4" />
-                        Cerrar Sesión
+                        {t.logout}
                     </Button>
                 </div>
             </SheetContent>
@@ -119,7 +141,7 @@ export default function DashboardLayout({
           <span className="font-semibold">{navItems.find(item => item.href === pathname)?.label || 'Dashboard'}</span>
         </div>
          <Button variant="outline" size="sm" asChild>
-            <Link href="/">Volver al Sitio</Link>
+            <Link href="/">{t.backToSite}</Link>
         </Button>
     </header>
   );

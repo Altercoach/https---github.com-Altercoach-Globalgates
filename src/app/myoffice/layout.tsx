@@ -20,6 +20,53 @@ import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, Fi
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
+import { useLanguage } from '@/hooks/use-language';
+
+const labels = {
+  es: {
+    brand: "Marca",
+    services: "Servicios",
+    products: "Productos",
+    questionnaires: "Cuestionarios",
+    integrations: "Integraciones",
+    admin: "Admin",
+    customerView: "Vista Cliente",
+    loggedInAs: "Conectado como:",
+    logout: "Cerrar Sesión",
+    viewSite: "Ver Sitio",
+    redirecting: "Redirigiendo...",
+    loadingOffice: "Cargando Oficina..."
+  },
+  en: {
+    brand: "Brand",
+    services: "Services",
+    products: "Products",
+    questionnaires: "Questionnaires",
+    integrations: "Integrations",
+    admin: "Admin",
+    customerView: "Customer View",
+    loggedInAs: "Logged in as:",
+    logout: "Logout",
+    viewSite: "View Site",
+    redirecting: "Redirecting...",
+    loadingOffice: "Loading Office..."
+  },
+  fr: {
+    brand: "Marque",
+    services: "Services",
+    products: "Produits",
+    questionnaires: "Questionnaires",
+    integrations: "Intégrations",
+    admin: "Admin",
+    customerView: "Vue Client",
+    loggedInAs: "Connecté en tant que:",
+    logout: "Se déconnecter",
+    viewSite: "Voir le site",
+    redirecting: "Redirection...",
+    loadingOffice: "Chargement du bureau..."
+  }
+};
+
 
 export default function MyOfficeLayout({
   children,
@@ -30,6 +77,9 @@ export default function MyOfficeLayout({
   const router = useRouter();
   const { site } = useSite();
   const { auth, logout } = useAuth();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
+
 
   useEffect(() => {
     if (auth.user?.role !== 'admin') {
@@ -38,18 +88,18 @@ export default function MyOfficeLayout({
   }, [auth, router]);
 
   const menuItems = [
-    { href: '/myoffice/brand', label: 'Marca', icon: <Store /> },
-    { href: '/myoffice/services', label: 'Servicios', icon: <LayoutGrid /> },
-    { href: '/myoffice/products', label: 'Productos', icon: <ShoppingBag /> },
-    { href: '/myoffice/questionnaires', label: 'Cuestionarios', icon: <FileText /> },
-    { href: '/myoffice/integrations', label: 'Integraciones', icon: <Puzzle /> },
-    { href: '/myoffice/admin', label: 'Admin', icon: <ShieldCheck /> },
+    { href: '/myoffice/brand', label: t.brand, icon: <Store /> },
+    { href: '/myoffice/services', label: t.services, icon: <LayoutGrid /> },
+    { href: '/myoffice/products', label: t.products, icon: <ShoppingBag /> },
+    { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
+    { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle /> },
+    { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck /> },
   ];
 
   if (auth.user?.role !== 'admin') {
      return (
       <div className="flex h-screen w-full items-center justify-center">
-        <p>Redirigiendo...</p>
+        <p>{t.redirecting}</p>
       </div>
     );
   }
@@ -88,11 +138,11 @@ export default function MyOfficeLayout({
                 <SidebarMenuButton
                   asChild
                   isActive={pathname.startsWith('/dashboard')}
-                  tooltip={{ children: 'Vista Cliente' }}
+                  tooltip={{ children: t.customerView }}
                 >
                   <Link href="/dashboard">
                     <User />
-                    <span>Vista Cliente</span>
+                    <span>{t.customerView}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -103,10 +153,10 @@ export default function MyOfficeLayout({
         <header className="flex h-14 items-center justify-between border-b bg-background p-2">
           <SidebarTrigger />
            <div>
-            <span className="text-sm text-muted-foreground mr-4">Conectado como: {auth.user.email}</span>
-            <Button onClick={logout} variant="outline" size="sm">Cerrar Sesión</Button>
+            <span className="text-sm text-muted-foreground mr-4">{t.loggedInAs} {auth.user.email}</span>
+            <Button onClick={logout} variant="outline" size="sm">{t.logout}</Button>
             <Button asChild variant="outline" size="sm" className="ml-2">
-              <Link href="/">Ver Sitio</Link>
+              <Link href="/">{t.viewSite}</Link>
             </Button>
           </div>
         </header>

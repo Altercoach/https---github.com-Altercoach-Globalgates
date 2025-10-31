@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useLanguage } from '@/hooks/use-language';
 import { CheckCircle } from 'lucide-react';
+import { DEFAULT_SITE } from '@/lib/constants';
 
 const labels = {
   es: {
@@ -33,9 +34,10 @@ export function Hero() {
   const { site } = useSite();
   const { translatedSite, language } = useLanguage();
 
-  const brand = translatedSite.brand || site.brand;
   const t = labels[language.code as keyof typeof labels] || labels.en;
-
+  
+  // Use translated site if available, but fallback to live site, then default site
+  const brand = translatedSite.brand || site.brand || DEFAULT_SITE.brand;
 
   const scrollToPlans = () => {
     document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' });
