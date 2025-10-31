@@ -6,15 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart, FileText, ShoppingBag, Edit, CheckCircle, Target, Percent, UserPlus } from 'lucide-react';
+import { LogOut, BarChart, FileText, ShoppingBag, Edit, CheckCircle, Target, Percent, UserPlus, Bot, Eye, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import { Bar, BarChart as RechartsBarChart, CartesianGrid, XAxis, YAxis, Legend, Tooltip } from "recharts";
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
 import Link from 'next/link';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import type { AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 
 const chartData = [
   { month: "Enero", leads: 186, closed: 20 },
@@ -63,10 +65,25 @@ const pendingActions = [
     },
 ];
 
+// Mock data, this would come from a backend checking admin settings
+const visibleAnalyses: { id: string, title: string, analysis: AnalyzeBusinessEvaluationOutput }[] = [
+    {
+        id: 'analysis-eval-001',
+        title: 'Análisis de Evaluación de Negocio',
+        analysis: {
+            swot: {
+                strengths: "Producto estrella (cold brew) con alta demanda potencial.",
+                weaknesses: "Poca presencia de marca y falta de un canal de ventas digital claro.",
+                opportunities: "Mercado local en crecimiento para cafés de especialidad.",
+                threats: "Competencia de cafeterías establecidas en la zona centro."
+            },
+            recommendations: "1. **Lanzar Campaña de Branding Local**: Enfocarse en Instagram para dar a conocer el 'cold brew'.\n2. **Implementar Funnel de Ventas**: Crear una landing page para capturar leads interesados en pedidos grandes.\n\n**Plan Sugerido**: Contratar 'Setup Funnel' y 'Marketing de Contenido'."
+        }
+    }
+];
+
 export default function DashboardPage() {
-  const { auth, logout } = useAuth();
-  const { hasPurchased } = useCart();
-  const { currency } = useCurrency();
+  const { auth } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -75,24 +92,6 @@ export default function DashboardPage() {
     }
   }, [auth, router]);
 
-  const activeServices = useMemo(() => {
-    if (!hasPurchased) return [];
-    // Simulating purchased items for demonstration
-    const purchasedItems = [
-      { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', status: 'Activo' },
-      { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', status: 'Completado' },
-    ];
-    return purchasedItems;
-  }, [hasPurchased]);
-
-  const billingHistory = useMemo(() => {
-    if(!hasPurchased) return [];
-    return [
-      { id: 'INV001', date: new Date(), item: 'Setup Funnel + Content Marketing', amount: 650, status: 'Pagado'},
-      { id: 'INV002', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), item: 'Content Marketing', amount: 350, status: 'Pagado'},
-    ]
-  }, [hasPurchased, currency]);
-  
   const kpis = useMemo(() => {
     const totalLeads = chartData.reduce((acc, item) => acc + item.leads, 0);
     const totalClosed = chartData.reduce((acc, item) => acc + item.closed, 0);
@@ -105,28 +104,17 @@ export default function DashboardPage() {
   }, []);
 
   if (auth.user?.role !== 'customer') {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Redirigiendo...</p>
-      </div>
-    );
+    return null; // The layout will handle the redirect message
   }
 
   return (
-    <div className="min-h-screen bg-muted/20 p-4 sm:p-6 md:p-8">
-      <div className="container mx-auto">
-        <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold font-headline">Panel de Cliente</h1>
-            <p className="text-muted-foreground">Bienvenido, {auth.user?.email}</p>
-          </div>
-          <Button onClick={logout} variant="outline">
-            <LogOut className="mr-2" />
-            Cerrar Sesión
-          </Button>
+    <div className="space-y-6">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold font-headline">Panel de Cliente</h1>
+          <p className="text-muted-foreground">Bienvenido, {auth.user?.email}</p>
         </header>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Leads Generados</CardTitle>
@@ -159,8 +147,8 @@ export default function DashboardPage() {
             </Card>
         </div>
         
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid gap-6 lg:grid-cols-1">
+          <div className="space-y-6">
              <Card>
                 <CardHeader>
                     <CardTitle>Rendimiento del Embudo de Ventas</CardTitle>
@@ -187,6 +175,49 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
 
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Bot /> Análisis y Resultados de IA</CardTitle>
+                    <CardDescription>Revisa los análisis y recomendaciones estratégicas que hemos preparado para ti.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {visibleAnalyses.map(item => (
+                        <Dialog key={item.id}>
+                            <DialogTrigger asChild>
+                                <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg cursor-pointer hover:bg-accent/20 transition-colors">
+                                    <div>
+                                        <h4 className="font-semibold">{item.title}</h4>
+                                    </div>
+                                    <Button size="sm" variant="outline">
+                                        <Eye className="mr-2" />
+                                        Ver Análisis
+                                    </Button>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                    <DialogTitle>{item.title}</DialogTitle>
+                                </DialogHeader>
+                                <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground mt-4">
+                                    <h4>Análisis FODA</h4>
+                                    <div className="grid grid-cols-2 gap-x-4">
+                                        <p><strong>Fortalezas:</strong> {item.analysis.swot.strengths}</p>
+                                        <p><strong>Oportunidades:</strong> {item.analysis.swot.opportunities}</p>
+                                        <p><strong>Debilidades:</strong> {item.analysis.swot.weaknesses}</p>
+                                        <p><strong>Amenazas:</strong> {item.analysis.swot.threats}</p>
+                                    </div>
+                                    <h4 className="mt-4">Recomendaciones Estratégicas</h4>
+                                    <div 
+                                        className="whitespace-pre-wrap font-sans text-sm" 
+                                        dangerouslySetInnerHTML={{ __html: item.analysis.recommendations.replace(/\* /g, '• ').replace(/\n/g, '<br />') }}
+                                    />
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    ))}
+                </CardContent>
+            </Card>
+
             <Card>
                 <CardHeader>
                     <CardTitle>Acciones Pendientes</CardTitle>
@@ -194,7 +225,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {pendingActions.map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
+                      <div key={action.id} className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                           <div>
                               <h4 className="font-semibold">{action.title}</h4>
                           </div>
@@ -209,68 +240,7 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
           </div>
-
-          <div className="lg:col-span-1 space-y-6">
-             <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><FileText /> Historial de Facturación</CardTitle>
-                </CardHeader>
-                <CardContent>
-                   {billingHistory.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Fecha</TableHead>
-                          <TableHead className="text-right">Monto</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {billingHistory.map(invoice => (
-                          <TableRow key={invoice.id}>
-                            <TableCell>
-                              <div className="font-medium">{format(invoice.date, "dd MMM, yyyy")}</div>
-                              <div className="text-xs text-muted-foreground">{invoice.item}</div>
-                            </TableCell>
-                            <TableCell className="text-right">{formatCurrency(invoice.amount, currency)}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  ) : (
-                    <p className="text-muted-foreground p-4 text-center">No hay historial de facturación.</p>
-                  )}
-                </CardContent>
-            </Card>
-             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><ShoppingBag /> Servicios Contratados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {activeServices.length > 0 ? (
-                   <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Servicio</TableHead>
-                        <TableHead>Estado</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {activeServices.map(service => (
-                        <TableRow key={service.id}>
-                          <TableCell className="font-medium">{service.name}</TableCell>
-                          <TableCell><Badge variant="outline" className="text-accent-foreground bg-accent/20 border-accent/50">{service.status}</Badge></TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <p className="text-muted-foreground p-4 text-center">No tienes servicios activos.</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
         </div>
-      </div>
     </div>
   );
 }
