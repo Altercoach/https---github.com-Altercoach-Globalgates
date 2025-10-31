@@ -12,8 +12,6 @@ import { Shield, User } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const { login } = useAuth();
 
   const handleAdminLogin = () => {
@@ -29,9 +27,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
-          <CardDescription>Selecciona tu rol para continuar</CardDescription>
+          <CardDescription>Selecciona tu rol para acceder a la plataforma.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
            <Button onClick={handleAdminLogin} className="w-full">
             <Shield className="mr-2"/>
             Entrar como Administrador
@@ -40,42 +38,10 @@ export default function LoginPage() {
             <User className="mr-2"/>
             Entrar como Cliente (Demo)
           </Button>
-
-          <div className="relative my-4">
-            <Separator />
-            <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-background px-2 text-xs text-muted-foreground">O</span>
-          </div>
           
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled
-              />
-            </div>
-             <Button type="submit" className="w-full" disabled>
-              Iniciar Sesión (deshabilitado)
-            </Button>
-          </form>
+          <p className="px-8 text-center text-sm text-muted-foreground">
+            El inicio de sesión manual está deshabilitado para esta demostración. Por favor, usa uno de los botones de arriba.
+          </p>
 
           <Button variant="outline" className="w-full" asChild>
               <Link href="/">Volver al Inicio</Link>

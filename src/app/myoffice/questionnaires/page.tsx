@@ -76,8 +76,8 @@ export default function QuestionnairesPage() {
                   <TableCell>{q.type}</TableCell>
                   <TableCell>{format(q.date, "dd MMM, yyyy", { locale: es })}</TableCell>
                   <TableCell>
-                    <Badge variant={q.status === 'Completado' ? 'default' : 'secondary'} className={q.status === 'Completado' ? 'bg-green-100 text-green-800' : ''}>
-                      {q.status === 'Completado' ? <CheckCircle className="mr-1" /> : <Clock className="mr-1" />}
+                    <Badge variant={q.status === 'Completado' ? 'default' : 'secondary'} className={q.status === 'Completado' ? 'bg-accent/20 text-accent-foreground border-accent/30' : ''}>
+                      {q.status === 'Completado' ? <CheckCircle className="mr-1 h-3 w-3" /> : <Clock className="mr-1 h-3 w-3" />}
                       {q.status}
                     </Badge>
                   </TableCell>

@@ -121,6 +121,17 @@ export default function AdminDashboardPage() {
     return null;
   }
 
+  const getStatusBadgeVariant = (status: Customer['status']): 'default' | 'secondary' | 'destructive' => {
+      switch (status) {
+          case 'Active':
+              return 'default';
+          case 'Suspended':
+              return 'secondary';
+          case 'Canceled':
+              return 'destructive';
+      }
+  }
+
   return (
     <div className="space-y-6">
       <header>
@@ -250,8 +261,7 @@ export default function AdminDashboardPage() {
                     <TableCell>{customer.plan}</TableCell>
                     <TableCell>
                       <Badge 
-                        variant={customer.status === 'Active' ? 'default' : customer.status === 'Suspended' ? 'secondary' : 'destructive'} 
-                        className={customer.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}
+                        variant={getStatusBadgeVariant(customer.status)}
                       >
                         {customer.status}
                       </Badge>
@@ -291,5 +301,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-    

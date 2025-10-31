@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -47,7 +48,7 @@ const customerQuestionnaires = [
 
 export default function CustomerDetailPage({ params }: { params: { id: string } }) {
   const { currency } = useCurrency();
-  const customerId = params.id;
+  const customerId = use(Promise.resolve(params.id));
   const totalLeads = useMemo(() => chartData.reduce((acc, item) => acc + item.leads, 0), []);
   const totalClosed = useMemo(() => chartData.reduce((acc, item) => acc + item.closed, 0), []);
   const conversionRate = totalLeads > 0 ? (totalClosed / totalLeads) * 100 : 0;
@@ -69,7 +70,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                     <p><strong>Plan:</strong> {customerData.plan}</p>
                     <p><strong>Ingresos Totales:</strong> {formatCurrency(customerData.revenue, currency)}</p>
                     <p><strong>Miembro Desde:</strong> {format(customerData.signupDate, "dd MMM, yyyy", { locale: es })}</p>
-                    <p><strong>Estado:</strong> <Badge variant={customerData.status === 'Active' ? 'default' : 'destructive'}  className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
+                    <p><strong>Estado:</strong> <Badge variant={customerData.status === 'Active' ? 'default' : 'destructive'} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
                 </CardContent>
             </Card>
             <Card className="md:col-span-2">
