@@ -98,7 +98,7 @@ export function PlanRecommender() {
             }
         }}>
             <DialogTrigger asChild>
-                <Button variant="default" size="lg" className="bg-accent hover:bg-accent/90 gap-2">
+                <Button variant="default" size="lg" className="gap-2">
                     <Wand />
                     Obtener Recomendación de IA
                 </Button>
@@ -137,7 +137,7 @@ export function PlanRecommender() {
                     )}
                     
                     {hasRecommendation && (
-                         <Card className="bg-primary/5">
+                         <Card className="bg-muted">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
                                     <CheckCircle className="text-accent" />

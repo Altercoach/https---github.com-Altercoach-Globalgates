@@ -6,7 +6,7 @@ import { ArrowLeft, Bot, Download, Loader2, EyeOff, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { generateAgentPrompt, GenerateAgentPromptOutput } from '@/ai/flows/generate-agent-prompt';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, use } from 'react';
 import { useLanguage } from '@/hooks/use-language';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -36,7 +36,7 @@ const sampleAnswers = {
 
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
-  const questionnaireId = params.id;
+  const { id: questionnaireId } = params;
   const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001';
   const isAgentTraining = questionnaireId === 'agent-training-001';
   const { toast } = useToast();
@@ -80,12 +80,17 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
         }
       } catch (error) {
         console.error("Analysis failed", error);
+        toast({
+          variant: "destructive",
+          title: "Error de Análisis",
+          description: "La IA no pudo procesar las respuestas. Por favor, inténtalo de nuevo más tarde."
+        });
       } finally {
         setIsLoading(false);
       }
     };
     getAnalysis();
-  }, [isCompleted, isAgentTraining, language, currentAnswers]);
+  }, [isCompleted, isAgentTraining, language, currentAnswers, toast]);
 
   const handleVisibilityToggle = (checked: boolean) => {
     setIsClientVisible(checked);
@@ -116,10 +121,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
                 <p><strong>Amenazas:</strong> {businessAnalysis.swot.threats}</p>
             </div>
             <h4 className="mt-4">Recomendaciones Estratégicas</h4>
-            <div 
-                className="whitespace-pre-wrap font-sans text-sm" 
-                dangerouslySetInnerHTML={{ __html: businessAnalysis.recommendations.replace(/\* /g, '• ').replace(/\n/g, '<br />') }}
-            />
+            <div className="text-sm font-sans whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: businessAnalysis.recommendations.replace(/\n/g, '<br />').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
         </div>
       )
     }

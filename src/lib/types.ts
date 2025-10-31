@@ -1,7 +1,7 @@
 
 
 export type ProductFeature = {
-  id: string; // e.g., 'brief-marketing', 'business-evaluation'
+  id: string; // e.g., 'brief-marketing', 'business-evaluation', 'agent-training'
   name: string;
   stage: 'onboarding' | 'campaign_start' | 'campaign_end' | 'on_demand';
   enabled: boolean;
@@ -86,4 +86,3 @@ export type Customer = {
   signupDate: Date;
   revenue: number;
 };
-

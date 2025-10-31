@@ -2,7 +2,6 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { useCart } from '@/hooks/use-cart';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -186,7 +185,7 @@ export default function DashboardPage() {
                         visibleAnalyses.map(item => (
                             <Dialog key={item.id}>
                                 <DialogTrigger asChild>
-                                    <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg cursor-pointer hover:bg-accent/20 transition-colors">
+                                    <div className="flex items-center justify-between p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors">
                                         <div>
                                             <h4 className="font-semibold">{item.title}</h4>
                                         </div>
@@ -230,7 +229,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {pendingActions.map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
+                      <div key={action.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                           <div>
                               <h4 className="font-semibold">{action.title}</h4>
                           </div>

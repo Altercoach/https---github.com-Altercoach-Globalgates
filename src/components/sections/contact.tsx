@@ -90,7 +90,7 @@ export function Contact() {
                   <Label htmlFor="message" className="text-left block">Cuéntanos sobre tu proyecto</Label>
                   <Textarea id="message" name="message" placeholder="Tu mensaje..." required />
                 </div>
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Enviar Mensaje</Button>
+                <Button type="submit" className="w-full">Enviar Mensaje</Button>
               </form>
             </CardContent>
           </Card>

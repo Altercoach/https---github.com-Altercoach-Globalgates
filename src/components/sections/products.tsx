@@ -12,7 +12,7 @@ export function Products() {
   const products = translatedSite.products || site.products;
 
   return (
-    <section id="plans" className="w-full bg-primary/5 py-12 md:py-24 lg:py-32">
+    <section id="plans" className="w-full bg-muted/40 py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">

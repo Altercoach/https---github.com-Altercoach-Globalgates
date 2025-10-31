@@ -48,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg">{product.name}</CardTitle>
-              <Badge variant="secondary" className="shrink-0 border-transparent bg-accent/20 text-accent">{product.badge}</Badge>
+              <Badge variant="outline" className="shrink-0 border-accent text-accent">{product.badge}</Badge>
           </div>
         </CardHeader>
         <CardContent className="flex-grow">
@@ -63,7 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Button variant="outline" className="w-full">Ver Detalles</Button>
             </DialogTrigger>
             {isInfo ? (
-                <Button variant="default" className="w-full bg-accent hover:bg-accent/90" onClick={handleInfoClick}>Solicitar Info</Button>
+                <Button variant="default" className="w-full" onClick={handleInfoClick}>Solicitar Info</Button>
             ) : (
                 <Button className="w-full" onClick={handleAddToCart}>
                     <ShoppingCart className="mr-2" />
@@ -77,7 +77,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
           <div className="!mt-2">
-            <Badge variant="secondary" className="border-transparent bg-accent/20 text-accent">{product.badge}</Badge>
+            <Badge variant="outline" className="border-accent text-accent">{product.badge}</Badge>
           </div>
         </DialogHeader>
         <div className="py-4">
@@ -92,7 +92,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Button variant="outline">Cerrar</Button>
             </DialogClose>
            {isInfo ? (
-                <Button variant="default" className="w-full bg-accent hover:bg-accent/hove-90" onClick={() => { handleInfoClick(); }}>Solicitar Info</Button>
+                <Button variant="default" className="w-full" onClick={() => { handleInfoClick(); }}>Solicitar Info</Button>
             ) : (
                 <DialogClose asChild>
                     <Button onClick={handleAddToCart}>

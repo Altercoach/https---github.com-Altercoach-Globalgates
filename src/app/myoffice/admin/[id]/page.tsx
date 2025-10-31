@@ -119,7 +119,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                         <TableCell className="font-medium">{q.type}</TableCell>
                         <TableCell>
                             <Badge variant={q.status === 'Completado' ? 'default' : 'secondary'} className={q.status === 'Completado' ? 'bg-green-100 text-green-800' : ''}>
-                            {q.status === 'Completado' ? <CheckCircle className="mr-1" /> : <Clock className="mr-1" />}
+                            {q.status === 'Completado' ? <CheckCircle className="mr-1 h-4 w-4" /> : <Clock className="mr-1 h-4 w-4" />}
                             {q.status}
                             </Badge>
                         </TableCell>

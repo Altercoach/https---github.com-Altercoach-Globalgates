@@ -32,7 +32,7 @@ export function Hero() {
             <ul className="grid gap-2 text-lg">
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Automatización con IA</span>
+                    <span>Automatización con Agentes de IA</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
@@ -44,13 +44,13 @@ export function Hero() {
                 </li>
             </ul>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button onClick={scrollToPlans} className="bg-accent hover:bg-accent/90 text-accent-foreground" size="lg">
+              <Button onClick={scrollToPlans} size="lg">
                 Explorar Planes
               </Button>
             </div>
           </div>
           <Image
-            src={brand.heroImage || 'https://placehold.co/600x400.png'}
+            src={brand.heroImage || 'https://picsum.photos/seed/rocket/600/400'}
             alt="Hero Image"
             width={600}
             height={400}

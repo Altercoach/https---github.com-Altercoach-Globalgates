@@ -36,7 +36,7 @@ export default function SignupPage() {
         </CardHeader>
         <CardContent>
           {!hasPurchased && (
-            <Alert variant="default" className="mb-4 bg-accent/10 border-accent/30">
+            <Alert variant="default" className="mb-4 bg-yellow-500/10 border-yellow-500/30 text-yellow-700">
               <Terminal className="h-4 w-4" />
               <AlertTitle>Registro Deshabilitado</AlertTitle>
               <AlertDescription>
@@ -71,7 +71,7 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={!hasPurchased}>
+              <Button type="submit" className="w-full" disabled={!hasPurchased}>
                 Crear Cuenta
               </Button>
             </fieldset>

@@ -88,7 +88,7 @@ export function CartDrawer() {
               <span>{formatCurrency(totals.total, currency)}</span>
             </div>
             <Button 
-                className="w-full bg-accent hover:bg-accent/90" 
+                className="w-full" 
                 onClick={checkout}
                 disabled={cart.length === 0}>
               Finalizar Compra
