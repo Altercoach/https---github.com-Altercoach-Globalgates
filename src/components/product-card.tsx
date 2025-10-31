@@ -82,7 +82,7 @@ export function ProductCard({ product }: ProductCardProps) {
     addToCart(product);
   }
 
-  const badge = product.badge[language.code as keyof typeof product.badge] || product.badge.en;
+  const badge = product.badge[language.code as keyof typeof product.badge] || product.badge['en'] || product.badge;
 
   return (
     <Dialog>
@@ -118,9 +118,9 @@ export function ProductCard({ product }: ProductCardProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
-          <div className="!mt-2">
-            <Badge variant="outline" className="border-accent text-accent">{badge}</Badge>
-          </div>
+          <DialogDescription>
+             <Badge variant="outline" className="border-accent text-accent mt-2">{badge}</Badge>
+          </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <p>{product.description}</p>
@@ -148,3 +148,5 @@ export function ProductCard({ product }: ProductCardProps) {
     </Dialog>
   );
 }
+
+    
