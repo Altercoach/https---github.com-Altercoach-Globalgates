@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
-import type { SiteData, Language } from '@/lib/types';
+import type { SiteData, Language, Product } from '@/lib/types';
 import { LANGUAGES, LS_KEYS, DEFAULT_SITE } from '@/lib/constants';
 import { translateSiteContent } from '@/ai/flows/translate-site-content';
 import { useToast } from '@/hooks/use-toast';
@@ -44,35 +44,24 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const translateContent = useCallback(async (targetLanguage: Language, currentSite: SiteData) => {
     setIsTranslating(true);
     
-    // Create a base site object by merging default content with user's live customizations.
-    // This ensures user edits are always the source of truth for translation.
-    const siteToTranslate: SiteData = {
-        ...DEFAULT_SITE, // Start with default structure
-        brand: {
-            ...DEFAULT_SITE.brand, // Start with default brand
-            ...currentSite.brand // Overwrite with user's live data
-        },
-        services: currentSite.services, // Use user's live services
-        products: currentSite.products, // Use user's live products
-    };
+    // The "site" object from useSite is always the source of truth, and is considered to be in English.
+    const sourceSiteInEnglish = currentSite;
     
     if (targetLanguage.code === 'en') {
-      setTranslatedSite(siteToTranslate);
+      setTranslatedSite(sourceSiteInEnglish);
       setIsTranslating(false);
       return;
     }
 
     try {
-      // Exclude heroImage from the translation payload as it's just a URL.
-      const { heroImage, ...brandContentToTranslate } = siteToTranslate.brand;
+      // Exclude elements that shouldn't be translated.
+      const { heroImage, ...brandContentToTranslate } = sourceSiteInEnglish.brand;
+      const productsToTranslate = sourceSiteInEnglish.products.map(({ badge, ...rest }) => rest);
       
-      const payload: Omit<SiteData, 'brand'|'products'> & { 
-        brand: Omit<SiteData['brand'], 'heroImage'>,
-        products: Omit<Product, 'badge'>[] // badges are translated separately
-      } = { 
-          ...siteToTranslate, 
+      const payload = { 
           brand: brandContentToTranslate,
-          products: siteToTranslate.products.map(({badge, ...rest}) => rest)
+          services: sourceSiteInEnglish.services,
+          products: productsToTranslate
       };
 
       const translatedJson = await translateSiteContent({
@@ -80,17 +69,22 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         targetLanguage: targetLanguage.code,
       });
       
-      const translatedData = JSON.parse(translatedJson || '{}') as Partial<SiteData>;
+      const translatedData = JSON.parse(translatedJson || '{}') as Partial<Omit<SiteData, 'brand'> & { brand: Omit<SiteData['brand'], 'heroImage'> }>;
 
       // Re-assemble the final, translated site data
+      // Start with the English source of truth to ensure all properties are present
       const finalTranslatedSite: SiteData = {
-          ...siteToTranslate, // Base structure with user data
+          ...sourceSiteInEnglish,
           brand: {
-              ...(translatedData.brand || siteToTranslate.brand),
-              heroImage: siteToTranslate.brand.heroImage, // Crucially, restore the user's hero image
+              ...(translatedData.brand || sourceSiteInEnglish.brand),
+              heroImage: sourceSiteInEnglish.brand.heroImage, // Crucially, restore the user's hero image
           },
-          services: translatedData.services || siteToTranslate.services,
-          products: translatedData.products ? siteToTranslate.products.map((p, i) => ({...p, ...translatedData.products![i]})) : siteToTranslate.products,
+          services: translatedData.services || sourceSiteInEnglish.services,
+          products: sourceSiteInEnglish.products.map((p, i) => ({
+            ...p, // Keep original id, type, price, etc.
+            ...(translatedData.products?.[i] || {}), // Overwrite with translated text content
+            badge: p.badge // Keep original multi-language badge object
+          })),
       };
 
       setTranslatedSite(finalTranslatedSite);
@@ -121,7 +115,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     isTranslating,
   }), [language, translatedSite, isTranslating, site]);
 
-  if (!isMounted) {
+  if (!isMounted || !isSiteMounted) {
     return null;
   }
   
