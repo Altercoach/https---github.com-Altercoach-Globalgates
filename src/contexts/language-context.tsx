@@ -83,7 +83,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         targetLanguage: targetLanguage.code,
       });
       
-      let translatedData = JSON.parse(translatedJson || '{}') as Partial<SiteData>;
+      const translatedData = JSON.parse(translatedJson || '{}') as Partial<SiteData>;
 
       // 5. Re-assemble the final, translated site data
       const finalTranslatedSite: SiteData = {

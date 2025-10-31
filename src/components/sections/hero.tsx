@@ -3,10 +3,8 @@
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { useSite } from '@/hooks/use-site';
 import { useLanguage } from '@/hooks/use-language';
 import { CheckCircle } from 'lucide-react';
-import { DEFAULT_SITE } from '@/lib/constants';
 
 const labels = {
   es: {
@@ -31,13 +29,10 @@ const labels = {
 
 
 export function Hero() {
-  const { site } = useSite();
   const { translatedSite, language } = useLanguage();
 
   const t = labels[language.code as keyof typeof labels] || labels.en;
   
-  // `translatedSite` is now the single source of truth. 
-  // It contains the merged and translated content.
   const brand = translatedSite.brand;
 
   const scrollToPlans = () => {
