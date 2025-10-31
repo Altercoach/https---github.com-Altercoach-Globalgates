@@ -15,26 +15,20 @@ interface SiteContextType {
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export function SiteProvider({ children }: { children: React.ReactNode }) {
+  // The state is now initialized directly from the imported default content.
+  // localStorage is now only for temporary edits in the live preview.
   const [site, setSite] = useState<SiteData>(DEFAULT_SITE_CONTENT);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEYS.SITE);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.brand && parsed.services && parsed.products) {
-          setSite(parsed);
-        }
-      }
-    } catch {
-      // Ignore parsing errors and use default content
-      setSite(DEFAULT_SITE_CONTENT);
-    }
+    // Set mounted after the initial render to avoid hydration issues,
+    // but we no longer read from localStorage here.
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
+    // This effect still saves to localStorage, allowing for temporary live edits,
+    // but it no longer affects the initial state on page load.
     if (isMounted) {
       try {
         localStorage.setItem(LS_KEYS.SITE, JSON.stringify(site));
@@ -47,6 +41,8 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({ site, setSite, isMounted }), [site, isMounted]);
 
   if (!isMounted) {
+    // Return null on the server and during the initial client render
+    // to prevent hydration mismatches.
     return null; 
   }
 
