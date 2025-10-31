@@ -33,7 +33,10 @@ const labels = {
     viewDetails: "Ver Detalles",
     requestInfo: "Solicitar Info",
     addToCart: "Añadir al Carrito",
-    close: "Cerrar"
+    close: "Cerrar",
+    monthly: "/mes",
+    variable: "Variable",
+    free: "Gratis"
   },
   en: {
     contactUs: "Contact Us",
@@ -41,7 +44,10 @@ const labels = {
     viewDetails: "View Details",
     requestInfo: "Request Info",
     addToCart: "Add to Cart",
-    close: "Close"
+    close: "Close",
+    monthly: "/month",
+    variable: "Variable",
+    free: "Free"
   },
   fr: {
     contactUs: "Contactez-nous",
@@ -49,7 +55,10 @@ const labels = {
     viewDetails: "Voir les détails",
     requestInfo: "Demander des informations",
     addToCart: "Ajouter au panier",
-    close: "Fermer"
+    close: "Fermer",
+    monthly: "/mois",
+    variable: "Variable",
+    free: "Gratuit"
   }
 };
 
@@ -73,19 +82,21 @@ export function ProductCard({ product }: ProductCardProps) {
     addToCart(product);
   }
 
+  const badge = product.badge[language.code as keyof typeof product.badge] || product.badge.en;
+
   return (
     <Dialog>
       <Card className="flex flex-col">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg">{product.name}</CardTitle>
-              <Badge variant="outline" className="shrink-0 border-accent text-accent">{product.badge}</Badge>
+              <Badge variant="outline" className="shrink-0 border-accent text-accent">{badge}</Badge>
           </div>
         </CardHeader>
         <CardContent className="flex-grow">
           <div className="text-3xl font-bold">
-              {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? 'Variable' : 'Gratis')}
-              {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">/mes</span>}
+              {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? t.variable : t.free)}
+              {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
           </div>
           <CardDescription className="mt-2 min-h-[40px]">{product.note}</CardDescription>
         </CardContent>
@@ -108,14 +119,14 @@ export function ProductCard({ product }: ProductCardProps) {
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
           <div className="!mt-2">
-            <Badge variant="outline" className="border-accent text-accent">{product.badge}</Badge>
+            <Badge variant="outline" className="border-accent text-accent">{badge}</Badge>
           </div>
         </DialogHeader>
         <div className="py-4">
           <p>{product.description}</p>
           <div className="mt-4 text-2xl font-bold">
-            {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? 'Variable' : 'Gratis')}
-            {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">/mes</span>}
+            {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? t.variable : t.free)}
+            {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
           </div>
         </div>
         <DialogFooter>

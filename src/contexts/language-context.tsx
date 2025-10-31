@@ -43,39 +43,36 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const translateContent = useCallback(async (targetLanguage: Language, currentSite: SiteData) => {
     setIsTranslating(true);
-
-    // 1. Start with the default English content as the ultimate source of truth.
-    const baseContent = { ...DEFAULT_SITE };
-
-    // 2. Merge user's customizations from `currentSite` (live site data) into the base.
-    // This ensures user edits are not lost.
+    
+    // Create a base site object by merging default content with user's live customizations.
+    // This ensures user edits are always the source of truth for translation.
     const siteToTranslate: SiteData = {
-        ...baseContent,
+        ...DEFAULT_SITE, // Start with default structure
         brand: {
-            ...baseContent.brand,
-            name: currentSite.brand.name,
-            tagline: currentSite.brand.tagline,
-            heroTitle: currentSite.brand.heroTitle,
-            heroSubtitle: currentSite.brand.heroSubtitle,
-            heroImage: currentSite.brand.heroImage,
+            ...DEFAULT_SITE.brand, // Start with default brand
+            ...currentSite.brand // Overwrite with user's live data
         },
-        services: currentSite.services,
-        products: currentSite.products,
+        services: currentSite.services, // Use user's live services
+        products: currentSite.products, // Use user's live products
     };
     
-    // 3. If target language is English, no translation is needed. Just use the merged content.
     if (targetLanguage.code === 'en') {
       setTranslatedSite(siteToTranslate);
       setIsTranslating(false);
       return;
     }
 
-    // 4. For other languages, perform translation.
     try {
+      // Exclude heroImage from the translation payload as it's just a URL.
       const { heroImage, ...brandContentToTranslate } = siteToTranslate.brand;
-      const payload: Omit<SiteData, 'brand'> & { brand: Omit<SiteData['brand'], 'heroImage'> } = { 
+      
+      const payload: Omit<SiteData, 'brand'|'products'> & { 
+        brand: Omit<SiteData['brand'], 'heroImage'>,
+        products: Omit<Product, 'badge'>[] // badges are translated separately
+      } = { 
           ...siteToTranslate, 
-          brand: brandContentToTranslate 
+          brand: brandContentToTranslate,
+          products: siteToTranslate.products.map(({badge, ...rest}) => rest)
       };
 
       const translatedJson = await translateSiteContent({
@@ -85,15 +82,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       const translatedData = JSON.parse(translatedJson || '{}') as Partial<SiteData>;
 
-      // 5. Re-assemble the final, translated site data
+      // Re-assemble the final, translated site data
       const finalTranslatedSite: SiteData = {
-          ...siteToTranslate, // Start with the merged base
+          ...siteToTranslate, // Base structure with user data
           brand: {
               ...(translatedData.brand || siteToTranslate.brand),
-              heroImage: currentSite.brand.heroImage, // Always preserve user's hero image
+              heroImage: siteToTranslate.brand.heroImage, // Crucially, restore the user's hero image
           },
           services: translatedData.services || siteToTranslate.services,
-          products: translatedData.products || siteToTranslate.products,
+          products: translatedData.products ? siteToTranslate.products.map((p, i) => ({...p, ...translatedData.products![i]})) : siteToTranslate.products,
       };
 
       setTranslatedSite(finalTranslatedSite);
@@ -105,7 +102,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         description: 'Failed to translate content. Reverting to original.',
         variant: 'destructive',
       });
-      setTranslatedSite(currentSite); // Revert to user's current site on error
+      setTranslatedSite(currentSite);
     } finally {
       setIsTranslating(false);
     }
@@ -120,7 +117,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(() => ({
     language,
     setLanguage: setLanguageState,
-    translatedSite: translatedSite || site, // Fallback to site object
+    translatedSite: translatedSite || site, 
     isTranslating,
   }), [language, translatedSite, isTranslating, site]);
 

@@ -1,5 +1,5 @@
 
-import type { SiteData, Language, Currency, ProductFeature, Customer } from '@/lib/types';
+import type { SiteData, Language, Currency, ProductFeature, Customer, ProductBadge } from '@/lib/types';
 
 export const LS_KEYS = {
   THEME: 'gk_theme',
@@ -17,6 +17,15 @@ export const defaultFeatures: ProductFeature[] = [
   { id: 'agent-training', name: 'AI Agent Training', stage: 'onboarding', enabled: false },
   { id: 'satisfaction-survey', name: 'Satisfaction Survey', stage: 'campaign_end', enabled: false },
 ];
+
+const oneTimeBadge: ProductBadge = { en: 'One-time', es: 'Pago Único', fr: 'Unique' };
+const aiBadge: ProductBadge = { en: 'AI', es: 'IA', fr: 'IA' };
+const proBadge: ProductBadge = { en: 'Pro', es: 'Pro', fr: 'Pro' };
+const monthlyBadge: ProductBadge = { en: 'Monthly', es: 'Mensual', fr: 'Mensuel' };
+const contentBadge: ProductBadge = { en: 'Content', es: 'Contenido', fr: 'Contenu' };
+const brandingBadge: ProductBadge = { en: 'Branding', es: 'Marca', fr: 'Marque' };
+const infoBadge: ProductBadge = { en: 'Info', es: 'Info', fr: 'Info' };
+
 
 export const DEFAULT_SITE: SiteData = {
   brand: {
@@ -53,13 +62,13 @@ export const DEFAULT_SITE: SiteData = {
     ]},
   ],
   products: [
-    { id: 'p-funnel-setup', name: 'Funnel Setup (Landing + Forms + AI Agent)', type: 'one', price: 300, badge: 'One-time', note: 'Includes integration and testing. Ideal for starting your sales funnel.', description: 'This one-time payment package sets up your initial sales funnel. It includes an optimized landing page, cloud-based forms to capture leads, and a basic AI Agent to interact with your visitors.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
-    { id: 'p-ai-agent', name: 'AI Agent (Initial Setup)', type: 'one', price: 700, badge: 'AI', note: 'Training and integration of the smart agent.', description: 'We implement an AI Agent trained with your information to answer questions, qualify prospects, and schedule appointments. A single payment for the complete setup.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
-    { id: 'p-research', name: 'Comprehensive Market Research', type: 'one', price: 2000, badge: 'Pro', note: 'Free when you hire an annual Marketing plan.', description: 'In-depth analysis of your competition, ideal customer, and market. We provide a complete advertising brief and corporate image suggestions. This service is free when hiring an annual marketing plan.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
-    { id: 's-ai-agent-maint', name: 'AI Agent Maintenance (monthly)', type: 'sub', interval: 'month', price: 45, badge: 'Monthly', note: 'Agent monitoring and adjustments.', description: 'We ensure the optimal performance of your AI Agent with constant monitoring, adjustments, and optimizations. This is a monthly subscription plan.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
-    { id: 's-content-15', name: 'Content Marketing (15 + 15 / month)', type: 'sub', interval: 'month', price: 350, badge: 'Content', note: 'Advertising budget (ad cost) not included.', description: 'Creation of 15 Instagram posts and 15 Facebook posts each month, including editorial calendar, persuasive copy, and designs. Does not include the cost of the advertising budget (ads).', features: JSON.parse(JSON.stringify(defaultFeatures)) },
-    { id: 's-brand-8', name: 'Branding (8 posts / month)', type: 'sub', interval: 'month', price: 200, badge: 'Branding', note: 'Requires a minimum ad spend of $250 USD/month (not included).', description: 'We develop 8 brand posts per month to position your company. This plan requires a minimum investment of $250 USD in advertising spend, which is not included in the price.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
-    { id: 'i-brand-4', name: 'Branding (4 posts / month)', type: 'info', interval: 'month', price: 0, badge: 'Info', note: 'Cost = ad spend amount (minimum $250 USD).', description: 'This is an informational plan. We create 4 branding posts per month, and the service cost equals your investment in advertising, with a minimum of $250 USD. Contact us to activate it.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 'p-funnel-setup', name: 'Funnel Setup (Landing + Forms + AI Agent)', type: 'one', price: 300, badge: oneTimeBadge, note: 'Includes integration and testing. Ideal for starting your sales funnel.', description: 'This one-time payment package sets up your initial sales funnel. It includes an optimized landing page, cloud-based forms to capture leads, and a basic AI Agent to interact with your visitors.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 'p-ai-agent', name: 'AI Agent (Initial Setup)', type: 'one', price: 700, badge: aiBadge, note: 'Training and integration of the smart agent.', description: 'We implement an AI Agent trained with your information to answer questions, qualify prospects, and schedule appointments. A single payment for the complete setup.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 'p-research', name: 'Comprehensive Market Research', type: 'one', price: 2000, badge: proBadge, note: 'Free when you hire an annual Marketing plan.', description: 'In-depth analysis of your competition, ideal customer, and market. We provide a complete advertising brief and corporate image suggestions. This service is free when hiring an annual marketing plan.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 's-ai-agent-maint', name: 'AI Agent Maintenance (monthly)', type: 'sub', interval: 'month', price: 45, badge: monthlyBadge, note: 'Agent monitoring and adjustments.', description: 'We ensure the optimal performance of your AI Agent with constant monitoring, adjustments, and optimizations. This is a monthly subscription plan.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 's-content-15', name: 'Content Marketing (15 + 15 / month)', type: 'sub', interval: 'month', price: 350, badge: contentBadge, note: 'Advertising budget (ad cost) not included.', description: 'Creation of 15 Instagram posts and 15 Facebook posts each month, including editorial calendar, persuasive copy, and designs. Does not include the cost of the advertising budget (ads).', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 's-brand-8', name: 'Branding (8 posts / month)', type: 'sub', interval: 'month', price: 200, badge: brandingBadge, note: 'Requires a minimum ad spend of $250 USD/month (not included).', description: 'We develop 8 brand posts per month to position your company. This plan requires a minimum investment of $250 USD in advertising spend, which is not included in the price.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
+    { id: 'i-brand-4', name: 'Branding (4 posts / month)', type: 'info', interval: 'month', price: 0, badge: infoBadge, note: 'Cost = ad spend amount (minimum $250 USD).', description: 'This is an informational plan. We create 4 branding posts per month, and the service cost equals your investment in advertising, with a minimum of $250 USD. Contact us to activate it.', features: JSON.parse(JSON.stringify(defaultFeatures)) },
   ],
 };
 

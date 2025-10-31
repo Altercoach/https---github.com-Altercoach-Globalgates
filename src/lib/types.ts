@@ -7,12 +7,18 @@ export type ProductFeature = {
   enabled: boolean;
 };
 
+export type ProductBadge = {
+  en: string;
+  es: string;
+  fr: string;
+}
+
 export type Product = {
   id: string;
   name: string;
   type: 'one' | 'sub' | 'info';
   price: number;
-  badge: string;
+  badge: ProductBadge;
   note: string;
   description: string;
   interval?: 'month';
