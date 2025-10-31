@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -38,7 +39,7 @@ export default function LoginPage() {
             Entrar como Cliente (Demo)
           </Button>
           
-          <p className="px-8 text-center text-sm text-muted-foreground">
+          <p className="px-8 text-center text-sm text-muted-foreground pt-2">
             El inicio de sesión manual está deshabilitado para esta demostración.
           </p>
 

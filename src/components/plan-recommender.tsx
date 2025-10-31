@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -159,7 +160,7 @@ export function PlanRecommender() {
                     )}
                 </div>
 
-                <DialogFooter className="gap-2 sm:gap-0">
+                <DialogFooter className="gap-2 sm:gap-0 sm:justify-between w-full">
                     {hasRecommendation && (
                         <>
                             <Button variant="ghost" onClick={resetState}>

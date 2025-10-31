@@ -57,7 +57,6 @@ export default function AdminDashboardPage() {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [planFilter, setPlanFilter] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -68,10 +67,9 @@ export default function AdminDashboardPage() {
     return customers.filter(customer => {
       const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || customer.status.toLowerCase() === statusFilter;
-      const matchesPlan = planFilter === 'all' || customer.plan === planFilter;
-      return matchesSearch && matchesStatus && matchesPlan;
+      return matchesSearch && matchesStatus;
     });
-  }, [customers, searchTerm, statusFilter, planFilter]);
+  }, [customers, searchTerm, statusFilter]);
 
   const handleSelectCustomer = (customerId: string, checked: boolean) => {
     setSelectedCustomerIds(prev =>
@@ -115,8 +113,6 @@ export default function AdminDashboardPage() {
     activeSubscriptions: customers.filter(c => c.status === 'Active').length, // Simplified logic
   }), [customers]);
   
-  const uniquePlans = ['all', ...Array.from(new Set(initialCustomers.map(c => c.plan)))];
-
   if (!isMounted) {
     return null;
   }
@@ -197,16 +193,6 @@ export default function AdminDashboardPage() {
                     <SelectItem value="canceled">Cancelado</SelectItem>
                 </SelectContent>
             </Select>
-            <Select value={planFilter} onValueChange={setPlanFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                    <SelectValue placeholder="Filtrar por plan" />
-                </SelectTrigger>
-                <SelectContent>
-                  {uniquePlans.map(plan => (
-                     <SelectItem key={plan} value={plan}>{plan === 'all' ? 'Todos los planes' : plan}</SelectItem>
-                  ))}
-                </SelectContent>
-            </Select>
             <div className="ml-auto flex items-center gap-2">
               <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -262,6 +248,7 @@ export default function AdminDashboardPage() {
                     <TableCell>
                       <Badge 
                         variant={getStatusBadgeVariant(customer.status)}
+                        className={customer.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}
                       >
                         {customer.status}
                       </Badge>

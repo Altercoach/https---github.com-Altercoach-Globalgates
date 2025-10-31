@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useSite } from '@/hooks/use-site';
@@ -18,7 +19,7 @@ export function Products() {
           <div className="space-y-2">
             <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">Planes y Paquetes</h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Compra en línea. Las suscripciones se facturan mensualmente.
+              Compra en línea, crea tu cuenta y gestiona tus servicios. Las suscripciones se renuevan automáticamente.
             </p>
           </div>
            <div className="pt-4">
