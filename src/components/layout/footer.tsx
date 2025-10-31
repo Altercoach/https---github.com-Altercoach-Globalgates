@@ -11,7 +11,7 @@ import { useSite } from '@/hooks/use-site';
 const labels = {
   es: {
     rightsReserved: "Todos los derechos reservados.",
-    home: "Inicio",
+    home: "Página Principal",
     myOffice: "Mi Oficina",
     login: "Iniciar Sesión"
   },
