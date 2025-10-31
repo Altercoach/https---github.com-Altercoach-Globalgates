@@ -64,10 +64,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       const translatedData = JSON.parse(translatedJson || '{}') as SiteData;
 
-      // Restore the hero image to the translated data
-      if (translatedData.brand) {
-        translatedData.brand.heroImage = sourceSiteData.brand.heroImage;
+      // Ensure brand object exists before assigning properties to it
+      if (!translatedData.brand) {
+        translatedData.brand = { ...sourceSiteData.brand, heroImage: '' }; // Create a fallback brand object
       }
+
+      // Restore the default hero image to the translated data
+      translatedData.brand.heroImage = sourceSiteData.brand.heroImage;
       
       // Also, restore the user-defined hero image from the live `site` object
       if (site.brand.heroImage) {
