@@ -19,7 +19,7 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(un
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
-  const { site } = useSite(); 
+  const { site, isMounted: isSiteMounted } = useSite(); 
   const [isMounted, setIsMounted] = useState(false);
   
   const [language, setLanguageState] = useState<Language>(() => {
@@ -41,73 +41,83 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [language, isMounted]);
 
-  const translateContent = useCallback(async (targetLanguage: Language) => {
-    // The default content in constants is now English, so it acts as the source of truth.
-    const sourceSiteData = DEFAULT_SITE;
+  const translateContent = useCallback(async (targetLanguage: Language, currentSite: SiteData) => {
+    // The source of truth for base content is the default English site.
+    const sourceContent = DEFAULT_SITE;
+
+    // However, we merge in the user's live customizations from `currentSite`.
+    // This ensures user edits are not lost during translation.
+    const siteToTranslate: SiteData = {
+        ...sourceContent,
+        brand: {
+            ...sourceContent.brand,
+            name: currentSite.brand.name,
+            tagline: currentSite.brand.tagline,
+            heroTitle: currentSite.brand.heroTitle,
+            heroSubtitle: currentSite.brand.heroSubtitle,
+        },
+        services: currentSite.services,
+        products: currentSite.products,
+    };
     
     if (targetLanguage.code === 'en') {
-      // If the target is English, just use the default content.
-      setTranslatedSite(sourceSiteData);
+      // If the target is English, just use the merged site data.
+      setTranslatedSite(siteToTranslate);
       return;
     }
 
     setIsTranslating(true);
     try {
-      // Exclude the hero image from the translation payload to save tokens
-      const { heroImage, ...siteContentToTranslate } = sourceSiteData.brand;
-      const payload = { ...sourceSiteData, brand: siteContentToTranslate };
+      const { heroImage, ...brandContentToTranslate } = siteToTranslate.brand;
+      const payload: Omit<SiteData, 'brand'> & { brand: Omit<SiteData['brand'], 'heroImage'> } = { 
+          ...siteToTranslate, 
+          brand: brandContentToTranslate 
+      };
 
       const translatedJson = await translateSiteContent({
         siteContent: JSON.stringify(payload),
         targetLanguage: targetLanguage.code,
       });
       
-      const translatedData = JSON.parse(translatedJson || '{}') as SiteData;
+      let translatedData = JSON.parse(translatedJson || '{}') as Partial<SiteData>;
 
-      // Ensure brand object exists before assigning properties to it
-      if (!translatedData.brand) {
-        translatedData.brand = { ...sourceSiteData.brand, heroImage: '' }; // Create a fallback brand object
-      }
+      // Re-assemble the final, translated site data
+      const finalTranslatedSite: SiteData = {
+          brand: {
+              ...(translatedData.brand || sourceContent.brand),
+              heroImage: currentSite.brand.heroImage, // Always preserve user's hero image
+          },
+          services: translatedData.services || currentSite.services,
+          products: translatedData.products || currentSite.products,
+      };
 
-      // Restore the default hero image to the translated data
-      translatedData.brand.heroImage = sourceSiteData.brand.heroImage;
-      
-      // Also, restore the user-defined hero image from the live `site` object
-      if (site.brand.heroImage) {
-        translatedData.brand.heroImage = site.brand.heroImage;
-      }
-
-      setTranslatedSite(translatedData);
+      setTranslatedSite(finalTranslatedSite);
 
     } catch (error) {
       console.error('Translation failed:', error);
       toast({
         title: 'Translation Error',
-        description: 'Failed to translate content. Please try again.',
+        description: 'Failed to translate content. Reverting to original.',
         variant: 'destructive',
       });
-      setTranslatedSite(sourceSiteData); // Revert to default
+      setTranslatedSite(currentSite); // Revert to user's current site on error
     } finally {
       setIsTranslating(false);
     }
-  }, [toast, site.brand.heroImage]);
+  }, [toast]);
 
   useEffect(() => {
-    if(isMounted) {
-        // We always translate from the default English content
-        translateContent(language);
+    if(isMounted && isSiteMounted) {
+        translateContent(language, site);
     }
-    // The dependency on `site` is removed to avoid re-translating when site data changes.
-    // The translation is based on the default content, and dynamic user changes (like hero image)
-    // are handled separately or will be reflected on next language change.
-  }, [language, translateContent, isMounted]);
+  }, [language, site, translateContent, isMounted, isSiteMounted]);
 
   const value = useMemo(() => ({
     language,
     setLanguage: setLanguageState,
-    translatedSite,
+    translatedSite: translatedSite || site, // Fallback to site object
     isTranslating,
-  }), [language, translatedSite, isTranslating]);
+  }), [language, translatedSite, isTranslating, site]);
 
   if (!isMounted) {
     return null;
