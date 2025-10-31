@@ -22,11 +22,10 @@ const labels = {
 };
 
 export function Services() {
-  const { site } = useSite();
   const { translatedSite, language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
   
-  const services = translatedSite.services || site.services;
+  const services = translatedSite.services;
 
   return (
     <section id="services" className="w-full py-12 md:py-24 lg:py-32 bg-background">

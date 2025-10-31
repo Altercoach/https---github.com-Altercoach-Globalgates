@@ -33,10 +33,10 @@ const labels = {
 
 export function Products() {
   const { site } = useSite();
-  const { translatedSite, language } = useLanguage();
+  const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
-  const products = translatedSite.products || site.products;
+  const products = site.products;
 
   return (
     <section id="plans" className="w-full bg-muted/40 py-12 md:py-24 lg:py-32">

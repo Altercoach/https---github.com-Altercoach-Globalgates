@@ -43,7 +43,7 @@ const navLabels = {
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { site } = useSite();
-  const { translatedSite, language } = useLanguage();
+  const { language } = useLanguage();
   const { setIsCartOpen, cart } = useCart();
   const { auth } = useAuth();
   
@@ -59,7 +59,7 @@ export function Header() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
   
-  const siteName = translatedSite?.brand?.name || site.brand.name;
+  const siteName = site.brand.name;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">

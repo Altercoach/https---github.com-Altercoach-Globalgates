@@ -31,11 +31,11 @@ const labels = {
 
 export function Footer() {
   const { site } = useSite();
-  const { translatedSite, language } = useLanguage();
+  const { language } = useLanguage();
   const { auth } = useAuth();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
-  const siteName = translatedSite?.brand?.name || site.brand.name;
+  const siteName = site.brand.name;
 
   return (
     <footer className="w-full border-t bg-background">
