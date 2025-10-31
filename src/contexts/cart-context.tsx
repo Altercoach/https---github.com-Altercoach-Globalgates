@@ -84,14 +84,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type, interval: prod.interval || null, qty: 1 }];
     });
     
-    if (!cart.some(item => item.id === prod.id && item.type === 'sub')) {
+    if (!cart.some(item => item.id === prod.id)) {
       toast({ description: 'Añadido al carrito.' });
     }
     setIsCartOpen(true);
   }, [toast, cart]);
 
   const removeFromCart = (id: string) => setCart((prev) => prev.filter((x) => x.id !== id));
-  const setQty = (id: string, qty: number) => setCart((prev) => prev.map((x) => (x.id === id ? { ...x, qty: clampQty(qty) } : x)));
+  
+  const setQty = (id: string, qty: number) => {
+    const safeQty = clampQty(qty);
+    setCart((prev) => prev.map((x) => (x.id === id ? { ...x, qty: safeQty } : x)));
+  };
+
 
   const totals = useMemo(() => {
     const one = cart.filter((i) => i.type === 'one');
@@ -132,7 +137,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     hasPurchased,
     isCartOpen,
     setIsCartOpen,
-  }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen, removeFromCart, setQty]);
+  }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen]);
   
   if (!isMounted) {
     return null;

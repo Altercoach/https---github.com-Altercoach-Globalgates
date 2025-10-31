@@ -71,6 +71,17 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
       );
   }
 
+  const getStatusBadgeVariant = (status: Customer['status']): 'default' | 'secondary' | 'destructive' => {
+      switch (status) {
+          case 'Active':
+              return 'default';
+          case 'Suspended':
+              return 'secondary';
+          case 'Canceled':
+              return 'destructive';
+      }
+  }
+
   return (
     <div className="space-y-6">
       <header>
@@ -88,7 +99,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                     <p><strong>Plan:</strong> {customerData.plan}</p>
                     <p><strong>Ingresos Totales:</strong> {formatCurrency(customerData.revenue, currency)}</p>
                     <p><strong>Miembro Desde:</strong> {format(customerData.signupDate, "dd MMM, yyyy", { locale: es })}</p>
-                    <p><strong>Estado:</strong> <Badge variant={customerData.status === 'Active' ? 'default' : 'destructive'} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
+                    <p><strong>Estado:</strong> <Badge variant={getStatusBadgeVariant(customerData.status)} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
                 </CardContent>
             </Card>
             <Card className="md:col-span-2">
