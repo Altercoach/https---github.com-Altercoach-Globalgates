@@ -20,21 +20,52 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { ShoppingCart } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface ProductCardProps {
   product: Product;
 }
 
+const labels = {
+  es: {
+    contactUs: "Contáctanos",
+    infoPlanContact: "Por favor, contáctanos para activar este plan informativo.",
+    viewDetails: "Ver Detalles",
+    requestInfo: "Solicitar Info",
+    addToCart: "Añadir al Carrito",
+    close: "Cerrar"
+  },
+  en: {
+    contactUs: "Contact Us",
+    infoPlanContact: "Please contact us to activate this informational plan.",
+    viewDetails: "View Details",
+    requestInfo: "Request Info",
+    addToCart: "Add to Cart",
+    close: "Close"
+  },
+  fr: {
+    contactUs: "Contactez-nous",
+    infoPlanContact: "Veuillez nous contacter pour activer ce plan d'information.",
+    viewDetails: "Voir les détails",
+    requestInfo: "Demander des informations",
+    addToCart: "Ajouter au panier",
+    close: "Fermer"
+  }
+};
+
 export function ProductCard({ product }: ProductCardProps) {
   const { currency } = useCurrency();
   const { addToCart } = useCart();
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
+  
   const isInfo = product.type === 'info';
 
   const handleInfoClick = () => {
     toast({
-      title: 'Contáctanos',
-      description: 'Por favor, contáctanos para activar este plan informativo.',
+      title: t.contactUs,
+      description: t.infoPlanContact,
     });
   };
 
@@ -60,14 +91,14 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardContent>
         <CardFooter className="flex flex-col items-stretch gap-2">
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-full">Ver Detalles</Button>
+                <Button variant="outline" className="w-full">{t.viewDetails}</Button>
             </DialogTrigger>
             {isInfo ? (
-                <Button variant="default" className="w-full" onClick={handleInfoClick}>Solicitar Info</Button>
+                <Button variant="default" className="w-full" onClick={handleInfoClick}>{t.requestInfo}</Button>
             ) : (
                 <Button className="w-full" onClick={handleAddToCart}>
                     <ShoppingCart className="mr-2" />
-                    Añadir al Carrito
+                    {t.addToCart}
                 </Button>
             )}
         </CardFooter>
@@ -89,15 +120,15 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         <DialogFooter>
             <DialogClose asChild>
-                <Button variant="outline">Cerrar</Button>
+                <Button variant="outline">{t.close}</Button>
             </DialogClose>
            {isInfo ? (
-                <Button variant="default" className="w-full" onClick={() => { handleInfoClick(); }}>Solicitar Info</Button>
+                <Button variant="default" className="w-full" onClick={() => { handleInfoClick(); }}>{t.requestInfo}</Button>
             ) : (
                 <DialogClose asChild>
                     <Button onClick={handleAddToCart}>
                         <ShoppingCart className="mr-2" />
-                        Añadir al Carrito
+                        {t.addToCart}
                     </Button>
                 </DialogClose>
             )}

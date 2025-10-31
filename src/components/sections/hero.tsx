@@ -36,8 +36,9 @@ export function Hero() {
 
   const t = labels[language.code as keyof typeof labels] || labels.en;
   
-  // Use translated site if available, but fallback to live site, then default site
-  const brand = translatedSite.brand || site.brand || DEFAULT_SITE.brand;
+  // Use translated site if available, otherwise fallback to the default content.
+  // This ensures that the content language always matches the selected language.
+  const brand = translatedSite.brand.name ? translatedSite.brand : DEFAULT_SITE.brand;
 
   const scrollToPlans = () => {
     document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' });
@@ -77,7 +78,7 @@ export function Hero() {
             </div>
           </div>
           <Image
-            src={brand.heroImage || 'https://picsum.photos/seed/rocket/600/400'}
+            src={site.brand.heroImage || brand.heroImage || 'https://picsum.photos/seed/rocket/600/400'}
             alt="Hero Image"
             width={600}
             height={400}
