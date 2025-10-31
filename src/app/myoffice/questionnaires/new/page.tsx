@@ -88,8 +88,13 @@ export default function NewQuestionnairePage() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(questionnaireUrl);
-    toast({ title: t.linkCopied, description: t.linkCopiedDesc });
+    try {
+      navigator.clipboard.writeText(questionnaireUrl);
+      toast({ title: t.linkCopied, description: t.linkCopiedDesc });
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      toast({ title: "Error al copiar", description: "No se pudo copiar el enlace al portapapeles.", variant: 'destructive'});
+    }
   };
 
   return (
@@ -120,13 +125,10 @@ export default function NewQuestionnairePage() {
             <Alert>
                 <LinkIcon className="h-4 w-4" />
                 <AlertTitle>{t.linkGenerated}</AlertTitle>
-                <AlertDescription className="flex items-center justify-between">
+                <AlertDescription>
                   <Link href={questionnaireUrl} target="_blank" className="text-sm underline truncate pr-4">
                     {questionnaireUrl}
                   </Link>
-                  <Button variant="ghost" size="icon" onClick={copyToClipboard}>
-                    <Clipboard className="h-4 w-4"/>
-                  </Button>
                 </AlertDescription>
             </Alert>
           )}
@@ -142,3 +144,5 @@ export default function NewQuestionnairePage() {
     </div>
   );
 }
+
+    

@@ -15,7 +15,7 @@ import { Bar, BarChart as RechartsBarChart, CartesianGrid, XAxis, YAxis, Legend,
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
 import Link from 'next/link';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import type { AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { useLanguage } from '@/hooks/use-language';
 
@@ -245,5 +245,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     

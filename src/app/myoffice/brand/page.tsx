@@ -163,7 +163,7 @@ export default function BrandEditorPage() {
                     <Card className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
                       {draft.brand.heroImage ? (
                           <div className="relative h-full w-full">
-                              <Image src={draft.brand.heroImage} alt="Vista previa del Héroe" fill className="rounded-md object-contain p-2" />
+                              <Image src={draft.brand.heroImage} alt="Vista previa del Héroe" layout="fill" className="rounded-md object-contain p-2" />
                           </div>
                       ) : (
                         <div className="text-center">
@@ -195,3 +195,5 @@ export default function BrandEditorPage() {
     </div>
   );
 }
+
+    
