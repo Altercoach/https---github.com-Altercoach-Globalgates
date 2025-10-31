@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { SiteData, Language } from '@/lib/types';
-import { LANGUAGES, LS_KEYS } from '@/lib/constants';
+import { LANGUAGES, LS_KEYS, DEFAULT_SITE } from '@/lib/constants';
 import { translateSiteContent } from '@/ai/flows/translate-site-content';
 import { useToast } from '@/hooks/use-toast';
 import { useSite } from '@/hooks/use-site';
@@ -41,16 +41,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [language, isMounted]);
 
-  const translateContent = useCallback(async (targetLanguage: Language, currentSite: SiteData) => {
-    if (targetLanguage.code === 'es') {
-      setTranslatedSite(currentSite);
+  const translateContent = useCallback(async (targetLanguage: Language) => {
+    // The default content in constants is now English, so it acts as the source of truth.
+    const sourceSiteData = DEFAULT_SITE;
+    
+    if (targetLanguage.code === 'en') {
+      // If the target is English, just use the default content.
+      setTranslatedSite(sourceSiteData);
       return;
     }
+
     setIsTranslating(true);
     try {
       // Exclude the hero image from the translation payload to save tokens
-      const { heroImage, ...siteContentToTranslate } = currentSite.brand;
-      const payload = { ...currentSite, brand: siteContentToTranslate };
+      const { heroImage, ...siteContentToTranslate } = sourceSiteData.brand;
+      const payload = { ...sourceSiteData, brand: siteContentToTranslate };
 
       const translatedJson = await translateSiteContent({
         siteContent: JSON.stringify(payload),
@@ -61,7 +66,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
       // Restore the hero image to the translated data
       if (translatedData.brand) {
-        translatedData.brand.heroImage = currentSite.brand.heroImage;
+        translatedData.brand.heroImage = sourceSiteData.brand.heroImage;
+      }
+      
+      // Also, restore the user-defined hero image from the live `site` object
+      if (site.brand.heroImage) {
+        translatedData.brand.heroImage = site.brand.heroImage;
       }
 
       setTranslatedSite(translatedData);
@@ -73,17 +83,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         description: 'Failed to translate content. Please try again.',
         variant: 'destructive',
       });
-      setTranslatedSite(currentSite); // Revert to current site
+      setTranslatedSite(sourceSiteData); // Revert to default
     } finally {
       setIsTranslating(false);
     }
-  }, [toast]);
+  }, [toast, site.brand.heroImage]);
 
   useEffect(() => {
     if(isMounted) {
-      translateContent(language, site);
+        // We always translate from the default English content
+        translateContent(language);
     }
-  }, [language, site, translateContent, isMounted]);
+    // The dependency on `site` is removed to avoid re-translating when site data changes.
+    // The translation is based on the default content, and dynamic user changes (like hero image)
+    // are handled separately or will be reflected on next language change.
+  }, [language, translateContent, isMounted]);
 
   const value = useMemo(() => ({
     language,
