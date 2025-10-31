@@ -13,7 +13,7 @@ import { useLanguage } from '@/hooks/use-language';
 const labels = {
   es: {
     title: "Panel de Cliente",
-    home: "Inicio",
+    home: "Página Principal",
     dashboard: "Dashboard",
     settings: "Configuración",
     logout: "Cerrar Sesión",
@@ -22,7 +22,7 @@ const labels = {
   },
   en: {
     title: "Customer Dashboard",
-    home: "Home",
+    home: "Main Page",
     dashboard: "Dashboard",
     settings: "Settings",
     logout: "Logout",
@@ -31,7 +31,7 @@ const labels = {
   },
   fr: {
     title: "Tableau de Bord Client",
-    home: "Accueil",
+    home: "Page d'accueil",
     dashboard: "Tableau de bord",
     settings: "Paramètres",
     logout: "Se déconnecter",
