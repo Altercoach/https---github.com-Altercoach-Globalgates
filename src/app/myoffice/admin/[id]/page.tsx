@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useMemo, use } from 'react';
+import { useState, useMemo, useEffect, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, BarChart, FileText, ShoppingBag, Edit, ArrowLeft, CheckCircle, Clock } from 'lucide-react';
+import { ShoppingBag, Edit, ArrowLeft, CheckCircle, Clock, BarChart, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
@@ -16,9 +16,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import Link from 'next/link';
 import type { Customer } from '@/lib/types';
 import { es } from 'date-fns/locale';
-
-// Mock data, in a real app this would be fetched based on params.id
-const customerData: Customer = { id: 'cus_002', name: 'Jane Smith', email: 'demo@cliente.com', plan: 'Setup Funnel + Contenido', status: 'Active', signupDate: new Date('2023-11-01'), revenue: 650 };
+import { initialCustomers } from '@/lib/constants';
 
 const chartData = [
   { month: "Enero", leads: 186, closed: 20 },
@@ -47,11 +45,31 @@ const customerQuestionnaires = [
 
 
 export default function CustomerDetailPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const { currency } = useCurrency();
   const customerId = use(Promise.resolve(params.id));
+  const [customerData, setCustomerData] = useState<Customer | undefined>(undefined);
+  
+  useEffect(() => {
+    const customer = initialCustomers.find(c => c.id === customerId);
+    if (customer) {
+      setCustomerData(customer);
+    } else {
+        router.push('/myoffice/admin');
+    }
+  }, [customerId, router]);
+
   const totalLeads = useMemo(() => chartData.reduce((acc, item) => acc + item.leads, 0), []);
   const totalClosed = useMemo(() => chartData.reduce((acc, item) => acc + item.closed, 0), []);
   const conversionRate = totalLeads > 0 ? (totalClosed / totalLeads) * 100 : 0;
+  
+  if (!customerData) {
+      return (
+        <div className="flex h-full w-full items-center justify-center">
+            <p>Cargando cliente...</p>
+        </div>
+      );
+  }
 
   return (
     <div className="space-y-6">

@@ -84,9 +84,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type, interval: prod.interval || null, qty: 1 }];
     });
     
-    toast({ description: 'Añadido al carrito.' });
+    if (!cart.some(item => item.id === prod.id && item.type === 'sub')) {
+      toast({ description: 'Añadido al carrito.' });
+    }
     setIsCartOpen(true);
-  }, [toast]);
+  }, [toast, cart]);
 
   const removeFromCart = (id: string) => setCart((prev) => prev.filter((x) => x.id !== id));
   const setQty = (id: string, qty: number) => setCart((prev) => prev.map((x) => (x.id === id ? { ...x, qty: clampQty(qty) } : x)));
