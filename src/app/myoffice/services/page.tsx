@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SiteData, Service, MultilingualString } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Trash2, Info, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -20,9 +19,6 @@ const labels = {
     pageSubtitle: "Gestiona los servicios que muestras en tu página de inicio.",
     newFeature: "Nueva característica",
     addFeature: "Añadir Característica",
-    saveChanges: "Guardar Cambios",
-    toastSuccessTitle: "¡Cambios guardados!",
-    toastSuccessDescription: "Tus servicios han sido actualizados.",
     editingLanguage: "Estás editando el contenido en",
     visible: "Visible en la página principal"
   },
@@ -31,9 +27,6 @@ const labels = {
     pageSubtitle: "Manage the services you display on your homepage.",
     newFeature: "New feature",
     addFeature: "Add Feature",
-    saveChanges: "Save Changes",
-    toastSuccessTitle: "Changes saved!",
-    toastSuccessDescription: "Your services have been updated.",
     editingLanguage: "You are editing the content in",
     visible: "Visible on homepage"
   },
@@ -42,9 +35,6 @@ const labels = {
     pageSubtitle: "Gérez les services que vous affichez sur votre page d'accueil.",
     newFeature: "Nouvelle fonctionnalité",
     addFeature: "Ajouter une Caractéristique",
-    saveChanges: "Enregistrer les Modifications",
-    toastSuccessTitle: "Changements enregistrés !",
-    toastSuccessDescription: "Vos services ont été mis à jour.",
     editingLanguage: "Vous éditez le contenu en",
     visible: "Visible sur la page d'accueil"
   }
@@ -52,23 +42,12 @@ const labels = {
 
 export default function ServicesEditorPage() {
   const { site, setSite } = useSite();
-  const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
-  const { toast } = useToast();
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
-
-  useEffect(() => {
-    setDraft(JSON.parse(JSON.stringify(site)));
-  }, [site]);
-
-  const saveChanges = () => {
-    setSite(draft);
-    toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
-  };
   
   const handleTextUpdate = (serviceId: string, field: keyof Service, value: any) => {
-    setDraft(prev => ({
+    setSite(prev => ({
       ...prev,
       services: prev.services.map(s => {
         if (s.id === serviceId) {
@@ -82,15 +61,16 @@ export default function ServicesEditorPage() {
   };
   
   const handleVisibilityToggle = (serviceId: string, checked: boolean) => {
-    const updatedServices = site.services.map(s => 
-      s.id === serviceId ? { ...s, visible: checked } : s
-    );
-    setSite(prev => ({ ...prev, services: updatedServices }));
+    setSite(prev => ({ 
+      ...prev, 
+      services: prev.services.map(s => 
+        s.id === serviceId ? { ...s, visible: checked } : s
+      ) 
+    }));
   };
 
-
   const handleBulletChange = (serviceId: string, bulletIndex: number, newText: string) => {
-    setDraft(prev => ({
+    setSite(prev => ({
       ...prev,
       services: prev.services.map(s => {
         if (s.id === serviceId) {
@@ -104,7 +84,7 @@ export default function ServicesEditorPage() {
   };
 
   const addBullet = (serviceId: string) => {
-    setDraft(prev => ({
+    setSite(prev => ({
         ...prev,
         services: prev.services.map(s => {
             if(s.id === serviceId) {
@@ -116,7 +96,7 @@ export default function ServicesEditorPage() {
   };
 
   const removeBullet = (serviceId: string, bulletIndex: number) => {
-    setDraft(prev => ({
+    setSite(prev => ({
         ...prev,
         services: prev.services.map(s => {
             if(s.id === serviceId) {
@@ -141,7 +121,7 @@ export default function ServicesEditorPage() {
       </Alert>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {draft.services.map((service) => (
+        {site.services.map((service) => (
           <Card key={service.id}>
             <CardHeader>
               <Input 
@@ -152,11 +132,11 @@ export default function ServicesEditorPage() {
               <div className="flex items-center space-x-2 pt-2">
                 <Switch 
                   id={`visible-${service.id}`} 
-                  checked={site.services.find(s => s.id === service.id)?.visible ?? false}
+                  checked={service.visible}
                   onCheckedChange={(checked) => handleVisibilityToggle(service.id, checked)}
                 />
                 <Label htmlFor={`visible-${service.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
-                  {(site.services.find(s => s.id === service.id)?.visible ?? false) ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
+                  {service.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
                   {t.visible}
                 </Label>
               </div>
@@ -181,10 +161,6 @@ export default function ServicesEditorPage() {
           </Card>
         ))}
       </div>
-      
-       <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>{t.saveChanges}</Button>
-        </div>
     </div>
   );
 }
