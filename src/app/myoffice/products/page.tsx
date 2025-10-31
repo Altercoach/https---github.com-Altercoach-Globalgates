@@ -6,7 +6,7 @@ import { useSite } from '@/hooks/use-site';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -15,27 +15,93 @@ import type { SiteData, Product, ProductFeature } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Trash2, FileText } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
+import { useLanguage } from '@/hooks/use-language';
 
-const stageOptions = [
-    { value: 'onboarding', label: 'Al contratar' },
-    { value: 'campaign_start', label: 'Al iniciar campaña' },
-    { value: 'campaign_end', label: 'Al finalizar campaña' },
-    { value: 'on_demand', label: 'Bajo demanda' },
-];
+const labels = {
+  es: {
+    pageTitle: "Productos y Planes",
+    pageSubtitle: "Gestiona los productos y planes de suscripción que ofreces.",
+    addProduct: "Añadir Producto",
+    newProduct: "Nuevo Producto",
+    newProductDesc: "Una breve descripción.",
+    newProductDetail: "Descripción detallada del nuevo producto.",
+    newBadge: "Nuevo",
+    nameLabel: "Nombre",
+    typeLabel: "Tipo",
+    priceLabel: "Precio (USD)",
+    noteLabel: "Nota (Descripción corta)",
+    badgeLabel: "Etiqueta",
+    fullDescLabel: "Descripción Completa",
+    includedFormsTitle: "Formularios Incluidos y Disparadores",
+    activationStage: "Etapa de activación",
+    saveChanges: "Guardar Cambios",
+    toastSuccessTitle: "¡Cambios guardados!",
+    toastSuccessDescription: "Tus productos han sido actualizados.",
+    productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
+    stageOptions: { onboarding: 'Al contratar', campaign_start: 'Al iniciar campaña', campaign_end: 'Al finalizar campaña', on_demand: 'Bajo demanda' },
+  },
+  en: {
+    pageTitle: "Products & Plans",
+    pageSubtitle: "Manage the products and subscription plans you offer.",
+    addProduct: "Add Product",
+    newProduct: "New Product",
+    newProductDesc: "A short description.",
+    newProductDetail: "Detailed description of the new product.",
+    newBadge: "New",
+    nameLabel: "Name",
+    typeLabel: "Type",
+    priceLabel: "Price (USD)",
+    noteLabel: "Note (Short description)",
+    badgeLabel: "Badge",
+    fullDescLabel: "Full Description",
+    includedFormsTitle: "Included Forms & Triggers",
+    activationStage: "Activation Stage",
+    saveChanges: "Save Changes",
+    toastSuccessTitle: "Changes saved!",
+    toastSuccessDescription: "Your products have been updated.",
+    productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
+    stageOptions: { onboarding: 'Onboarding', campaign_start: 'On campaign start', campaign_end: 'On campaign end', on_demand: 'On demand' },
+  },
+  fr: {
+    pageTitle: "Produits et Forfaits",
+    pageSubtitle: "Gérez les produits et les plans d'abonnement que vous proposez.",
+    addProduct: "Ajouter un Produit",
+    newProduct: "Nouveau Produit",
+    newProductDesc: "Une courte description.",
+    newProductDetail: "Description détaillée du nouveau produit.",
+    newBadge: "Nouveau",
+    nameLabel: "Nom",
+    typeLabel: "Type",
+    priceLabel: "Prix (USD)",
+    noteLabel: "Note (Description courte)",
+    badgeLabel: "Badge",
+    fullDescLabel: "Description Complète",
+    includedFormsTitle: "Formulaires et Déclencheurs Inclus",
+    activationStage: "Étape d'activation",
+    saveChanges: "Enregistrer les Modifications",
+    toastSuccessTitle: "Changements enregistrés !",
+    toastSuccessDescription: "Vos produits ont été mis à jour.",
+    productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
+    stageOptions: { onboarding: 'À l\'intégration', campaign_start: 'Au début de la campagne', campaign_end: 'À la fin de la campagne', on_demand: 'À la demande' },
+  }
+};
+
 
 export default function ProductsEditorPage() {
   const { site, setSite } = useSite();
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
+
+  const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
 
   useEffect(() => {
-    // Ensure all products have a features array by merging with defaults
     const siteWithFeatures = JSON.parse(JSON.stringify(site));
     siteWithFeatures.products.forEach((p: Product) => {
       if (!p.features) {
         p.features = JSON.parse(JSON.stringify(defaultFeatures));
       } else {
-        // Ensure all default features are present
         const featureIds = p.features.map(f => f.id);
         defaultFeatures.forEach(df => {
           if (!featureIds.includes(df.id)) {
@@ -49,7 +115,7 @@ export default function ProductsEditorPage() {
 
   const saveChanges = () => {
     setSite(draft);
-    toast({ title: '¡Cambios guardados!', description: 'Tus productos han sido actualizados.' });
+    toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
   };
   
   const handleProductUpdate = (id: string, field: keyof Product, value: any) => {
@@ -92,12 +158,12 @@ export default function ProductsEditorPage() {
   const addNewProduct = () => {
     const newProduct: Product = {
         id: `prod_${Date.now()}`,
-        name: 'Nuevo Producto',
+        name: t.newProduct,
         type: 'one',
         price: 100,
-        badge: 'Nuevo',
-        note: 'Una breve descripción.',
-        description: 'Descripción detallada del nuevo producto.',
+        badge: t.newBadge,
+        note: t.newProductDesc,
+        description: t.newProductDetail,
         interval: 'month',
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
@@ -112,12 +178,12 @@ export default function ProductsEditorPage() {
     <div className="space-y-6">
       <header className="flex items-center justify-between">
           <div>
-            <h1 className="font-headline text-3xl font-bold">Productos y Planes</h1>
-            <p className="text-muted-foreground">Gestiona los productos y planes de suscripción que ofreces.</p>
+            <h1 className="font-headline text-3xl font-bold">{t.pageTitle}</h1>
+            <p className="text-muted-foreground">{t.pageSubtitle}</p>
           </div>
           <Button onClick={addNewProduct} variant="outline">
               <PlusCircle className="mr-2" />
-              Añadir Producto
+              {t.addProduct}
           </Button>
       </header>
 
@@ -132,30 +198,30 @@ export default function ProductsEditorPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                      <div className="sm:col-span-2"><Label>Nombre</Label><Input value={product.name} onChange={e => handleProductUpdate(product.id, 'name', e.target.value)} /></div>
-                      <div><Label>Tipo</Label>
+                      <div className="sm:col-span-2"><Label>{t.nameLabel}</Label><Input value={product.name} onChange={e => handleProductUpdate(product.id, 'name', e.target.value)} /></div>
+                      <div><Label>{t.typeLabel}</Label>
                           <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v)}>
                               <SelectTrigger><SelectValue/></SelectTrigger>
                               <SelectContent>
-                                  <SelectItem value="one">Pago Único</SelectItem>
-                                  <SelectItem value="sub">Suscripción</SelectItem>
-                                  <SelectItem value="info">Informativo</SelectItem>
+                                  <SelectItem value="one">{t.productTypes.one}</SelectItem>
+                                  <SelectItem value="sub">{t.productTypes.sub}</SelectItem>
+                                  <SelectItem value="info">{t.productTypes.info}</SelectItem>
                               </SelectContent>
                           </Select>
                       </div>
-                      <div><Label>Precio (USD)</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value))} /></div>
-                      <div className="sm:col-span-2"><Label>Nota (Descripción corta)</Label><Input value={product.note} onChange={e => handleProductUpdate(product.id, 'note', e.target.value)} /></div>
-                      <div className="sm:col-span-2"><Label>Etiqueta</Label><Input value={product.badge} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value)} /></div>
+                      <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value))} /></div>
+                      <div className="sm:col-span-2"><Label>{t.noteLabel}</Label><Input value={product.note} onChange={e => handleProductUpdate(product.id, 'note', e.target.value)} /></div>
+                      <div className="sm:col-span-2"><Label>{t.badgeLabel}</Label><Input value={product.badge} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value)} /></div>
                     </div>
                     <div>
-                      <Label>Descripción Completa</Label>
+                      <Label>{t.fullDescLabel}</Label>
                       <Textarea value={product.description} onChange={e => handleProductUpdate(product.id, 'description', e.target.value)} rows={4} />
                     </div>
                     
                     <Separator className="my-6" />
 
                     <div>
-                        <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> Formularios Incluidos y Disparadores</h4>
+                        <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFormsTitle}</h4>
                         <div className="space-y-4">
                             {(product.features || []).map(feature => (
                                 <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border p-4">
@@ -174,7 +240,7 @@ export default function ProductsEditorPage() {
                                         disabled={!feature.enabled}
                                     >
                                         <SelectTrigger className="w-[180px]">
-                                            <SelectValue placeholder="Etapa de activación" />
+                                            <SelectValue placeholder={t.activationStage} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {stageOptions.map(opt => (
@@ -192,7 +258,7 @@ export default function ProductsEditorPage() {
       </div>
       
        <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>Guardar Cambios</Button>
+            <Button onClick={saveChanges}>{t.saveChanges}</Button>
         </div>
     </div>
   );

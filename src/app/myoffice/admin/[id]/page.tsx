@@ -15,8 +15,9 @@ import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
 import Link from 'next/link';
 import type { Customer } from '@/lib/types';
-import { es } from 'date-fns/locale';
+import { es, enUS, fr } from 'date-fns/locale';
 import { initialCustomers } from '@/lib/constants';
+import { useLanguage } from '@/hooks/use-language';
 
 const chartData = [
   { month: "Enero", leads: 186, closed: 20 },
@@ -43,12 +44,102 @@ const customerQuestionnaires = [
   { id: 'agent-training-001', type: 'Entrenamiento de Agente IA', status: 'Pendiente', date: new Date('2024-05-16')},
 ];
 
+const labels = {
+  es: {
+    backToClients: "Volver a Clientes",
+    pageTitle: "Detalle del Cliente",
+    pageSubtitle: "Vista 360° de",
+    loading: "Cargando cliente...",
+    generalInfo: "Información General",
+    plan: "Plan",
+    totalRevenue: "Ingresos Totales",
+    memberSince: "Miembro Desde",
+    status: "Estado",
+    activeServices: "Servicios Activos",
+    service: "Servicio",
+    type: "Tipo",
+    subType: "Suscripción",
+    oneTimeType: "Pago Único",
+    assignedQuestionnaires: "Cuestionarios Asignados",
+    actions: "Acciones",
+    completedStatus: "Completado",
+    pendingStatus: "Pendiente",
+    viewResponses: "Ver Respuestas",
+    viewSubmission: "Ver Envío",
+    marketingKPIs: "KPIs de Marketing",
+    leads: "Leads",
+    closures: "Cierres",
+    conversion: "Conversión",
+    performanceAnalytics: "Analíticas de Rendimiento",
+    performanceDesc: "Leads vs Cierres en los últimos 6 meses.",
+  },
+  en: {
+    backToClients: "Back to Clients",
+    pageTitle: "Customer Detail",
+    pageSubtitle: "360° view of",
+    loading: "Loading customer...",
+    generalInfo: "General Information",
+    plan: "Plan",
+    totalRevenue: "Total Revenue",
+    memberSince: "Member Since",
+    status: "Status",
+    activeServices: "Active Services",
+    service: "Service",
+    type: "Type",
+    subType: "Subscription",
+    oneTimeType: "One-time Payment",
+    assignedQuestionnaires: "Assigned Questionnaires",
+    actions: "Actions",
+    completedStatus: "Completed",
+    pendingStatus: "Pending",
+    viewResponses: "View Responses",
+    viewSubmission: "View Submission",
+    marketingKPIs: "Marketing KPIs",
+    leads: "Leads",
+    closures: "Closures",
+    conversion: "Conversion",
+    performanceAnalytics: "Performance Analytics",
+    performanceDesc: "Leads vs. Closures in the last 6 months.",
+  },
+  fr: {
+    backToClients: "Retour aux Clients",
+    pageTitle: "Détail du Client",
+    pageSubtitle: "Vue à 360° de",
+    loading: "Chargement du client...",
+    generalInfo: "Informations Générales",
+    plan: "Plan",
+    totalRevenue: "Revenu Total",
+    memberSince: "Membre Depuis",
+    status: "Statut",
+    activeServices: "Services Actifs",
+    service: "Service",
+    type: "Type",
+    subType: "Abonnement",
+    oneTimeType: "Paiement Unique",
+    assignedQuestionnaires: "Questionnaires Assignés",
+    actions: "Actions",
+    completedStatus: "Complété",
+    pendingStatus: "En attente",
+    viewResponses: "Voir les Réponses",
+    viewSubmission: "Voir la Soumission",
+    marketingKPIs: "KPIs Marketing",
+    leads: "Prospects",
+    closures: "Fermetures",
+    conversion: "Conversion",
+    performanceAnalytics: "Analytique de Performance",
+    performanceDesc: "Prospects vs Fermetures des 6 derniers mois.",
+  }
+};
+
 
 export default function CustomerDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { currency } = useCurrency();
   const customerId = use(Promise.resolve(params.id));
   const [customerData, setCustomerData] = useState<Customer | undefined>(undefined);
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const locale = { es, en: enUS, fr }[language.code] || enUS;
   
   useEffect(() => {
     const customer = initialCustomers.find(c => c.id === customerId);
@@ -66,7 +157,7 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
   if (!customerData) {
       return (
         <div className="flex h-full w-full items-center justify-center">
-            <p>Cargando cliente...</p>
+            <p>{t.loading}</p>
         </div>
       );
   }
@@ -86,40 +177,40 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
     <div className="space-y-6">
       <header>
           <Button variant="outline" size="sm" asChild className="mb-4">
-              <Link href="/myoffice/admin"><ArrowLeft className="mr-2"/> Volver a Clientes</Link>
+              <Link href="/myoffice/admin"><ArrowLeft className="mr-2"/> {t.backToClients}</Link>
           </Button>
-          <h1 className="text-3xl font-bold font-headline">Detalle del Cliente</h1>
-          <p className="text-muted-foreground">Vista 360° de {customerData.name} ({customerData.email})</p>
+          <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
+          <p className="text-muted-foreground">{t.pageSubtitle} {customerData.name} ({customerData.email})</p>
       </header>
 
        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
-                <CardHeader><CardTitle>Información General</CardTitle></CardHeader>
+                <CardHeader><CardTitle>{t.generalInfo}</CardTitle></CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                    <p><strong>Plan:</strong> {customerData.plan}</p>
-                    <p><strong>Ingresos Totales:</strong> {formatCurrency(customerData.revenue, currency)}</p>
-                    <p><strong>Miembro Desde:</strong> {format(customerData.signupDate, "dd MMM, yyyy", { locale: es })}</p>
-                    <p><strong>Estado:</strong> <Badge variant={getStatusBadgeVariant(customerData.status)} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
+                    <p><strong>{t.plan}:</strong> {customerData.plan}</p>
+                    <p><strong>{t.totalRevenue}:</strong> {formatCurrency(customerData.revenue, currency)}</p>
+                    <p><strong>{t.memberSince}:</strong> {format(customerData.signupDate, "dd MMM, yyyy", { locale })}</p>
+                    <p><strong>{t.status}:</strong> <Badge variant={getStatusBadgeVariant(customerData.status)} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
                 </CardContent>
             </Card>
             <Card className="md:col-span-2">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><ShoppingBag /> Servicios Activos</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><ShoppingBag /> {t.activeServices}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Servicio</TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Estado</TableHead>
+                                <TableHead>{t.service}</TableHead>
+                                <TableHead>{t.type}</TableHead>
+                                <TableHead>{t.status}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {activeServices.map(service => (
                             <TableRow key={service.id}>
                                 <TableCell className="font-medium">{service.name}</TableCell>
-                                <TableCell><Badge variant={service.type === 'sub' ? 'default' : 'secondary'}>{service.type === 'sub' ? 'Suscripción' : 'Pago Único'}</Badge></TableCell>
+                                <TableCell><Badge variant={service.type === 'sub' ? 'default' : 'secondary'}>{service.type === 'sub' ? t.subType : t.oneTimeType}</Badge></TableCell>
                                 <TableCell><Badge variant="outline">{service.status}</Badge></TableCell>
                             </TableRow>
                             ))}
@@ -132,56 +223,59 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><FileText /> Cuestionarios Asignados</CardTitle>
+                <CardTitle className="flex items-center gap-2"><FileText /> {t.assignedQuestionnaires}</CardTitle>
             </CardHeader>
             <CardContent>
                 <Table>
                     <TableHeader>
                     <TableRow>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead>Estado</TableHead>
-                        <TableHead className="text-right">Acciones</TableHead>
+                        <TableHead>{t.type}</TableHead>
+                        <TableHead>{t.status}</TableHead>
+                        <TableHead className="text-right">{t.actions}</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
-                    {customerQuestionnaires.map((q) => (
+                    {customerQuestionnaires.map((q) => {
+                       const isCompleted = q.status === 'Completado';
+                       return (
                         <TableRow key={q.id}>
                         <TableCell className="font-medium">{q.type}</TableCell>
                         <TableCell>
-                            <Badge variant={q.status === 'Completado' ? 'default' : 'secondary'} className={q.status === 'Completado' ? 'bg-accent text-accent-foreground' : ''}>
-                            {q.status === 'Completado' ? <CheckCircle className="mr-1 h-4 w-4" /> : <Clock className="mr-1 h-4 w-4" />}
-                            {q.status}
+                            <Badge variant={isCompleted ? 'default' : 'secondary'} className={isCompleted ? 'bg-accent text-accent-foreground' : ''}>
+                            {isCompleted ? <CheckCircle className="mr-1 h-4 w-4" /> : <Clock className="mr-1 h-4 w-4" />}
+                            {isCompleted ? t.completedStatus : t.pendingStatus}
                             </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                             <Button variant="outline" size="sm" asChild>
                             <Link href={`/myoffice/questionnaires/${q.id}`}>
-                                {q.status === 'Completado' ? 'Ver Respuestas' : 'Ver Envío'}
+                                {isCompleted ? t.viewResponses : t.viewSubmission}
                             </Link>
                             </Button>
                         </TableCell>
                         </TableRow>
-                    ))}
+                       )
+                    })}
                     </TableBody>
                 </Table>
             </CardContent>
         </Card>
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><BarChart/> KPIs de Marketing</CardTitle>
+                <CardTitle className="flex items-center gap-2"><BarChart/> {t.marketingKPIs}</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-4 text-center">
                 <div>
                     <p className="text-2xl font-bold">{totalLeads}</p>
-                    <p className="text-sm text-muted-foreground">Leads</p>
+                    <p className="text-sm text-muted-foreground">{t.leads}</p>
                 </div>
                  <div>
                     <p className="text-2xl font-bold">{totalClosed}</p>
-                    <p className="text-sm text-muted-foreground">Cierres</p>
+                    <p className="text-sm text-muted-foreground">{t.closures}</p>
                 </div>
                  <div>
                     <p className="text-2xl font-bold">{conversionRate.toFixed(1)}%</p>
-                    <p className="text-sm text-muted-foreground">Conversión</p>
+                    <p className="text-sm text-muted-foreground">{t.conversion}</p>
                 </div>
             </CardContent>
         </Card>
@@ -189,8 +283,8 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
 
        <Card>
             <CardHeader>
-                <CardTitle>Analíticas de Rendimiento</CardTitle>
-                <CardDescription>Leads vs Cierres en los últimos 6 meses.</CardDescription>
+                <CardTitle>{t.performanceAnalytics}</CardTitle>
+                <CardDescription>{t.performanceDesc}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig} className="h-[300px] w-full">

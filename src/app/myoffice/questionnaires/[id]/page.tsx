@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 
-// Datos de ejemplo para las respuestas. En el futuro, esto vendrá de la base de datos.
 const sampleAnswers = {
   eval: {
     'Sección 1: Información General del Negocio': {
@@ -34,6 +34,114 @@ const sampleAnswers = {
   }
 };
 
+const labels = {
+  es: {
+    back: "Volver a Cuestionarios",
+    pageTitle: "Respuestas del Cliente",
+    reviewing: "Revisando",
+    responsesTitle: "Respuestas del Cuestionario",
+    analysisTitle: "Análisis y Recomendación de IA",
+    loadingAnalysis: "La IA está analizando las respuestas...",
+    analysisError: "Error de Análisis",
+    analysisErrorDesc: "La IA no pudo procesar las respuestas. Por favor, inténtalo de nuevo más tarde.",
+    noAnalysis: "No se pudo generar el análisis.",
+    pendingAnalysis: "El análisis se generará automáticamente una vez que el cliente envíe sus respuestas.",
+    clientVisibility: "Permitir que el cliente vea este análisis",
+    visibilityOn: "Visibilidad para el cliente activada.",
+    visibilityOnDesc: "El cliente ahora puede ver este análisis.",
+    visibilityOff: "Visibilidad para el cliente desactivada.",
+    visibilityOffDesc: "El cliente ya no puede ver este análisis.",
+    download: "Descargar Análisis (PDF)",
+    agentProfileTitle: "Perfil del Agente de IA",
+    agentRole: "Rol Principal",
+    agentTone: "Tono de Voz",
+    agentPsychology: "Psicología y Comportamiento",
+    agentArchetype: "Arquetipo",
+    agentTraits: "Rasgos Clave",
+    agentSystemPrompt: "Prompt Generado para el Sistema",
+    swotAnalysis: "Análisis FODA",
+    strengths: "Fortalezas",
+    opportunities: "Oportunidades",
+    weaknesses: "Debilidades",
+    threats: "Amenazas",
+    recommendations: "Recomendaciones Estratégicas",
+    questionnaireTypes: {
+      'agent-training-001': "Entrenamiento de Agente de IA",
+      default: "Evaluación de Negocio"
+    }
+  },
+  en: {
+    back: "Back to Questionnaires",
+    pageTitle: "Customer Responses",
+    reviewing: "Reviewing",
+    responsesTitle: "Questionnaire Responses",
+    analysisTitle: "AI Analysis & Recommendation",
+    loadingAnalysis: "The AI is analyzing the responses...",
+    analysisError: "Analysis Error",
+    analysisErrorDesc: "The AI could not process the responses. Please try again later.",
+    noAnalysis: "Could not generate analysis.",
+    pendingAnalysis: "The analysis will be generated automatically once the customer submits their responses.",
+    clientVisibility: "Allow customer to see this analysis",
+    visibilityOn: "Visibility for customer enabled.",
+    visibilityOnDesc: "The customer can now see this analysis.",
+    visibilityOff: "Visibility for customer disabled.",
+    visibilityOffDesc: "The customer can no longer see this analysis.",
+    download: "Download Analysis (PDF)",
+    agentProfileTitle: "AI Agent Profile",
+    agentRole: "Main Role",
+    agentTone: "Tone of Voice",
+    agentPsychology: "Psychology and Behavior",
+    agentArchetype: "Archetype",
+    agentTraits: "Key Traits",
+    agentSystemPrompt: "Generated System Prompt",
+    swotAnalysis: "SWOT Analysis",
+    strengths: "Strengths",
+    opportunities: "Opportunities",
+    weaknesses: "Weaknesses",
+    threats: "Threats",
+    recommendations: "Strategic Recommendations",
+    questionnaireTypes: {
+      'agent-training-001': "AI Agent Training",
+      default: "Business Evaluation"
+    }
+  },
+  fr: {
+    back: "Retour aux Questionnaires",
+    pageTitle: "Réponses du Client",
+    reviewing: "Examen en cours",
+    responsesTitle: "Réponses au Questionnaire",
+    analysisTitle: "Analyse et Recommandation de l'IA",
+    loadingAnalysis: "L'IA analyse les réponses...",
+    analysisError: "Erreur d'Analyse",
+    analysisErrorDesc: "L'IA n'a pas pu traiter les réponses. Veuillez réessayer plus tard.",
+    noAnalysis: "Impossible de générer l'analyse.",
+    pendingAnalysis: "L'analyse sera générée automatiquement une fois que le client aura soumis ses réponses.",
+    clientVisibility: "Autoriser le client à voir cette analyse",
+    visibilityOn: "Visibilité pour le client activée.",
+    visibilityOnDesc: "Le client peut maintenant voir cette analyse.",
+    visibilityOff: "Visibilité pour le client désactivée.",
+    visibilityOffDesc: "Le client ne peut plus voir cette analyse.",
+    download: "Télécharger l'Analyse (PDF)",
+    agentProfileTitle: "Profil de l'Agent IA",
+    agentRole: "Rôle Principal",
+    agentTone: "Ton de la Voix",
+    agentPsychology: "Psychologie et Comportement",
+    agentArchetype: "Archétype",
+    agentTraits: "Traits Clés",
+    agentSystemPrompt: "Prompt Système Généré",
+    swotAnalysis: "Analyse SWOT",
+    strengths: "Forces",
+    opportunities: "Opportunités",
+    weaknesses: "Faiblesses",
+    threats: "Menaces",
+    recommendations: "Recommandations Stratégiques",
+    questionnaireTypes: {
+      'agent-training-001': "Formation d'Agent IA",
+      default: "Évaluation d'Entreprise"
+    }
+  }
+};
+
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
   const { id: questionnaireId } = params;
@@ -46,12 +154,11 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
   const [isLoading, setIsLoading] = useState(false);
   const [isClientVisible, setIsClientVisible] = useState(false);
   const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
 
   const questionnaireTitle = useMemo(() => {
-    if (isAgentTraining) return 'Entrenamiento de Agente de IA';
-    // Add other types here
-    return 'Evaluación de Negocio';
-  }, [isAgentTraining]);
+      return t.questionnaireTypes[questionnaireId as keyof typeof t.questionnaireTypes] || t.questionnaireTypes.default;
+  }, [questionnaireId, t]);
 
   const currentAnswers = useMemo(() => {
     if (isAgentTraining) return sampleAnswers.agent;
@@ -82,21 +189,21 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
         console.error("Analysis failed", error);
         toast({
           variant: "destructive",
-          title: "Error de Análisis",
-          description: "La IA no pudo procesar las respuestas. Por favor, inténtalo de nuevo más tarde."
+          title: t.analysisError,
+          description: t.analysisErrorDesc,
         });
       } finally {
         setIsLoading(false);
       }
     };
     getAnalysis();
-  }, [isCompleted, isAgentTraining, language, currentAnswers, toast]);
+  }, [isCompleted, isAgentTraining, language, currentAnswers, toast, t]);
 
   const handleVisibilityToggle = (checked: boolean) => {
     setIsClientVisible(checked);
     toast({
-        title: `Visibilidad para el cliente ${checked ? 'activada' : 'desactivada'}.`,
-        description: `El cliente ${checked ? 'ahora puede ver' : 'ya no puede ver'} este análisis.`,
+        title: checked ? t.visibilityOn : t.visibilityOff,
+        description: checked ? t.visibilityOnDesc : t.visibilityOffDesc,
     });
   }
   
@@ -105,7 +212,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
       return (
         <div className="flex flex-col items-center justify-center text-center py-8 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin mb-4" />
-          <p>La IA está analizando las respuestas...</p>
+          <p>{t.loadingAnalysis}</p>
         </div>
       );
     }
@@ -113,14 +220,14 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     if (businessAnalysis) {
       return (
          <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground">
-            <h4>Análisis FODA</h4>
+            <h4>{t.swotAnalysis}</h4>
             <div className="grid grid-cols-2 gap-x-4">
-                <p><strong>Fortalezas:</strong> {businessAnalysis.swot.strengths}</p>
-                <p><strong>Oportunidades:</strong> {businessAnalysis.swot.opportunities}</p>
-                <p><strong>Debilidades:</strong> {businessAnalysis.swot.weaknesses}</p>
-                <p><strong>Amenazas:</strong> {businessAnalysis.swot.threats}</p>
+                <p><strong>{t.strengths}:</strong> {businessAnalysis.swot.strengths}</p>
+                <p><strong>{t.opportunities}:</strong> {businessAnalysis.swot.opportunities}</p>
+                <p><strong>{t.weaknesses}:</strong> {businessAnalysis.swot.weaknesses}</p>
+                <p><strong>{t.threats}:</strong> {businessAnalysis.swot.threats}</p>
             </div>
-            <h4 className="mt-4">Recomendaciones Estratégicas</h4>
+            <h4 className="mt-4">{t.recommendations}</h4>
             <div className="text-sm font-sans whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: businessAnalysis.recommendations.replace(/\n/g, '<br />').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
         </div>
       )
@@ -129,15 +236,15 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     if (agentPrompt) {
          return (
             <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground">
-                <h4>Perfil del Agente de IA</h4>
-                <p><strong>Rol Principal:</strong> {agentPrompt.profile.role}</p>
-                <p><strong>Tono de Voz:</strong> {agentPrompt.profile.tone}</p>
+                <h4>{t.agentProfileTitle}</h4>
+                <p><strong>{t.agentRole}:</strong> {agentPrompt.profile.role}</p>
+                <p><strong>{t.agentTone}:</strong> {agentPrompt.profile.tone}</p>
                 
-                <h4 className="mt-4">Psicología y Comportamiento</h4>
-                <p><strong>Arquetipo:</strong> {agentPrompt.psychology.archetype}</p>
-                <p><strong>Rasgos Clave:</strong> {agentPrompt.psychology.traits}</p>
+                <h4 className="mt-4">{t.agentPsychology}</h4>
+                <p><strong>{t.agentArchetype}:</strong> {agentPrompt.psychology.archetype}</p>
+                <p><strong>{t.agentTraits}:</strong> {agentPrompt.psychology.traits}</p>
 
-                <h4 className="mt-4">Prompt Generado para el Sistema</h4>
+                <h4 className="mt-4">{t.agentSystemPrompt}</h4>
                 <Card className="bg-background mt-2">
                     <CardContent className="p-4 text-xs">
                         <pre className="whitespace-pre-wrap font-sans">{agentPrompt.systemPrompt}</pre>
@@ -149,7 +256,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     
     return (
         <div className="text-center py-8 text-muted-foreground">
-            <p>{isCompleted ? 'No se pudo generar el análisis.' : 'El análisis se generará automáticamente una vez que el cliente envíe sus respuestas.'}</p>
+            <p>{isCompleted ? t.noAnalysis : t.pendingAnalysis}</p>
         </div>
     )
   }
@@ -158,17 +265,17 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     <div className="space-y-6">
       <header>
         <Button variant="outline" size="sm" asChild className="mb-4">
-            <Link href="/myoffice/questionnaires"><ArrowLeft className="mr-2"/> Volver a Cuestionarios</Link>
+            <Link href="/myoffice/questionnaires"><ArrowLeft className="mr-2"/> {t.back}</Link>
         </Button>
-        <h1 className="font-headline text-3xl font-bold">Respuestas del Cliente</h1>
-        <p className="text-muted-foreground">Revisando: {questionnaireTitle}</p>
+        <h1 className="font-headline text-3xl font-bold">{t.pageTitle}</h1>
+        <p className="text-muted-foreground">{t.reviewing}: {questionnaireTitle}</p>
       </header>
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Columna de Respuestas */}
         <Card>
           <CardHeader>
-            <CardTitle>Respuestas del Cuestionario</CardTitle>
+            <CardTitle>{t.responsesTitle}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {isCompleted ? (
@@ -186,7 +293,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
                 </div>
               ))
             ) : (
-              <p className="text-muted-foreground text-center py-8">El cliente aún no ha completado este cuestionario.</p>
+              <p className="text-muted-foreground text-center py-8">{t.pendingAnalysis}</p>
             )}
           </CardContent>
         </Card>
@@ -194,7 +301,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
         {/* Columna de Análisis IA */}
         <Card className="bg-primary/5 sticky top-20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Bot /> Análisis y Recomendación de IA</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Bot /> {t.analysisTitle}</CardTitle>
           </CardHeader>
           <CardContent>
             {renderAnalysis()}
@@ -205,12 +312,12 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
                     <Switch id="client-visibility" checked={isClientVisible} onCheckedChange={handleVisibilityToggle} />
                     <Label htmlFor="client-visibility" className="flex items-center gap-2">
                         {isClientVisible ? <Eye /> : <EyeOff/>}
-                        Permitir que el cliente vea este análisis
+                        {t.clientVisibility}
                     </Label>
                 </div>
                 <Button variant="secondary" className="w-full">
                     <Download className="mr-2" />
-                    Descargar Análisis (PDF)
+                    {t.download}
                 </Button>
             </CardFooter>
            )}

@@ -12,11 +12,75 @@ import type { SiteData } from '@/lib/types';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Upload } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
+
+const labels = {
+  es: {
+    pageTitle: "Marca y Héroe",
+    pageSubtitle: "Gestiona tu identidad de marca y el contenido de la sección principal.",
+    brandDetailsTitle: "Detalles de la Marca",
+    brandDetailsSubtitle: "Esta información se utiliza en todo tu sitio.",
+    brandNameLabel: "Nombre de la Marca",
+    taglineLabel: "Eslogan",
+    heroSectionTitle: "Sección Héroe",
+    heroSectionSubtitle: "Esto es lo primero que ven los visitantes en tu página de inicio.",
+    heroTitleLabel: "Título del Héroe",
+    heroSubtitleLabel: "Subtítulo del Héroe",
+    heroImageLabel: "Imagen del Héroe",
+    heroImageRecommended: "Tamaño recomendado: 1200x800px.",
+    uploadImage: "Subir Imagen",
+    changeImage: "Cambiar Imagen",
+    saveChanges: "Guardar Cambios",
+    toastSuccessTitle: "¡Cambios guardados!",
+    toastSuccessDescription: "Los detalles de tu marca han sido actualizados."
+  },
+  en: {
+    pageTitle: "Brand & Hero",
+    pageSubtitle: "Manage your brand identity and the content of the main section.",
+    brandDetailsTitle: "Brand Details",
+    brandDetailsSubtitle: "This information is used throughout your site.",
+    brandNameLabel: "Brand Name",
+    taglineLabel: "Tagline",
+    heroSectionTitle: "Hero Section",
+    heroSectionSubtitle: "This is the first thing visitors see on your homepage.",
+    heroTitleLabel: "Hero Title",
+    heroSubtitleLabel: "Hero Subtitle",
+    heroImageLabel: "Hero Image",
+    heroImageRecommended: "Recommended size: 1200x800px.",
+    uploadImage: "Upload Image",
+    changeImage: "Change Image",
+    saveChanges: "Save Changes",
+    toastSuccessTitle: "Changes saved!",
+    toastSuccessDescription: "Your brand details have been updated."
+  },
+  fr: {
+    pageTitle: "Marque et Héro",
+    pageSubtitle: "Gérez votre identité de marque et le contenu de la section principale.",
+    brandDetailsTitle: "Détails de la Marque",
+    brandDetailsSubtitle: "Ces informations sont utilisées sur tout votre site.",
+    brandNameLabel: "Nom de la Marque",
+    taglineLabel: "Slogan",
+    heroSectionTitle: "Section Héro",
+    heroSectionSubtitle: "C'est la première chose que les visiteurs voient sur votre page d'accueil.",
+    heroTitleLabel: "Titre du Héro",
+    heroSubtitleLabel: "Sous-titre du Héro",
+    heroImageLabel: "Image du Héro",
+    heroImageRecommended: "Taille recommandée : 1200x800px.",
+    uploadImage: "Télécharger une Image",
+    changeImage: "Changer d'Image",
+    saveChanges: "Enregistrer les Modifications",
+    toastSuccessTitle: "Changements enregistrés !",
+    toastSuccessDescription: "Les détails de votre marque ont été mis à jour."
+  }
+};
+
 
 export default function BrandEditorPage() {
   const { site, setSite } = useSite();
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
 
   useEffect(() => {
     setDraft(JSON.parse(JSON.stringify(site)));
@@ -24,7 +88,7 @@ export default function BrandEditorPage() {
 
   const saveChanges = () => {
     setSite(draft);
-    toast({ title: '¡Cambios guardados!', description: 'Los detalles de tu marca han sido actualizados.' });
+    toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
   };
   
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,33 +111,33 @@ export default function BrandEditorPage() {
   return (
     <div className="space-y-6">
         <header>
-            <h1 className="text-3xl font-bold font-headline">Marca y Héroe</h1>
-            <p className="text-muted-foreground">Gestiona tu identidad de marca y el contenido de la sección principal.</p>
+            <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
+            <p className="text-muted-foreground">{t.pageSubtitle}</p>
         </header>
 
         <Card>
             <CardHeader>
-                <CardTitle>Detalles de la Marca</CardTitle>
-                <CardDescription>Esta información se utiliza en todo tu sitio.</CardDescription>
+                <CardTitle>{t.brandDetailsTitle}</CardTitle>
+                <CardDescription>{t.brandDetailsSubtitle}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div><Label>Nombre de la Marca</Label><Input className="border-0 px-0" value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
-                <div><Label>Eslogan</Label><Input className="border-0 px-0" value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
+                <div><Label>{t.brandNameLabel}</Label><Input className="border-0 px-0" value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
+                <div><Label>{t.taglineLabel}</Label><Input className="border-0 px-0" value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
             </CardContent>
         </Card>
 
          <Card>
             <CardHeader>
-                <CardTitle>Sección Héroe</CardTitle>
-                <CardDescription>Esto es lo primero que ven los visitantes en tu página de inicio.</CardDescription>
+                <CardTitle>{t.heroSectionTitle}</CardTitle>
+                <CardDescription>{t.heroSectionSubtitle}</CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                    <div><Label>Título del Héroe</Label><Input className="border-0 px-0" value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
-                    <div><Label>Subtítulo del Héroe</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
+                    <div><Label>{t.heroTitleLabel}</Label><Input className="border-0 px-0" value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
+                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
                 </div>
                  <div className="space-y-2">
-                    <Label>Imagen del Héroe</Label>
+                    <Label>{t.heroImageLabel}</Label>
                     <Card className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
                       {draft.brand.heroImage ? (
                           <div className="relative h-full w-full">
@@ -81,10 +145,10 @@ export default function BrandEditorPage() {
                           </div>
                       ) : (
                         <div className="text-center">
-                            <p className="text-sm text-muted-foreground">Tamaño recomendado: 1200x800px.</p>
+                            <p className="text-sm text-muted-foreground">{t.heroImageRecommended}</p>
                             <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
                                 <Upload className="mr-2"/>
-                                Subir Imagen
+                                {t.uploadImage}
                             </Button>
                             <Input id="heroImagePicker" type="file" accept="image/*" onChange={handleImagePick} className="hidden"/>
                         </div>
@@ -94,7 +158,7 @@ export default function BrandEditorPage() {
                         <div className="text-center">
                             <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
                                 <Upload className="mr-2"/>
-                                Cambiar Imagen
+                                {t.changeImage}
                             </Button>
                             <Input id="heroImagePicker" type="file" accept="image/*" onChange={handleImagePick} className="hidden"/>
                         </div>
@@ -104,7 +168,7 @@ export default function BrandEditorPage() {
         </Card>
 
         <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>Guardar Cambios</Button>
+            <Button onClick={saveChanges}>{t.saveChanges}</Button>
         </div>
     </div>
   );

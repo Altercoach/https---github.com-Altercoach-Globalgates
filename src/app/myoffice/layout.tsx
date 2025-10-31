@@ -77,7 +77,7 @@ export default function MyOfficeLayout({
   const router = useRouter();
   const { site } = useSite();
   const { auth, logout } = useAuth();
-  const { language } = useLanguage();
+  const { language, translatedSite } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
 
@@ -103,6 +103,8 @@ export default function MyOfficeLayout({
       </div>
     );
   }
+  
+  const siteName = translatedSite?.brand?.name || site.brand.name;
 
   return (
     <SidebarProvider>
@@ -114,7 +116,7 @@ export default function MyOfficeLayout({
                 <KeyRound />
               </Link>
             </Button>
-            <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">{site.brand.name}</span>
+            <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">{siteName}</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
