@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
@@ -177,44 +178,48 @@ export default function DashboardPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Bot /> Análisis y Resultados de IA</CardTitle>
+                    <CardTitle>Análisis y Resultados</CardTitle>
                     <CardDescription>Revisa los análisis y recomendaciones estratégicas que hemos preparado para ti.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {visibleAnalyses.map(item => (
-                        <Dialog key={item.id}>
-                            <DialogTrigger asChild>
-                                <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg cursor-pointer hover:bg-accent/20 transition-colors">
-                                    <div>
-                                        <h4 className="font-semibold">{item.title}</h4>
+                    {visibleAnalyses.length > 0 ? (
+                        visibleAnalyses.map(item => (
+                            <Dialog key={item.id}>
+                                <DialogTrigger asChild>
+                                    <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg cursor-pointer hover:bg-accent/20 transition-colors">
+                                        <div>
+                                            <h4 className="font-semibold">{item.title}</h4>
+                                        </div>
+                                        <Button size="sm" variant="outline">
+                                            <Eye className="mr-2 h-4 w-4" />
+                                            Ver Análisis
+                                        </Button>
                                     </div>
-                                    <Button size="sm" variant="outline">
-                                        <Eye className="mr-2" />
-                                        Ver Análisis
-                                    </Button>
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                                <DialogHeader>
-                                    <DialogTitle>{item.title}</DialogTitle>
-                                </DialogHeader>
-                                <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground mt-4">
-                                    <h4>Análisis FODA</h4>
-                                    <div className="grid grid-cols-2 gap-x-4">
-                                        <p><strong>Fortalezas:</strong> {item.analysis.swot.strengths}</p>
-                                        <p><strong>Oportunidades:</strong> {item.analysis.swot.opportunities}</p>
-                                        <p><strong>Debilidades:</strong> {item.analysis.swot.weaknesses}</p>
-                                        <p><strong>Amenazas:</strong> {item.analysis.swot.threats}</p>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl">
+                                    <DialogHeader>
+                                        <DialogTitle>{item.title}</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-strong:text-foreground mt-4">
+                                        <h4>Análisis FODA</h4>
+                                        <div className="grid grid-cols-2 gap-x-4">
+                                            <p><strong>Fortalezas:</strong> {item.analysis.swot.strengths}</p>
+                                            <p><strong>Oportunidades:</strong> {item.analysis.swot.opportunities}</p>
+                                            <p><strong>Debilidades:</strong> {item.analysis.swot.weaknesses}</p>
+                                            <p><strong>Amenazas:</strong> {item.analysis.swot.threats}</p>
+                                        </div>
+                                        <h4 className="mt-4">Recomendaciones Estratégicas</h4>
+                                        <div 
+                                            className="whitespace-pre-wrap font-sans text-sm" 
+                                            dangerouslySetInnerHTML={{ __html: item.analysis.recommendations.replace(/\* /g, '• ').replace(/\n/g, '<br />') }}
+                                        />
                                     </div>
-                                    <h4 className="mt-4">Recomendaciones Estratégicas</h4>
-                                    <div 
-                                        className="whitespace-pre-wrap font-sans text-sm" 
-                                        dangerouslySetInnerHTML={{ __html: item.analysis.recommendations.replace(/\* /g, '• ').replace(/\n/g, '<br />') }}
-                                    />
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    ))}
+                                </DialogContent>
+                            </Dialog>
+                        ))
+                    ) : (
+                        <p className="text-sm text-center text-muted-foreground py-4">Aún no hay análisis disponibles.</p>
+                    )}
                 </CardContent>
             </Card>
 
@@ -231,7 +236,7 @@ export default function DashboardPage() {
                           </div>
                           <Button asChild size="sm">
                               <Link href={action.href}>
-                                  <Edit className="mr-2" />
+                                  <Edit className="mr-2 h-4 w-4" />
                                   Completar
                               </Link>
                           </Button>
