@@ -67,7 +67,7 @@ export default function ServicesEditorPage() {
     toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
   };
   
-  const handleServiceUpdate = (serviceId: string, field: keyof Service, value: any) => {
+  const handleTextUpdate = (serviceId: string, field: keyof Service, value: any) => {
     setDraft(prev => ({
       ...prev,
       services: prev.services.map(s => {
@@ -75,12 +75,19 @@ export default function ServicesEditorPage() {
           if (field === 'title') {
             return { ...s, title: { ...s.title, [langCode]: value }};
           }
-          return { ...s, [field]: value };
         }
         return s;
       })
     }));
   };
+  
+  const handleVisibilityToggle = (serviceId: string, checked: boolean) => {
+    const updatedServices = site.services.map(s => 
+      s.id === serviceId ? { ...s, visible: checked } : s
+    );
+    setSite(prev => ({ ...prev, services: updatedServices }));
+  };
+
 
   const handleBulletChange = (serviceId: string, bulletIndex: number, newText: string) => {
     setDraft(prev => ({
@@ -140,16 +147,16 @@ export default function ServicesEditorPage() {
               <Input 
                 className="text-lg font-bold border-0 px-0"
                 value={service.title[langCode]} 
-                onChange={e => handleServiceUpdate(service.id, 'title', e.target.value)} 
+                onChange={e => handleTextUpdate(service.id, 'title', e.target.value)} 
               />
               <div className="flex items-center space-x-2 pt-2">
                 <Switch 
                   id={`visible-${service.id}`} 
-                  checked={service.visible}
-                  onCheckedChange={(checked) => handleServiceUpdate(service.id, 'visible', checked)}
+                  checked={site.services.find(s => s.id === service.id)?.visible ?? false}
+                  onCheckedChange={(checked) => handleVisibilityToggle(service.id, checked)}
                 />
                 <Label htmlFor={`visible-${service.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
-                  {service.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
+                  {(site.services.find(s => s.id === service.id)?.visible ?? false) ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
                   {t.visible}
                 </Label>
               </div>
