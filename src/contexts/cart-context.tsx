@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import type { CartItem, Product } from '@/lib/types';
+import type { CartItem } from '@/lib/types';
 import { LS_KEYS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,7 +11,7 @@ const clampQty = (n: number) => Math.max(1, Math.min(99, Number.isFinite(n) ? Ma
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product) => void;
+  addToCart: (product: { id: string; name: string; price: number; type: 'one' | 'sub'; interval?: 'month' | null }) => void;
   removeFromCart: (id: string) => void;
   setQty: (id: string, qty: number) => void;
   totals: { oneTotal: number; subTotal: number; total: number };
@@ -51,7 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, hasPurchased, isMounted]);
 
-  const addToCart = useCallback((prod: Product) => {
+  const addToCart = useCallback((prod: { id: string; name: string; price: number; type: 'one' | 'sub'; interval?: 'month' | null }) => {
     if (!prod || prod.type === 'info') {
       toast({
         title: 'Plan Informativo',

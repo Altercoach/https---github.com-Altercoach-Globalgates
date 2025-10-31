@@ -6,6 +6,7 @@ import { KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
+import { useSite } from '@/hooks/use-site';
 
 const labels = {
   es: {
@@ -29,11 +30,12 @@ const labels = {
 };
 
 export function Footer() {
-  const { translatedSite, language } = useLanguage();
+  const { language, getTranslation } = useLanguage();
+  const { site } = useSite();
   const { auth } = useAuth();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const t = labels[language.code] || labels.en;
 
-  const siteName = translatedSite.brand.name;
+  const siteName = getTranslation(site.brand.name);
 
   return (
     <footer className="w-full border-t bg-background">

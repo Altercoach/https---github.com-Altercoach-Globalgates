@@ -4,6 +4,7 @@
 import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';
+import { useSite } from '@/hooks/use-site';
 
 const labels = {
     es: {
@@ -21,10 +22,11 @@ const labels = {
 };
 
 export function Services() {
-  const { translatedSite, language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const { language, getTranslation } = useLanguage();
+  const { site } = useSite();
+  const t = labels[language.code] || labels.en;
   
-  const services = translatedSite.services;
+  const services = site.services;
 
   return (
     <section id="services" className="w-full py-12 md:py-24 lg:py-32 bg-background">
@@ -41,10 +43,10 @@ export function Services() {
           {services.map((service) => (
             <Card key={service.id}>
               <CardHeader>
-                <CardTitle>{service.title}</CardTitle>
+                <CardTitle>{getTranslation(service.title)}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {service.bullets.map((bullet, index) => (
+                {getTranslation(service.bullets).map((bullet, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <Check className="mt-1 h-4 w-4 shrink-0 text-accent" />
                     <span className="text-muted-foreground">{bullet}</span>

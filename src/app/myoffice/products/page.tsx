@@ -11,11 +11,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import type { SiteData, Product, ProductFeature } from '@/lib/types';
+import type { SiteData, Product, ProductFeature, MultilingualString } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, FileText } from 'lucide-react';
+import { PlusCircle, Trash2, FileText, Info } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const labels = {
   es: {
@@ -39,6 +40,7 @@ const labels = {
     toastSuccessDescription: "Tus productos han sido actualizados.",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
     stageOptions: { onboarding: 'Al contratar', campaign_start: 'Al iniciar campaña', campaign_end: 'Al finalizar campaña', on_demand: 'Bajo demanda' },
+    editingLanguage: "Estás editando el contenido en"
   },
   en: {
     pageTitle: "Products & Plans",
@@ -61,6 +63,7 @@ const labels = {
     toastSuccessDescription: "Your products have been updated.",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
     stageOptions: { onboarding: 'Onboarding', campaign_start: 'On campaign start', campaign_end: 'On campaign end', on_demand: 'On demand' },
+    editingLanguage: "You are editing the content in"
   },
   fr: {
     pageTitle: "Produits et Forfaits",
@@ -83,6 +86,7 @@ const labels = {
     toastSuccessDescription: "Vos produits ont été mis à jour.",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
     stageOptions: { onboarding: 'À l\'intégration', campaign_start: 'Au début de la campagne', campaign_end: 'À la fin de la campagne', on_demand: 'À la demande' },
+    editingLanguage: "Vous éditez le contenu en"
   }
 };
 
@@ -92,7 +96,8 @@ export default function ProductsEditorPage() {
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
   const { language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const langCode = language.code;
+  const t = labels[langCode] || labels.en;
 
   const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
 
@@ -121,7 +126,16 @@ export default function ProductsEditorPage() {
   const handleProductUpdate = (id: string, field: keyof Product, value: any) => {
     setDraft(prev => ({
         ...prev,
-        products: prev.products.map(p => p.id === id ? {...p, [field]: value} : p)
+        products: prev.products.map(p => {
+          if (p.id === id) {
+            if (field === 'name' || field === 'note' || field === 'description' || field === 'badge') {
+              const multilingualValue = p[field] as MultilingualString;
+              return { ...p, [field]: { ...multilingualValue, [langCode]: value } };
+            }
+            return { ...p, [field]: value };
+          }
+          return p;
+        })
     }));
   };
 
@@ -158,12 +172,12 @@ export default function ProductsEditorPage() {
   const addNewProduct = () => {
     const newProduct: Product = {
         id: `prod_${Date.now()}`,
-        name: t.newProduct,
+        name: { en: 'New Product', es: 'Nuevo Producto', fr: 'Nouveau Produit' },
         type: 'one',
         price: 100,
-        badge: t.newBadge,
-        note: t.newProductDesc,
-        description: t.newProductDetail,
+        badge: { en: 'New', es: 'Nuevo', fr: 'Nouveau' },
+        note: { en: 'A short description.', es: 'Una breve descripción.', fr: 'Une courte description.' },
+        description: { en: 'Detailed description of the new product.', es: 'Descripción detallada del nuevo producto.', fr: 'Description détaillée du nouveau produit.' },
         interval: 'month',
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
@@ -187,18 +201,23 @@ export default function ProductsEditorPage() {
           </Button>
       </header>
 
+      <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>{`${t.editingLanguage} ${language.name}`}</AlertTitle>
+      </Alert>
+
       <div className="space-y-4">
         {draft.products.map(product => (
             <Card key={product.id}>
                 <CardHeader className="flex flex-row items-start justify-between">
-                    <CardTitle className="text-lg leading-tight">{product.name}</CardTitle>
+                    <CardTitle className="text-lg leading-tight">{product.name[langCode]}</CardTitle>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
                         <Trash2 />
                     </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                      <div className="sm:col-span-2"><Label>{t.nameLabel}</Label><Input value={product.name} onChange={e => handleProductUpdate(product.id, 'name', e.target.value)} /></div>
+                      <div className="sm:col-span-2"><Label>{t.nameLabel}</Label><Input value={product.name[langCode]} onChange={e => handleProductUpdate(product.id, 'name', e.target.value)} /></div>
                       <div><Label>{t.typeLabel}</Label>
                           <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v)}>
                               <SelectTrigger><SelectValue/></SelectTrigger>
@@ -210,12 +229,12 @@ export default function ProductsEditorPage() {
                           </Select>
                       </div>
                       <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value))} /></div>
-                      <div className="sm:col-span-2"><Label>{t.noteLabel}</Label><Input value={product.note} onChange={e => handleProductUpdate(product.id, 'note', e.target.value)} /></div>
-                      <div className="sm:col-span-2"><Label>{t.badgeLabel}</Label><Input value={product.badge} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value)} /></div>
+                      <div className="sm:col-span-2"><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value)} /></div>
+                      <div className="sm:col-span-2"><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value)} /></div>
                     </div>
                     <div>
                       <Label>{t.fullDescLabel}</Label>
-                      <Textarea value={product.description} onChange={e => handleProductUpdate(product.id, 'description', e.target.value)} rows={4} />
+                      <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value)} rows={4} />
                     </div>
                     
                     <Separator className="my-6" />

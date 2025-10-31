@@ -66,10 +66,15 @@ export function ProductCard({ product }: ProductCardProps) {
   const { currency } = useCurrency();
   const { addToCart } = useCart();
   const { toast } = useToast();
-  const { language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const { language, getTranslation } = useLanguage();
+  const t = labels[language.code] || labels.en;
   
   const isInfo = product.type === 'info';
+
+  const productName = getTranslation(product.name);
+  const productBadge = getTranslation(product.badge);
+  const productNote = getTranslation(product.note);
+  const productDescription = getTranslation(product.description);
 
   const handleInfoClick = () => {
     toast({
@@ -79,18 +84,18 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleAddToCart = () => {
-    addToCart(product);
+    // Pass the name in the current language to the cart
+    addToCart({ ...product, name: productName });
   }
 
-  const badge = product.badge[language.code as keyof typeof product.badge] || product.badge['en'] || product.badge;
 
   return (
     <Dialog>
       <Card className="flex flex-col">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
-              <CardTitle className="text-lg">{product.name}</CardTitle>
-              <Badge variant="outline" className="shrink-0 border-accent text-accent">{badge}</Badge>
+              <CardTitle className="text-lg">{productName}</CardTitle>
+              <Badge variant="outline" className="shrink-0 border-accent text-accent">{productBadge}</Badge>
           </div>
         </CardHeader>
         <CardContent className="flex-grow">
@@ -98,7 +103,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? t.variable : t.free)}
               {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
           </div>
-          <CardDescription className="mt-2 min-h-[40px]">{product.note}</CardDescription>
+          <CardDescription className="mt-2 min-h-[40px]">{productNote}</CardDescription>
         </CardContent>
         <CardFooter className="flex flex-col items-stretch gap-2">
             <DialogTrigger asChild>
@@ -117,13 +122,13 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{product.name}</DialogTitle>
+          <DialogTitle>{productName}</DialogTitle>
           <DialogDescription>
-             <Badge variant="outline" className="border-accent text-accent mt-2">{badge}</Badge>
+             <Badge variant="outline" className="border-accent text-accent mt-2">{productBadge}</Badge>
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <p>{product.description}</p>
+          <p>{productDescription}</p>
           <div className="mt-4 text-2xl font-bold">
             {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? t.variable : t.free)}
             {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
@@ -148,5 +153,3 @@ export function ProductCard({ product }: ProductCardProps) {
     </Dialog>
   );
 }
-
-    

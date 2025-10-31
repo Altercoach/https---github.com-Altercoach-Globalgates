@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
 import { CheckCircle } from 'lucide-react';
+import { useSite } from '@/hooks/use-site';
 
 const labels = {
   es: {
@@ -29,10 +30,9 @@ const labels = {
 
 
 export function Hero() {
-  const { translatedSite, language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
-  
-  const { brand } = translatedSite;
+  const { language, getTranslation } = useLanguage();
+  const { site } = useSite();
+  const t = labels[language.code] || labels.en;
 
   const scrollToPlans = () => {
     document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' });
@@ -45,10 +45,10 @@ export function Hero() {
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                {brand.heroTitle}
+                {getTranslation(site.brand.heroTitle)}
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                {brand.heroSubtitle}
+                {getTranslation(site.brand.heroSubtitle)}
               </p>
             </div>
             <ul className="grid gap-2 text-lg">
@@ -72,7 +72,7 @@ export function Hero() {
             </div>
           </div>
           <Image
-            src={brand.heroImage || 'https://picsum.photos/seed/rocket/600/400'}
+            src={site.brand.heroImage || 'https://picsum.photos/seed/rocket/600/400'}
             alt="Hero Image"
             width={600}
             height={400}

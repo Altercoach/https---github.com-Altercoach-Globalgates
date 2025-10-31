@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SiteData, Service } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Info } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const labels = {
   es: {
@@ -19,7 +20,8 @@ const labels = {
     addFeature: "Añadir Característica",
     saveChanges: "Guardar Cambios",
     toastSuccessTitle: "¡Cambios guardados!",
-    toastSuccessDescription: "Tus servicios han sido actualizados."
+    toastSuccessDescription: "Tus servicios han sido actualizados.",
+    editingLanguage: "Estás editando el contenido en"
   },
   en: {
     pageTitle: "Services",
@@ -28,7 +30,8 @@ const labels = {
     addFeature: "Add Feature",
     saveChanges: "Save Changes",
     toastSuccessTitle: "Changes saved!",
-    toastSuccessDescription: "Your services have been updated."
+    toastSuccessDescription: "Your services have been updated.",
+    editingLanguage: "You are editing the content in"
   },
   fr: {
     pageTitle: "Services",
@@ -37,7 +40,8 @@ const labels = {
     addFeature: "Ajouter une Caractéristique",
     saveChanges: "Enregistrer les Modifications",
     toastSuccessTitle: "Changements enregistrés !",
-    toastSuccessDescription: "Vos services ont été mis à jour."
+    toastSuccessDescription: "Vos services ont été mis à jour.",
+    editingLanguage: "Vous éditez le contenu en"
   }
 };
 
@@ -46,7 +50,8 @@ export default function ServicesEditorPage() {
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
   const { language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const langCode = language.code;
+  const t = labels[langCode] || labels.en;
 
   useEffect(() => {
     setDraft(JSON.parse(JSON.stringify(site)));
@@ -60,7 +65,7 @@ export default function ServicesEditorPage() {
   const handleServiceTitleChange = (serviceId: string, newTitle: string) => {
     setDraft(prev => ({
       ...prev,
-      services: prev.services.map(s => s.id === serviceId ? { ...s, title: newTitle } : s)
+      services: prev.services.map(s => s.id === serviceId ? { ...s, title: {...s.title, [langCode]: newTitle } } : s)
     }));
   };
 
@@ -70,7 +75,7 @@ export default function ServicesEditorPage() {
       services: prev.services.map(s => {
         if (s.id === serviceId) {
           const newBullets = [...s.bullets];
-          newBullets[bulletIndex] = newText;
+          newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
           return { ...s, bullets: newBullets };
         }
         return s;
@@ -83,7 +88,7 @@ export default function ServicesEditorPage() {
         ...prev,
         services: prev.services.map(s => {
             if(s.id === serviceId) {
-                return {...s, bullets: [...s.bullets, t.newFeature]}
+                return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New Feature', fr: 'Nouvelle fonctionnalité'}]}
             }
             return s;
         })
@@ -110,13 +115,18 @@ export default function ServicesEditorPage() {
         <p className="text-muted-foreground">{t.pageSubtitle}</p>
       </header>
 
+      <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>{`${t.editingLanguage} ${language.name}`}</AlertTitle>
+      </Alert>
+
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {draft.services.map((service) => (
           <Card key={service.id}>
             <CardHeader>
               <Input 
                 className="text-lg font-bold border-0 px-0"
-                value={service.title} 
+                value={service.title[langCode]} 
                 onChange={e => handleServiceTitleChange(service.id, e.target.value)} 
               />
             </CardHeader>
@@ -124,7 +134,7 @@ export default function ServicesEditorPage() {
               {service.bullets.map((bullet, b_idx) => (
                 <div key={b_idx} className="flex items-center gap-2">
                     <Input 
-                        value={bullet} 
+                        value={bullet[langCode]} 
                         className="border-0 px-0"
                         onChange={e => handleBulletChange(service.id, b_idx, e.target.value)}
                     />

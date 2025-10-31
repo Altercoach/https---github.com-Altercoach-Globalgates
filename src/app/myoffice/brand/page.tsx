@@ -11,8 +11,9 @@ import { Label } from '@/components/ui/label';
 import type { SiteData } from '@/lib/types';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
-import { Upload } from 'lucide-react';
+import { Upload, Info } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const labels = {
   es: {
@@ -32,7 +33,8 @@ const labels = {
     changeImage: "Cambiar Imagen",
     saveChanges: "Guardar Cambios",
     toastSuccessTitle: "¡Cambios guardados!",
-    toastSuccessDescription: "Los detalles de tu marca han sido actualizados."
+    toastSuccessDescription: "Los detalles de tu marca han sido actualizados.",
+    editingLanguage: "Estás editando el contenido en"
   },
   en: {
     pageTitle: "Brand & Hero",
@@ -51,7 +53,8 @@ const labels = {
     changeImage: "Change Image",
     saveChanges: "Save Changes",
     toastSuccessTitle: "Changes saved!",
-    toastSuccessDescription: "Your brand details have been updated."
+    toastSuccessDescription: "Your brand details have been updated.",
+    editingLanguage: "You are editing the content in"
   },
   fr: {
     pageTitle: "Marque et Héro",
@@ -70,7 +73,8 @@ const labels = {
     changeImage: "Changer d'Image",
     saveChanges: "Enregistrer les Modifications",
     toastSuccessTitle: "Changements enregistrés !",
-    toastSuccessDescription: "Les détails de votre marque ont été mis à jour."
+    toastSuccessDescription: "Les détails de votre marque ont été mis à jour.",
+    editingLanguage: "Vous éditez le contenu en"
   }
 };
 
@@ -80,7 +84,8 @@ export default function BrandEditorPage() {
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
   const { language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
+  const langCode = language.code;
+  const t = labels[langCode] || labels.en;
 
   useEffect(() => {
     setDraft(JSON.parse(JSON.stringify(site)));
@@ -107,6 +112,18 @@ export default function BrandEditorPage() {
     document.getElementById('heroImagePicker')?.click();
   }
 
+  const handleTextChange = (field: keyof SiteData['brand'], subField: 'name' | 'tagline' | 'heroTitle' | 'heroSubtitle', value: string) => {
+    setDraft(prev => ({
+        ...prev,
+        brand: {
+            ...prev.brand,
+            [subField]: {
+                ...prev.brand[subField],
+                [langCode]: value,
+            }
+        }
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -115,14 +132,19 @@ export default function BrandEditorPage() {
             <p className="text-muted-foreground">{t.pageSubtitle}</p>
         </header>
 
+        <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>{`${t.editingLanguage} ${language.name}`}</AlertTitle>
+        </Alert>
+
         <Card>
             <CardHeader>
                 <CardTitle>{t.brandDetailsTitle}</CardTitle>
                 <CardDescription>{t.brandDetailsSubtitle}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div><Label>{t.brandNameLabel}</Label><Input className="border-0 px-0" value={draft.brand.name} onChange={e => setDraft(p => ({...p, brand: {...p.brand, name: e.target.value}}))} /></div>
-                <div><Label>{t.taglineLabel}</Label><Input className="border-0 px-0" value={draft.brand.tagline} onChange={e => setDraft(p => ({...p, brand: {...p.brand, tagline: e.target.value}}))} /></div>
+                <div><Label>{t.brandNameLabel}</Label><Input className="border-0 px-0" value={draft.brand.name[langCode]} onChange={e => handleTextChange('brand', 'name', e.target.value)} /></div>
+                <div><Label>{t.taglineLabel}</Label><Input className="border-0 px-0" value={draft.brand.tagline[langCode]} onChange={e => handleTextChange('brand', 'tagline', e.target.value)} /></div>
             </CardContent>
         </Card>
 
@@ -133,8 +155,8 @@ export default function BrandEditorPage() {
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                    <div><Label>{t.heroTitleLabel}</Label><Input className="border-0 px-0" value={draft.brand.heroTitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroTitle: e.target.value}}))} /></div>
-                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle} onChange={e => setDraft(p => ({...p, brand: {...p.brand, heroSubtitle: e.target.value}}))} rows={5} /></div>
+                    <div><Label>{t.heroTitleLabel}</Label><Input className="border-0 px-0" value={draft.brand.heroTitle[langCode]} onChange={e => handleTextChange('brand', 'heroTitle', e.target.value)} /></div>
+                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle[langCode]} onChange={e => handleTextChange('brand', 'heroSubtitle', e.target.value)} rows={5} /></div>
                 </div>
                  <div className="space-y-2">
                     <Label>{t.heroImageLabel}</Label>

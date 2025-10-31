@@ -1,5 +1,11 @@
 
 
+export type MultilingualString = {
+  es: string;
+  en: string;
+  fr: string;
+};
+
 export type ProductFeature = {
   id: string; // e.g., 'brief-marketing', 'business-evaluation', 'agent-training'
   name: string;
@@ -7,35 +13,29 @@ export type ProductFeature = {
   enabled: boolean;
 };
 
-export type ProductBadge = {
-  en: string;
-  es: string;
-  fr: string;
-}
-
 export type Product = {
   id: string;
-  name: string;
+  name: MultilingualString;
   type: 'one' | 'sub' | 'info';
   price: number;
-  badge: ProductBadge;
-  note: string;
-  description: string;
+  badge: MultilingualString;
+  note: MultilingualString;
+  description: MultilingualString;
   interval?: 'month';
   features?: ProductFeature[];
 };
 
 export type Service = {
   id: string;
-  title: string;
-  bullets: string[];
+  title: MultilingualString;
+  bullets: MultilingualString[];
 };
 
 export type SiteBrand = {
-  name: string;
-  tagline: string;
-  heroTitle: string;
-  heroSubtitle: string;
+  name: MultilingualString;
+  tagline: MultilingualString;
+  heroTitle: MultilingualString;
+  heroSubtitle: MultilingualString;
   heroImage: string;
   colors: {
     gold: string;
@@ -53,7 +53,7 @@ export type SiteData = {
 
 export type CartItem = {
   id: string;
-  name: string;
+  name: string; // This will be the name in the current language
   price: number;
   type: 'one' | 'sub';
   interval: 'month' | null;
@@ -73,7 +73,7 @@ export type AuthState = {
 };
 
 export type Language = {
-  code: string;
+  code: 'es' | 'en' | 'fr';
   name: string;
 };
 
