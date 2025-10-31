@@ -12,28 +12,28 @@ interface AuthContextType {
   logout: () => void;
 }
 
+const initialAuthState: AuthState = { loggedIn: false, user: null };
+
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [auth, setAuth] = useState<AuthState>(initialAuthState);
   const [isMounted, setIsMounted] = useState(false);
 
-  const [auth, setAuth] = useState<AuthState>(() => {
-    if (typeof window === 'undefined') return { loggedIn: false, user: null };
+  useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEYS.AUTH);
-      const parsed = raw ? JSON.parse(raw) : { loggedIn: false, user: null };
-      // Basic validation
-      if (parsed.user && parsed.user.role) {
-        return parsed;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        // Basic validation
+        if (parsed.user && parsed.user.role) {
+          setAuth(parsed);
+        }
       }
-      return { loggedIn: false, user: null };
     } catch {
-      return { loggedIn: false, user: null };
+      // Ignore parsing errors
     }
-  });
-
-  useEffect(() => {
     setIsMounted(true);
   }, []);
 

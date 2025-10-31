@@ -20,18 +20,19 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(un
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const { site, isMounted: isSiteMounted } = useSite(); 
-  const [isMounted, setIsMounted] = useState(false);
-  
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window === 'undefined') return LANGUAGES[0];
-    const storedLangCode = localStorage.getItem(LS_KEYS.LANGUAGE);
-    return LANGUAGES.find(l => l.code === storedLangCode) || LANGUAGES[0];
-  });
-  
+  const [language, setLanguageState] = useState<Language>(LANGUAGES[0]);
   const [translatedSite, setTranslatedSite] = useState<SiteData>(site);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    try {
+      const storedLangCode = localStorage.getItem(LS_KEYS.LANGUAGE);
+      const foundLang = LANGUAGES.find(l => l.code === storedLangCode);
+      if(foundLang) setLanguageState(foundLang);
+    } catch {
+      // Ignore errors
+    }
     setIsMounted(true);
   }, []);
 
@@ -56,7 +57,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     try {
       // Exclude elements that shouldn't be translated.
       const { heroImage, ...brandContentToTranslate } = sourceSiteInEnglish.brand;
-      const productsToTranslate = sourceSiteInEnglish.products.map(({ badge, ...rest }) => rest);
+      const productsToTranslate = sourceSiteInEnglish.products.map(({ id, type, price, interval, features, badge, ...rest }) => rest);
       
       const payload = { 
           brand: brandContentToTranslate,

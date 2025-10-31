@@ -14,26 +14,22 @@ interface SiteContextType {
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export function SiteProvider({ children }: { children: React.ReactNode }) {
+  const [site, setSite] = useState<SiteData>(DEFAULT_SITE);
   const [isMounted, setIsMounted] = useState(false);
 
-  const [site, setSite] = useState<SiteData>(() => {
-    if (typeof window === 'undefined') {
-      return DEFAULT_SITE;
-    }
+  useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEYS.SITE);
-      const parsed = raw ? JSON.parse(raw) : DEFAULT_SITE;
-      // Basic validation to ensure we don't load corrupted data
-      if (parsed && parsed.brand && parsed.services && parsed.products) {
-        return parsed;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        // Basic validation to ensure we don't load corrupted data
+        if (parsed && parsed.brand && parsed.services && parsed.products) {
+          setSite(parsed);
+        }
       }
-      return DEFAULT_SITE;
     } catch {
-      return DEFAULT_SITE;
+      // Ignore parsing errors and keep default site data
     }
-  });
-
-  useEffect(() => {
     setIsMounted(true);
   }, []);
 

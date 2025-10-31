@@ -13,14 +13,19 @@ interface CurrencyContextType {
 export const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
+  const [currency, setCurrencyState] = useState<Currency>(CURRENCIES[0]);
   const [isMounted, setIsMounted] = useState(false);
-  const [currency, setCurrencyState] = useState<Currency>(() => {
-     if (typeof window === 'undefined') return CURRENCIES[0];
-    const storedCurrencyCode = localStorage.getItem(LS_KEYS.CURRENCY);
-    return CURRENCIES.find(c => c.code === storedCurrencyCode) || CURRENCIES[0];
-  });
   
   useEffect(() => {
+    try {
+      const storedCurrencyCode = localStorage.getItem(LS_KEYS.CURRENCY);
+      const foundCurrency = CURRENCIES.find(c => c.code === storedCurrencyCode);
+      if (foundCurrency) {
+        setCurrencyState(foundCurrency);
+      }
+    } catch {
+      // Ignore errors
+    }
     setIsMounted(true);
   }, []);
 

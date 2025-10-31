@@ -26,40 +26,30 @@ export const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const router = useRouter();
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [hasPurchased, setHasPurchased] = useState<boolean>(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    try {
+      const rawCart = localStorage.getItem(LS_KEYS.CART);
+      if (rawCart) setCart(JSON.parse(rawCart));
+      
+      const rawPurchased = localStorage.getItem(LS_KEYS.PURCHASED);
+      if (rawPurchased) setHasPurchased(rawPurchased === '1');
+    } catch {
+      // Ignore errors
+    }
     setIsMounted(true);
   }, []);
-
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const raw = localStorage.getItem(LS_KEYS.CART);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [hasPurchased, setHasPurchased] = useState<boolean>(() => {
-     if (typeof window === 'undefined') return false;
-    return localStorage.getItem(LS_KEYS.PURCHASED) === '1';
-  });
-
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem(LS_KEYS.CART, JSON.stringify(cart));
-    }
-  }, [cart, isMounted]);
-
-  useEffect(() => {
-    if (isMounted) {
       localStorage.setItem(LS_KEYS.PURCHASED, hasPurchased ? '1' : '0');
     }
-  }, [hasPurchased, isMounted]);
+  }, [cart, hasPurchased, isMounted]);
 
   const addToCart = useCallback((prod: Product) => {
     if (!prod || prod.type === 'info') {
@@ -96,7 +86,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const safeQty = clampQty(qty);
     setCart((prev) => prev.map((x) => (x.id === id ? { ...x, qty: safeQty } : x)));
   };
-
 
   const totals = useMemo(() => {
     const one = cart.filter((i) => i.type === 'one');
