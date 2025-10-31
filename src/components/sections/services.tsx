@@ -5,6 +5,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';
 import { useSite } from '@/hooks/use-site';
+import type { MultilingualString } from '@/lib/types';
 
 const labels = {
     es: {
@@ -24,9 +25,9 @@ const labels = {
 export function Services() {
   const { language, getTranslation } = useLanguage();
   const { site } = useSite();
-  const t = labels[language.code] || labels.en;
+  const t = labels[language.code as keyof typeof labels] || labels.en;
   
-  const services = site.services;
+  const services = site.services.filter(s => s.visible);
 
   return (
     <section id="services" className="w-full py-12 md:py-24 lg:py-32 bg-background">

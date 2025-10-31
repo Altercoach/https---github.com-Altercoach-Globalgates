@@ -21,7 +21,6 @@ export type Product = {
   badge: MultilingualString;
   note: MultilingualString;
   description: MultilingualString;
-  interval?: 'month';
   features?: ProductFeature[];
 };
 
@@ -29,6 +28,7 @@ export type Service = {
   id: string;
   title: MultilingualString;
   bullets: MultilingualString[];
+  visible: boolean;
 };
 
 export type SiteBrand = {
@@ -56,7 +56,6 @@ export type CartItem = {
   name: string; // This will be the name in the current language
   price: number;
   type: 'one' | 'sub';
-  interval: 'month' | null;
   qty: number;
 };
 

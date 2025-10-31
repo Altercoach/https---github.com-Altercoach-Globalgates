@@ -6,11 +6,13 @@ import { useSite } from '@/hooks/use-site';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { SiteData, Service } from '@/lib/types';
+import type { SiteData, Service, MultilingualString } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, Info } from 'lucide-react';
+import { PlusCircle, Trash2, Info, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const labels = {
   es: {
@@ -21,7 +23,8 @@ const labels = {
     saveChanges: "Guardar Cambios",
     toastSuccessTitle: "¡Cambios guardados!",
     toastSuccessDescription: "Tus servicios han sido actualizados.",
-    editingLanguage: "Estás editando el contenido en"
+    editingLanguage: "Estás editando el contenido en",
+    visible: "Visible en la página principal"
   },
   en: {
     pageTitle: "Services",
@@ -31,7 +34,8 @@ const labels = {
     saveChanges: "Save Changes",
     toastSuccessTitle: "Changes saved!",
     toastSuccessDescription: "Your services have been updated.",
-    editingLanguage: "You are editing the content in"
+    editingLanguage: "You are editing the content in",
+    visible: "Visible on homepage"
   },
   fr: {
     pageTitle: "Services",
@@ -41,7 +45,8 @@ const labels = {
     saveChanges: "Enregistrer les Modifications",
     toastSuccessTitle: "Changements enregistrés !",
     toastSuccessDescription: "Vos services ont été mis à jour.",
-    editingLanguage: "Vous éditez le contenu en"
+    editingLanguage: "Vous éditez le contenu en",
+    visible: "Visible sur la page d'accueil"
   }
 };
 
@@ -50,7 +55,7 @@ export default function ServicesEditorPage() {
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
   const { language } = useLanguage();
-  const langCode = language.code;
+  const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
 
   useEffect(() => {
@@ -62,10 +67,18 @@ export default function ServicesEditorPage() {
     toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
   };
   
-  const handleServiceTitleChange = (serviceId: string, newTitle: string) => {
+  const handleServiceUpdate = (serviceId: string, field: keyof Service, value: any) => {
     setDraft(prev => ({
       ...prev,
-      services: prev.services.map(s => s.id === serviceId ? { ...s, title: {...s.title, [langCode]: newTitle } } : s)
+      services: prev.services.map(s => {
+        if (s.id === serviceId) {
+          if (field === 'title') {
+            return { ...s, title: { ...s.title, [langCode]: value }};
+          }
+          return { ...s, [field]: value };
+        }
+        return s;
+      })
     }));
   };
 
@@ -127,8 +140,19 @@ export default function ServicesEditorPage() {
               <Input 
                 className="text-lg font-bold border-0 px-0"
                 value={service.title[langCode]} 
-                onChange={e => handleServiceTitleChange(service.id, e.target.value)} 
+                onChange={e => handleServiceUpdate(service.id, 'title', e.target.value)} 
               />
+              <div className="flex items-center space-x-2 pt-2">
+                <Switch 
+                  id={`visible-${service.id}`} 
+                  checked={service.visible}
+                  onCheckedChange={(checked) => handleServiceUpdate(service.id, 'visible', checked)}
+                />
+                <Label htmlFor={`visible-${service.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
+                  {service.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
+                  {t.visible}
+                </Label>
+              </div>
             </CardHeader>
             <CardContent className="space-y-2">
               {service.bullets.map((bullet, b_idx) => (

@@ -96,7 +96,7 @@ export default function ProductsEditorPage() {
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
   const { language } = useLanguage();
-  const langCode = language.code;
+  const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
 
   const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
@@ -178,7 +178,6 @@ export default function ProductsEditorPage() {
         badge: { en: 'New', es: 'Nuevo', fr: 'Nouveau' },
         note: { en: 'A short description.', es: 'Una breve descripción.', fr: 'Une courte description.' },
         description: { en: 'Detailed description of the new product.', es: 'Descripción detallada del nuevo producto.', fr: 'Description détaillée du nouveau produit.' },
-        interval: 'month',
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
     setDraft(prev => ({...prev, products: [...prev.products, newProduct]}));
