@@ -2,12 +2,15 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ArrowLeft, Bot, Download, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bot, Download, Loader2, EyeOff, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { generateAgentPrompt, GenerateAgentPromptOutput } from '@/ai/flows/generate-agent-prompt';
 import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/hooks/use-language';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
 
 // Datos de ejemplo para las respuestas. En el futuro, esto vendrá de la base de datos.
 const sampleAnswers = {
@@ -33,12 +36,15 @@ const sampleAnswers = {
 
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
-  const isCompleted = params.id === 'brief-001' || params.id === 'agent-training-001';
-  const isAgentTraining = params.id === 'agent-training-001';
+  const questionnaireId = params.id;
+  const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001';
+  const isAgentTraining = questionnaireId === 'agent-training-001';
+  const { toast } = useToast();
 
   const [businessAnalysis, setBusinessAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(null);
   const [agentPrompt, setAgentPrompt] = useState<GenerateAgentPromptOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isClientVisible, setIsClientVisible] = useState(false);
   const { language } = useLanguage();
 
   const questionnaireTitle = useMemo(() => {
@@ -80,6 +86,14 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     };
     getAnalysis();
   }, [isCompleted, isAgentTraining, language, currentAnswers]);
+
+  const handleVisibilityToggle = (checked: boolean) => {
+    setIsClientVisible(checked);
+    toast({
+        title: `Visibilidad para el cliente ${checked ? 'activada' : 'desactivada'}.`,
+        description: `El cliente ${checked ? 'ahora puede ver' : 'ya no puede ver'} este análisis.`,
+    });
+  }
   
   const renderAnalysis = () => {
     if (isLoading) {
@@ -184,7 +198,14 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
             {renderAnalysis()}
           </CardContent>
            {isCompleted && (businessAnalysis || agentPrompt) && (
-            <CardFooter>
+            <CardFooter className="flex-col items-start gap-4">
+                <div className="flex items-center space-x-2">
+                    <Switch id="client-visibility" checked={isClientVisible} onCheckedChange={handleVisibilityToggle} />
+                    <Label htmlFor="client-visibility" className="flex items-center gap-2">
+                        {isClientVisible ? <Eye /> : <EyeOff/>}
+                        Permitir que el cliente vea este análisis
+                    </Label>
+                </div>
                 <Button variant="secondary" className="w-full">
                     <Download className="mr-2" />
                     Descargar Análisis (PDF)

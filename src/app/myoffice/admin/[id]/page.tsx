@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -36,7 +35,7 @@ const chartConfig = {
 
 const activeServices = [
   { id: 's-content-15', name: 'Marketing de Contenido (15 + 15 / mes)', type: 'sub', status: 'Activo' },
-  { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Chat)', type: 'one', status: 'Completado' },
+  { id: 'p-funnel-setup', name: 'Setup Funnel (Landing + Formularios + Agente IA)', type: 'one', status: 'Completado' },
 ];
 
 const customerQuestionnaires = [
@@ -48,6 +47,7 @@ const customerQuestionnaires = [
 
 export default function CustomerDetailPage({ params }: { params: { id: string } }) {
   const { currency } = useCurrency();
+  const customerId = params.id;
   const totalLeads = useMemo(() => chartData.reduce((acc, item) => acc + item.leads, 0), []);
   const totalClosed = useMemo(() => chartData.reduce((acc, item) => acc + item.closed, 0), []);
   const conversionRate = totalLeads > 0 ? (totalClosed / totalLeads) * 100 : 0;
