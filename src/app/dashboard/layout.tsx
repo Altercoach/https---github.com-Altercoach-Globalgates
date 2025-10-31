@@ -116,7 +116,7 @@ export default function DashboardLayout({
             </SheetContent>
         </Sheet>
         <div className="w-full flex-1">
-          <span className="font-semibold">Dashboard</span>
+          <span className="font-semibold">{navItems.find(item => item.href === pathname)?.label || 'Dashboard'}</span>
         </div>
          <Button variant="outline" size="sm" asChild>
             <Link href="/">Volver al Sitio</Link>

@@ -27,6 +27,13 @@ const sampleQuestionnaires = [
     status: 'Pendiente',
     date: new Date('2024-05-15'),
   },
+  {
+    id: 'agent-training-001',
+    clientEmail: 'cliente.c@example.com',
+    type: 'Entrenamiento de Agente IA',
+    status: 'Completado',
+    date: new Date('2024-05-18'),
+  }
 ];
 
 export default function QuestionnairesPage() {
@@ -76,7 +83,7 @@ export default function QuestionnairesPage() {
                   <TableCell>{q.type}</TableCell>
                   <TableCell>{format(q.date, "dd MMM, yyyy", { locale: es })}</TableCell>
                   <TableCell>
-                    <Badge variant={q.status === 'Completado' ? 'default' : 'secondary'} className={q.status === 'Completado' ? 'bg-accent/20 text-accent-foreground border-accent/30' : ''}>
+                    <Badge variant={q.status === 'Completado' ? 'default' : 'secondary'} className={q.status === 'Completado' ? 'bg-accent text-accent-foreground' : ''}>
                       {q.status === 'Completado' ? <CheckCircle className="mr-1 h-3 w-3" /> : <Clock className="mr-1 h-3 w-3" />}
                       {q.status}
                     </Badge>
