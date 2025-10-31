@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
 import { CheckCircle } from 'lucide-react';
-import { useSite } from '@/hooks/use-site';
 
 const labels = {
   es: {
@@ -30,12 +29,10 @@ const labels = {
 
 
 export function Hero() {
-  const { site } = useSite(); // This holds the user-customized content.
-  const { language } = useLanguage();
-
+  const { translatedSite, language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
   
-  const { brand } = site;
+  const { brand } = translatedSite;
 
   const scrollToPlans = () => {
     document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' });

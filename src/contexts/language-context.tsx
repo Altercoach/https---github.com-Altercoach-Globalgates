@@ -7,6 +7,7 @@ import { LANGUAGES, LS_KEYS } from '@/lib/constants';
 import { translateSiteContent } from '@/ai/flows/translate-site-content';
 import { useToast } from '@/hooks/use-toast';
 import { DEFAULT_SITE_CONTENT } from '@/lib/site-content';
+import { useSite } from '@/hooks/use-site';
 
 interface LanguageContextType {
   language: Language;
@@ -18,9 +19,10 @@ interface LanguageContextType {
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const { site: liveSite, isMounted: isSiteMounted } = useSite();
   const { toast } = useToast();
   const [language, setLanguageState] = useState<Language>(LANGUAGES[0]);
-  const [translatedContent, setTranslatedContent] = useState<Partial<SiteData>>(DEFAULT_SITE_CONTENT);
+  const [translatedSite, setTranslatedSite] = useState<SiteData>(liveSite);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -41,26 +43,26 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [language, isMounted]);
 
-  const translate = useCallback(async (targetLanguage: Language) => {
+  const translate = useCallback(async (siteContent: SiteData, targetLanguage: Language) => {
     setIsTranslating(true);
-    
-    // Always translate from the default English content
-    const sourceContent = DEFAULT_SITE_CONTENT;
-    
-    if (targetLanguage.code === 'en') {
-      setTranslatedContent(sourceContent);
-      setIsTranslating(false);
-      return;
-    }
-
     try {
-      // Only translate fields that are meant to be translated, excluding user-generated content like brand name or hero title.
-      // We will only translate the default service bullets and product notes/descriptions.
       const payload = {
-        services: sourceContent.services.map(({ id, title, bullets }) => ({ id, title, bullets })),
-        products: sourceContent.products.map(({ id, name, note, description, badge }) => ({ id, name, note, description, badge: badge.en })),
+        brand: {
+          name: siteContent.brand.name,
+          tagline: siteContent.brand.tagline,
+          heroTitle: siteContent.brand.heroTitle,
+          heroSubtitle: siteContent.brand.heroSubtitle,
+        },
+        services: siteContent.services.map(({ id, title, bullets }) => ({ id, title, bullets })),
+        products: siteContent.products.map(({ id, name, note, description, badge }) => ({ id, name, note, description, badge })),
       };
 
+      // If target is Spanish (the source language of user content), just use the live site data.
+      if (targetLanguage.code === 'es') {
+        setTranslatedSite(siteContent);
+        return;
+      }
+      
       const translatedJson = await translateSiteContent({
         siteContent: JSON.stringify(payload),
         targetLanguage: targetLanguage.code,
@@ -68,15 +70,24 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
       const translatedData = JSON.parse(translatedJson || '{}');
       
-      const finalContent: Partial<SiteData> = {
-        services: translatedData.services,
-        products: sourceContent.products.map(p => {
+      const finalContent: SiteData = {
+        ...siteContent,
+        brand: {
+          ...siteContent.brand,
+          ...translatedData.brand,
+        },
+        services: siteContent.services.map(s => {
+          const translatedSvc = translatedData.services?.find((ts: any) => ts.id === s.id);
+          return translatedSvc ? { ...s, ...translatedSvc } : s;
+        }),
+        products: siteContent.products.map(p => {
           const translatedProd = translatedData.products?.find((tp: any) => tp.id === p.id);
-          return translatedProd ? { ...p, note: translatedProd.note, description: translatedProd.description } : p;
+          const badge = translatedProd?.badge?.[targetLanguage.code as keyof typeof translatedProd.badge] || p.badge[targetLanguage.code as keyof typeof p.badge];
+          return translatedProd ? { ...p, ...translatedProd, badge: { ...p.badge, [targetLanguage.code]: badge } } : p;
         }),
       };
       
-      setTranslatedContent(finalContent);
+      setTranslatedSite(finalContent);
 
     } catch (error) {
       console.error('Translation failed:', error);
@@ -85,44 +96,26 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         description: 'Failed to translate content. Reverting to original.',
         variant: 'destructive',
       });
-      setTranslatedContent(sourceContent);
+      setTranslatedSite(siteContent); // Fallback to user's content
     } finally {
       setIsTranslating(false);
     }
   }, [toast]);
 
   useEffect(() => {
-    if (isMounted) {
-      translate(language);
+    if (isMounted && isSiteMounted) {
+      translate(liveSite, language);
     }
-  }, [language, isMounted, translate]);
+  }, [language, liveSite, isMounted, isSiteMounted, translate]);
 
-  const value = useMemo(() => {
-    // This combines user's site data with the translated default content.
-    // User-edited content (from SiteContext) is NOT translated and has priority.
-    const site: SiteData = {
-      ...DEFAULT_SITE_CONTENT,
-      brand: DEFAULT_SITE_CONTENT.brand,
-      services: translatedContent.services || DEFAULT_SITE_CONTENT.services,
-      products: DEFAULT_SITE_CONTENT.products.map(defaultProd => {
-        const translatedProd = translatedContent.products?.find(p => p.id === defaultProd.id);
-        return {
-          ...defaultProd,
-          note: translatedProd?.note || defaultProd.note,
-          description: translatedProd?.description || defaultProd.description,
-        }
-      })
-    };
+  const value = useMemo(() => ({
+    language,
+    setLanguage: setLanguageState,
+    translatedSite: translatedSite,
+    isTranslating,
+  }), [language, translatedSite, isTranslating]);
 
-    return {
-      language,
-      setLanguage: setLanguageState,
-      translatedSite: site,
-      isTranslating,
-    }
-  }, [language, translatedContent, isTranslating]);
-
-  if (!isMounted) {
+  if (!isMounted || !isSiteMounted) {
     return null;
   }
   

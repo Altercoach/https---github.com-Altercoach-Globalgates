@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import { Moon, Sun, ShoppingCart, KeyRound, User, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useSite } from '@/hooks/use-site';
 import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/hooks/use-auth';
 import { LanguageSwitcher } from '@/components/language-switcher';
@@ -42,8 +41,7 @@ const navLabels = {
 
 export function Header() {
   const { theme, setTheme } = useTheme();
-  const { site } = useSite();
-  const { language } = useLanguage();
+  const { translatedSite, language } = useLanguage();
   const { setIsCartOpen, cart } = useCart();
   const { auth } = useAuth();
   
@@ -59,7 +57,7 @@ export function Header() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
   
-  const siteName = site.brand.name;
+  const siteName = translatedSite.brand.name;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">

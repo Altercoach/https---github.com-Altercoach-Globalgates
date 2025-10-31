@@ -2,7 +2,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useSite } from '@/hooks/use-site';
 import { KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
@@ -30,12 +29,11 @@ const labels = {
 };
 
 export function Footer() {
-  const { site } = useSite();
-  const { language } = useLanguage();
+  const { translatedSite, language } = useLanguage();
   const { auth } = useAuth();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
-  const siteName = site.brand.name;
+  const siteName = translatedSite.brand.name;
 
   return (
     <footer className="w-full border-t bg-background">

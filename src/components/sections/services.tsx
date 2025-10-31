@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useSite } from '@/hooks/use-site';
 import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check } from 'lucide-react';

@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useSite } from '@/hooks/use-site';
 import { useLanguage } from '@/hooks/use-language';
 import { ProductCard } from '@/components/product-card';
 import { PlanRecommender } from '../plan-recommender';
@@ -32,11 +31,10 @@ const labels = {
 
 
 export function Products() {
-  const { site } = useSite();
-  const { language } = useLanguage();
+  const { translatedSite, language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
-  const products = site.products;
+  const products = translatedSite.products;
 
   return (
     <section id="plans" className="w-full bg-muted/40 py-12 md:py-24 lg:py-32">
