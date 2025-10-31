@@ -12,7 +12,7 @@ export const LS_KEYS = {
   CURRENCY: 'gk_currency',
 };
 
-const defaultFeatures: ProductFeature[] = [
+export const defaultFeatures: ProductFeature[] = [
   { id: 'business-evaluation', name: 'Evaluación de Negocio (Doctor RX)', stage: 'onboarding', enabled: false },
   { id: 'brief-marketing', name: 'Brief de Marketing Profesional', stage: 'onboarding', enabled: false },
   { id: 'agent-training', name: 'Entrenamiento de Agente de IA', stage: 'onboarding', enabled: false },

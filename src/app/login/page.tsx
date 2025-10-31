@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
 import { Shield, User } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -27,7 +26,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
-          <CardDescription>Selecciona tu rol para acceder a la plataforma.</CardDescription>
+          <CardDescription>Selecciona tu rol para acceder.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
            <Button onClick={handleAdminLogin} className="w-full">
@@ -40,7 +39,7 @@ export default function LoginPage() {
           </Button>
           
           <p className="px-8 text-center text-sm text-muted-foreground">
-            El inicio de sesión manual está deshabilitado para esta demostración. Por favor, usa uno de los botones de arriba.
+            El inicio de sesión manual está deshabilitado para esta demostración.
           </p>
 
           <Button variant="outline" className="w-full" asChild>
