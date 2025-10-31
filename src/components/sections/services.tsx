@@ -46,10 +46,10 @@ export function Services() {
                 <CardTitle>{getTranslation(service.title)}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {getTranslation(service.bullets).map((bullet, index) => (
+                {service.bullets.map((bullet, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <Check className="mt-1 h-4 w-4 shrink-0 text-accent" />
-                    <span className="text-muted-foreground">{bullet}</span>
+                    <span className="text-muted-foreground">{getTranslation(bullet)}</span>
                   </div>
                 ))}
               </CardContent>
