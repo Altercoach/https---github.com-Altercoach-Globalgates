@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BarChart, LogOut, Settings, User, Menu } from 'lucide-react';
+import { BarChart, LogOut, Settings, User, Menu, Home } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { useLanguage } from '@/hooks/use-language';
 const labels = {
   es: {
     title: "Panel de Cliente",
+    home: "Inicio",
     dashboard: "Dashboard",
     settings: "Configuración",
     logout: "Cerrar Sesión",
@@ -21,6 +22,7 @@ const labels = {
   },
   en: {
     title: "Customer Dashboard",
+    home: "Home",
     dashboard: "Dashboard",
     settings: "Settings",
     logout: "Logout",
@@ -29,6 +31,7 @@ const labels = {
   },
   fr: {
     title: "Tableau de Bord Client",
+    home: "Accueil",
     dashboard: "Tableau de bord",
     settings: "Paramètres",
     logout: "Se déconnecter",
@@ -55,6 +58,7 @@ export default function DashboardLayout({
   }, [auth, router]);
 
   const navItems = [
+    { href: '/', label: t.home, icon: Home },
     { href: '/dashboard', label: t.dashboard, icon: BarChart },
     { href: '/dashboard/settings', label: t.settings, icon: Settings },
   ];
@@ -71,7 +75,7 @@ export default function DashboardLayout({
     <div className="hidden border-r bg-background md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                <Link href="/" className="flex items-center gap-2 font-semibold">
+                <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
                     <User className="h-6 w-6" />
                     <span>{t.title}</span>
                 </Link>
@@ -112,7 +116,7 @@ export default function DashboardLayout({
             <SheetContent side="left" className="flex flex-col">
                 <nav className="grid gap-2 text-lg font-medium">
                     <Link
-                        href="#"
+                        href="/dashboard"
                         className="flex items-center gap-2 text-lg font-semibold mb-4"
                     >
                         <User className="h-6 w-6" />
