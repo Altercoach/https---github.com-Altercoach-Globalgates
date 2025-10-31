@@ -12,17 +12,47 @@ import { CurrencySwitcher } from '@/components/currency-switcher';
 import { useLanguage } from '@/hooks/use-language';
 import { useTheme } from 'next-themes';
 
+const navLabels = {
+  es: {
+    services: 'Servicios',
+    plans: 'Planes',
+    contact: 'Contacto',
+    myOffice: 'Mi Oficina',
+    dashboard: 'Panel',
+    login: 'Iniciar Sesión'
+  },
+  en: {
+    services: 'Services',
+    plans: 'Plans',
+    contact: 'Contact',
+    myOffice: 'My Office',
+    dashboard: 'Dashboard',
+    login: 'Login'
+  },
+    fr: {
+    services: 'Services',
+    plans: 'Forfaits',
+    contact: 'Contact',
+    myOffice: 'Mon Bureau',
+    dashboard: 'Tableau de bord',
+    login: 'Connexion'
+  }
+};
+
+
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { site } = useSite();
-  const { translatedSite } = useLanguage();
+  const { translatedSite, language } = useLanguage();
   const { setIsCartOpen, cart } = useCart();
   const { auth } = useAuth();
   
+  const labels = navLabels[language.code as keyof typeof navLabels] || navLabels.en;
+  
   const navItems = [
-    { label: 'Servicios', id: 'services' },
-    { label: 'Planes', id: 'plans' },
-    { label: 'Contacto', id: 'contact' },
+    { label: labels.services, id: 'services' },
+    { label: labels.plans, id: 'plans' },
+    { label: labels.contact, id: 'contact' },
   ];
 
   const scrollTo = (id: string) => {
@@ -49,14 +79,14 @@ export function Header() {
             {auth.loggedIn ? (
               <>
                 {auth.user?.role === 'admin' && (
-                  <Button asChild variant="ghost"><Link href="/myoffice"><Shield/> Mi Oficina</Link></Button>
+                  <Button asChild variant="ghost"><Link href="/myoffice"><Shield/> {labels.myOffice}</Link></Button>
                 )}
                 {auth.user?.role === 'customer' && (
-                   <Button asChild variant="ghost"><Link href="/dashboard"><User/> Panel</Link></Button>
+                   <Button asChild variant="ghost"><Link href="/dashboard"><User/> {labels.dashboard}</Link></Button>
                 )}
               </>
             ) : (
-               <Button asChild variant="ghost"><Link href="/login">Iniciar Sesión</Link></Button>
+               <Button asChild variant="ghost"><Link href="/login">{labels.login}</Link></Button>
             )}
           </nav>
           
@@ -71,12 +101,12 @@ export function Header() {
                   {cart.length}
                 </span>
               )}
-              <span className="sr-only">Abrir Carrito</span>
+              <span className="sr-only">Open Cart</span>
             </Button>
             
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              <span className="sr-only">Cambiar tema</span>
+              <span className="sr-only">Toggle theme</span>
             </Button>
           </div>
         </div>

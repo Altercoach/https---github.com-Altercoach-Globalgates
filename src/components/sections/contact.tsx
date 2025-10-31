@@ -9,6 +9,53 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { useLanguage } from '@/hooks/use-language';
+
+const labels = {
+  es: {
+    title: "¿Listo para Abrir Nuevas Puertas?",
+    subtitle: "Escríbenos y agenda una llamada. Hablemos de cómo podemos elevar tu marca.",
+    whatsapp: "Chatea con nosotros en WhatsApp",
+    nameLabel: "Nombre",
+    namePlaceholder: "Tu Nombre",
+    emailLabel: "Email",
+    emailPlaceholder: "tu@email.com",
+    messageLabel: "Cuéntanos sobre tu proyecto",
+    messagePlaceholder: "Tu mensaje...",
+    submitButton: "Enviar Mensaje",
+    toastTitle: "¡Mensaje Enviado!",
+    toastDescription: "Gracias por contactarnos. Te responderemos en breve.",
+  },
+  en: {
+    title: "Ready to Open New Doors?",
+    subtitle: "Write to us and schedule a call. Let's talk about how we can elevate your brand.",
+    whatsapp: "Chat with us on WhatsApp",
+    nameLabel: "Name",
+    namePlaceholder: "Your Name",
+    emailLabel: "Email",
+    emailPlaceholder: "you@email.com",
+    messageLabel: "Tell us about your project",
+    messagePlaceholder: "Your message...",
+    submitButton: "Send Message",
+    toastTitle: "Message Sent!",
+    toastDescription: "Thank you for contacting us. We will get back to you shortly.",
+  },
+    fr: {
+    title: "Prêt à Ouvrir de Nouvelles Portes ?",
+    subtitle: "Écrivez-nous et planifiez un appel. Parlons de la façon dont nous pouvons élever votre marque.",
+    whatsapp: "Discutez avec nous sur WhatsApp",
+    nameLabel: "Nom",
+    namePlaceholder: "Votre Nom",
+    emailLabel: "Email",
+    emailPlaceholder: "vous@email.com",
+    messageLabel: "Parlez-nous de votre projet",
+    messagePlaceholder: "Votre message...",
+    submitButton: "Envoyer le Message",
+    toastTitle: "Message Envoyé !",
+    toastDescription: "Merci de nous avoir contactés. Nous vous répondrons sous peu.",
+  }
+};
+
 
 // Helper component for WhatsApp icon
 function WhatsAppIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -35,12 +82,14 @@ function WhatsAppIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function Contact() {
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toast({
-      title: '¡Mensaje Enviado!',
-      description: 'Gracias por contactarnos. Te responderemos en breve.',
+      title: t.toastTitle,
+      description: t.toastDescription,
     });
     (e.target as HTMLFormElement).reset();
   };
@@ -49,9 +98,9 @@ export function Contact() {
     <section id="contact" className="w-full py-12 md:py-24 lg:py-32">
       <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
         <div className="space-y-3">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">¿Listo para Abrir Nuevas Puertas?</h2>
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">{t.title}</h2>
           <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-            Escríbenos y agenda una llamada. Hablemos de cómo podemos elevar tu marca.
+            {t.subtitle}
           </p>
         </div>
         <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
@@ -63,7 +112,7 @@ export function Contact() {
              <div className="flex items-center gap-3">
               <WhatsAppIcon className="h-5 w-5 text-accent" />
               <Link href="https://wa.me/message/I6IIHJNC7PP5C1" target="_blank" rel="noopener noreferrer">
-                Chatea con nosotros en WhatsApp
+                {t.whatsapp}
               </Link>
             </div>
             <div className="flex items-center gap-3">
@@ -79,18 +128,18 @@ export function Contact() {
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-left block">Nombre</Label>
-                  <Input id="name" name="name" autoComplete="name" placeholder="Tu Nombre" required />
+                  <Label htmlFor="name" className="text-left block">{t.nameLabel}</Label>
+                  <Input id="name" name="name" autoComplete="name" placeholder={t.namePlaceholder} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-left block">Email</Label>
-                  <Input id="email" name="email" type="email" autoComplete="email" placeholder="tu@email.com" required />
+                  <Label htmlFor="email" className="text-left block">{t.emailLabel}</Label>
+                  <Input id="email" name="email" type="email" autoComplete="email" placeholder={t.emailPlaceholder} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="message" className="text-left block">Cuéntanos sobre tu proyecto</Label>
-                  <Textarea id="message" name="message" placeholder="Tu mensaje..." required />
+                  <Label htmlFor="message" className="text-left block">{t.messageLabel}</Label>
+                  <Textarea id="message" name="message" placeholder={t.messagePlaceholder} required />
                 </div>
-                <Button type="submit" className="w-full">Enviar Mensaje</Button>
+                <Button type="submit" className="w-full">{t.submitButton}</Button>
               </form>
             </CardContent>
           </Card>

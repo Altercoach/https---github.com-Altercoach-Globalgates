@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -6,11 +7,35 @@ import { useSite } from '@/hooks/use-site';
 import { useLanguage } from '@/hooks/use-language';
 import { CheckCircle } from 'lucide-react';
 
+const labels = {
+  es: {
+    explorePlans: "Explorar Planes",
+    bullet1: "Automatización con Agentes de IA",
+    bullet2: "Embudos de Venta (Funnels) Medibles",
+    bullet3: "Marca, Contenido y Anuncios",
+  },
+  en: {
+    explorePlans: "Explore Plans",
+    bullet1: "Automation with AI Agents",
+    bullet2: "Measurable Sales Funnels",
+    bullet3: "Brand, Content, and Ads",
+  },
+  fr: {
+    explorePlans: "Explorer les Forfaits",
+    bullet1: "Automatisation avec des Agents IA",
+    bullet2: "Entonnoirs de Vente Mesurables",
+    bullet3: "Marque, Contenu et Publicités",
+  }
+};
+
+
 export function Hero() {
   const { site } = useSite();
-  const { translatedSite } = useLanguage();
+  const { translatedSite, language } = useLanguage();
 
   const brand = translatedSite.brand || site.brand;
+  const t = labels[language.code as keyof typeof labels] || labels.en;
+
 
   const scrollToPlans = () => {
     document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' });
@@ -32,20 +57,20 @@ export function Hero() {
             <ul className="grid gap-2 text-lg">
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Automatización con Agentes de IA</span>
+                    <span>{t.bullet1}</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Embudos de Venta (Funnels) Medibles</span>
+                    <span>{t.bullet2}</span>
                 </li>
                 <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>Marca, Contenido y Anuncios</span>
+                    <span>{t.bullet3}</span>
                 </li>
             </ul>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button onClick={scrollToPlans} size="lg">
-                Explorar Planes
+                {t.explorePlans}
               </Button>
             </div>
           </div>
