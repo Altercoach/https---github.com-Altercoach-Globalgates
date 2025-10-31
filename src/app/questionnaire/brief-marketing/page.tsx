@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -25,17 +26,17 @@ const Question = ({ label, children }: { label: string; children: React.ReactNod
   </div>
 );
 
-const FileUpload = ({ label, files, onFileChange, onFileRemove }: { label: string; files: File[], onFileChange: (event: React.ChangeEvent<HTMLInputElement>, field: string) => void, onFileRemove: (fileName: string, field: string) => void, field: string }) => (
+const FileUpload = ({ label, files, onFileChange, onFileRemove, field }: { label: string; files: File[], onFileChange: (event: React.ChangeEvent<HTMLInputElement>, field: string) => void, onFileRemove: (fileName: string, field: string) => void, field: string }) => (
     <div className="space-y-2">
         <Label>{label}</Label>
         <div className="flex items-center justify-center w-full">
-            <label htmlFor={`dropzone-${label}`} className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80">
+            <label htmlFor={`dropzone-${field}`} className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
                     <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Haz clic para subir</span></p>
                     <p className="text-xs text-muted-foreground">PDF, JPG, PNG, etc.</p>
                 </div>
-                <Input id={`dropzone-${label}`} type="file" className="hidden" onChange={(e) => onFileChange(e, label)} />
+                <Input id={`dropzone-${field}`} type="file" className="hidden" onChange={(e) => onFileChange(e, field)} />
             </label>
         </div>
          {files.length > 0 && (
@@ -47,7 +48,7 @@ const FileUpload = ({ label, files, onFileChange, onFileRemove }: { label: strin
                            <span className="font-medium">{file.name}</span> 
                            <span className="text-muted-foreground text-xs">({(file.size / 1024).toFixed(1)} KB)</span>
                         </div>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onFileRemove(file.name, label)}>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onFileRemove(file.name, field)}>
                             <X className="h-4 w-4"/>
                         </Button>
                     </div>
