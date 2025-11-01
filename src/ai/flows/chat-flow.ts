@@ -44,7 +44,7 @@ const prompt = ai.definePrompt({
 
   Here is the conversation history:
   {{#each history}}
-    {{#if (eq role 'user')}}
+    {{#if isUser}}
       User: {{{content}}}
     {{else}}
       Assistant: {{{content}}}
@@ -70,7 +70,14 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    // Augment history with isUser boolean for easier templating
+    const augmentedHistory = input.history.map(message => ({
+      ...message,
+      isUser: message.role === 'user',
+    }));
+
+    const { output } = await prompt({ ...input, history: augmentedHistory });
+    
     if (!output) {
       throw new Error('The AI failed to generate a response.');
     }
