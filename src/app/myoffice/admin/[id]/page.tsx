@@ -135,7 +135,7 @@ const labels = {
 export default function CustomerDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { currency } = useCurrency();
-  const { id: customerId } = params;
+  const { id: customerId } = use(params);
   const [customerData, setCustomerData] = useState<Customer | undefined>(undefined);
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
