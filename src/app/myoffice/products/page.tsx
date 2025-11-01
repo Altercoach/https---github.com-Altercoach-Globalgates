@@ -246,7 +246,7 @@ export default function ProductsEditorPage() {
                                     onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
                                 />
                                 <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
-                                    {product.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
+                                    {product.visible ? <Eye className="h-4 w-4"/> : <EyeOff className="h-4 w-4"/>}
                                 </Label>
                             </div>
                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
