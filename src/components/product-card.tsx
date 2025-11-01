@@ -36,7 +36,9 @@ const labels = {
     close: "Cerrar",
     monthly: "/mes",
     variable: "Variable",
-    free: "Gratis"
+    free: "Gratis",
+    whatIncludes: "Qué Incluye",
+    whatFor: "Para Qué Sirve",
   },
   en: {
     contactUs: "Contact Us",
@@ -47,7 +49,9 @@ const labels = {
     close: "Close",
     monthly: "/month",
     variable: "Variable",
-    free: "Free"
+    free: "Free",
+    whatIncludes: "What's Included",
+    whatFor: "What It's For",
   },
   fr: {
     contactUs: "Contactez-nous",
@@ -58,7 +62,9 @@ const labels = {
     close: "Fermer",
     monthly: "/mois",
     variable: "Variable",
-    free: "Gratuit"
+    free: "Gratuit",
+    whatIncludes: "Ce qui est inclus",
+    whatFor: "À quoi ça sert",
   }
 };
 
@@ -75,6 +81,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const productBadge = getTranslation(product.badge);
   const productNote = getTranslation(product.note);
   const productDescription = getTranslation(product.description);
+  const longDescription = product.longDescription ? getTranslation(product.longDescription) : null;
+  const whatIncludes = product.whatIncludes ? getTranslation(product.whatIncludes) : null;
+  const whatFor = product.whatFor ? getTranslation(product.whatFor) : null;
 
   const handleInfoClick = () => {
     toast({
@@ -95,7 +104,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg">{productName}</CardTitle>
-              <Badge variant="outline" className="shrink-0 border-accent text-accent">{productBadge}</Badge>
+              {productBadge && <Badge variant="outline" className="shrink-0 border-accent text-accent">{productBadge}</Badge>}
           </div>
         </CardHeader>
         <CardContent className="flex-grow">
@@ -120,21 +129,43 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardFooter>
       </Card>
 
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-xl max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{productName}</DialogTitle>
-          <DialogDescription>
-             <Badge variant="outline" className="border-accent text-accent mt-2">{productBadge}</Badge>
-          </DialogDescription>
+          {productBadge && (
+            <DialogDescription>
+              <Badge variant="outline" className="border-accent text-accent mt-2">{productBadge}</Badge>
+            </DialogDescription>
+          )}
         </DialogHeader>
-        <div className="py-4">
-          <p>{productDescription}</p>
+        <div className="py-4 overflow-y-auto pr-6 text-sm">
+          <p className="text-muted-foreground">{productDescription}</p>
+
+          {(longDescription || whatIncludes || whatFor) && <div className="space-y-4 mt-4">
+              {longDescription && <p>{longDescription}</p>}
+              {whatIncludes && (
+                <div>
+                  <h4 className="font-semibold mb-2">{t.whatIncludes}</h4>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    {whatIncludes.split('\n').map((item, index) => item.trim() && <li key={index}>{item.replace(/^-/,'').trim()}</li>)}
+                  </ul>
+                </div>
+              )}
+               {whatFor && (
+                <div>
+                  <h4 className="font-semibold mb-2 mt-4">{t.whatFor}</h4>
+                  <p className="text-muted-foreground">{whatFor}</p>
+                </div>
+              )}
+            </div>
+          }
+          
           <div className="mt-4 text-2xl font-bold">
             {product.price > 0 ? formatCurrency(product.price, currency) : (isInfo ? t.variable : t.free)}
             {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="mt-auto pt-4 border-t">
             <DialogClose asChild>
                 <Button variant="outline">{t.close}</Button>
             </DialogClose>

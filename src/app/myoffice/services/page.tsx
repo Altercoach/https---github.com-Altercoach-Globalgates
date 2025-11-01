@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSite } from '@/hooks/use-site';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { SiteData, Service, MultilingualString } from '@/lib/types';
+import type { Service, MultilingualString } from '@/lib/types';
 import { PlusCircle, Trash2, Info, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -20,7 +20,8 @@ const labels = {
     newFeature: "Nueva característica",
     addFeature: "Añadir Característica",
     editingLanguage: "Estás editando el contenido en",
-    visible: "Visible en la página principal"
+    visible: "Visible en la página principal",
+    addService: "Añadir Servicio",
   },
   en: {
     pageTitle: "Services",
@@ -28,7 +29,8 @@ const labels = {
     newFeature: "New feature",
     addFeature: "Add Feature",
     editingLanguage: "You are editing the content in",
-    visible: "Visible on homepage"
+    visible: "Visible on homepage",
+    addService: "Add Service",
   },
   fr: {
     pageTitle: "Services",
@@ -36,7 +38,8 @@ const labels = {
     newFeature: "Nouvelle fonctionnalité",
     addFeature: "Ajouter une Caractéristique",
     editingLanguage: "Vous éditez le contenu en",
-    visible: "Visible sur la page d'accueil"
+    visible: "Visible sur la page d'accueil",
+    addService: "Ajouter un Service",
   }
 };
 
@@ -52,7 +55,8 @@ export default function ServicesEditorPage() {
       services: prev.services.map(s => {
         if (s.id === serviceId) {
           if (field === 'title') {
-            return { ...s, title: { ...s.title, [langCode]: value }};
+            const newTitle = { ...s.title, [langCode]: value };
+            return { ...s, title: newTitle };
           }
         }
         return s;
@@ -107,12 +111,28 @@ export default function ServicesEditorPage() {
     }))
   };
 
+  const addNewService = () => {
+    const newService: Service = {
+      id: `svc_${Date.now()}`,
+      visible: true,
+      title: { es: 'Nuevo Servicio', en: 'New Service', fr: 'Nouveau Service' },
+      bullets: [{ es: 'Nueva característica', en: 'New feature', fr: 'Nouvelle fonctionnalité' }]
+    };
+    setSite(prev => ({...prev, services: [...prev.services, newService]}));
+  };
+
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
-        <p className="text-muted-foreground">{t.pageSubtitle}</p>
+      <header className="flex items-center justify-between">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
+            <p className="text-muted-foreground">{t.pageSubtitle}</p>
+        </div>
+         <Button onClick={addNewService}>
+            <PlusCircle className="mr-2" />
+            {t.addService}
+        </Button>
       </header>
 
       <Alert>

@@ -22,6 +22,9 @@ export type Product = {
   note: MultilingualString;
   description: MultilingualString;
   features?: ProductFeature[];
+  longDescription?: MultilingualString;
+  whatIncludes?: MultilingualString;
+  whatFor?: MultilingualString;
 };
 
 export type Service = {
