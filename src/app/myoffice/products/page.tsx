@@ -13,16 +13,33 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import type { SiteData, Product, ProductFeature, MultilingualString } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff } from 'lucide-react';
+import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff, GripVertical } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const labels = {
   es: {
     pageTitle: "Planes y Servicios",
-    pageSubtitle: "Gestiona los planes y servicios que ofreces.",
+    pageSubtitle: "Gestiona los planes y servicios que ofreces. Arrastra para reordenar.",
     addProduct: "Añadir Plan",
     newProduct: "Nuevo Plan",
     newProductDesc: "Una breve descripción.",
@@ -45,7 +62,7 @@ const labels = {
   },
   en: {
     pageTitle: "Plans & Services",
-    pageSubtitle: "Manage the plans and services you offer.",
+    pageSubtitle: "Manage the plans and services you offer. Drag to reorder.",
     addProduct: "Add Plan",
     newProduct: "New Plan",
     newProductDesc: "A short description.",
@@ -68,7 +85,7 @@ const labels = {
   },
   fr: {
     pageTitle: "Forfaits et Services",
-    pageSubtitle: "Gérez les forfaits et les services que vous proposez.",
+    pageSubtitle: "Gérez les forfaits et les services que vous proposez. Faites glisser pour réorganiser.",
     addProduct: "Ajouter un Forfait",
     newProduct: "Nouveau Forfait",
     newProductDesc: "Une courte description.",
@@ -91,6 +108,25 @@ const labels = {
   }
 };
 
+const SortableProductItem = ({ product, children }: { product: Product, children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: product.id });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div className="flex items-center gap-2">
+        <button {...listeners} className="cursor-grab p-2 text-muted-foreground hover:bg-muted rounded-md">
+          <GripVertical />
+        </button>
+        <div className="flex-grow">{children}</div>
+      </div>
+    </div>
+  );
+};
 
 export default function ProductsEditorPage() {
   const { site, setSite } = useSite();
@@ -127,7 +163,6 @@ export default function ProductsEditorPage() {
   const handleUpdate = (updater: (draft: SiteData) => SiteData) => {
     setSite(prev => {
         const newSite = updater(JSON.parse(JSON.stringify(prev)));
-        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
         return newSite;
     });
   };
@@ -198,6 +233,27 @@ export default function ProductsEditorPage() {
   const removeProduct = (id: string) => {
     handleUpdate(prev => ({...prev, products: prev.products.filter(p => p.id !== id)}));
   }
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      handleUpdate(prev => {
+        const oldIndex = prev.products.findIndex(p => p.id === active.id);
+        const newIndex = prev.products.findIndex(p => p.id === over.id);
+        return {
+          ...prev,
+          products: arrayMove(prev.products, oldIndex, newIndex),
+        };
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -219,105 +275,111 @@ export default function ProductsEditorPage() {
 
       <Card>
         <CardContent className="p-0">
-          <Accordion 
-              type="single" 
-              collapsible 
-              className="w-full"
-              value={openAccordionItem}
-              onValueChange={setOpenAccordionItem}
-          >
-            {site.products.map(product => (
-                <AccordionItem value={product.id} key={product.id} className="border-b last:border-b-0">
-                    <div className="flex items-center justify-between px-6 py-4 hover:bg-muted/50">
-                        <AccordionTrigger className="flex-1 text-left p-0 hover:no-underline">
-                            <div>
-                                <p className="font-semibold">{product.name[langCode] || product.name.en}</p>
-                                <p className="text-sm text-muted-foreground">{t.productTypes[product.type]}</p>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={site.products.map(p => p.id)} strategy={verticalListSortingStrategy}>
+              <Accordion 
+                  type="single" 
+                  collapsible 
+                  className="w-full"
+                  value={openAccordionItem}
+                  onValueChange={setOpenAccordionItem}
+              >
+                {site.products.map(product => (
+                  <SortableProductItem key={product.id} product={product}>
+                    <AccordionItem value={product.id} className="border-b last:border-b-0">
+                        <div className="flex items-center justify-between px-6 py-4 hover:bg-muted/50">
+                            <AccordionTrigger className="flex-1 text-left p-0 hover:no-underline">
+                                <div>
+                                    <p className="font-semibold">{product.name[langCode] || product.name.en}</p>
+                                    <p className="text-sm text-muted-foreground">{t.productTypes[product.type]}</p>
+                                </div>
+                            </AccordionTrigger>
+                            <div className="flex items-center gap-4 pl-4">
+                                <Switch
+                                    id={`visible-${product.id}`}
+                                    checked={product.visible}
+                                    onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
+                                    aria-label={t.visible}
+                                />
+                                <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground">
+                                    {product.visible ? <Eye className="h-4 w-4"/> : <EyeOff className="h-4 w-4"/>}
+                                </Label>
+                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
+                                    <Trash2 />
+                                </Button>
                             </div>
-                        </AccordionTrigger>
-                        <div className="flex items-center gap-4 pl-4">
-                            <Switch
-                                id={`visible-${product.id}`}
-                                checked={product.visible}
-                                onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
-                                aria-label={t.visible}
-                            />
-                            <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground">
-                                {product.visible ? <Eye className="h-4 w-4"/> : <EyeOff className="h-4 w-4"/>}
-                            </Label>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
-                                <Trash2 />
-                            </Button>
                         </div>
-                    </div>
-                    <AccordionContent>
-                      <div className="p-6 pt-2 space-y-4 bg-muted/20">
-                          <div><Label>{t.nameLabel}</Label>
-                            <Input 
-                              value={product.name[langCode]} 
-                              onChange={e => handleProductUpdate(product.id, 'name', e.target.value, true)} 
-                            />
-                          </div>
+                        <AccordionContent>
+                          <div className="p-6 pt-2 space-y-4 bg-muted/20">
+                              <div><Label>{t.nameLabel}</Label>
+                                <Input 
+                                  value={product.name[langCode]} 
+                                  onChange={e => handleProductUpdate(product.id, 'name', e.target.value, true)} 
+                                />
+                              </div>
 
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                            <div><Label>{t.typeLabel}</Label>
-                                <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v, false)}>
-                                    <SelectTrigger><SelectValue/></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="one">{t.productTypes.one}</SelectItem>
-                                        <SelectItem value="sub">{t.productTypes.sub}</SelectItem>
-                                        <SelectItem value="info">{t.productTypes.info}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value), false)} /></div>
-                            <div><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value, true)} /></div>
-                          </div>
-                          <div><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value, true)} /></div>
-                          <div>
-                            <Label>{t.fullDescLabel}</Label>
-                            <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value, true)} rows={4} />
-                          </div>
-                          
-                          <Separator className="my-6 bg-border" />
+                              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                                <div><Label>{t.typeLabel}</Label>
+                                    <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v, false)}>
+                                        <SelectTrigger><SelectValue/></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="one">{t.productTypes.one}</SelectItem>
+                                            <SelectItem value="sub">{t.productTypes.sub}</SelectItem>
+                                            <SelectItem value="info">{t.productTypes.info}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value), false)} /></div>
+                                <div><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value, true)} /></div>
+                              </div>
+                              <div><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value, true)} /></div>
+                              <div>
+                                <Label>{t.fullDescLabel}</Label>
+                                <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value, true)} rows={4} />
+                              </div>
+                              
+                              <Separator className="my-6 bg-border" />
 
-                          <div>
-                              <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFormsTitle}</h4>
-                              <div className="space-y-4">
-                                  {(product.features || []).map(feature => (
-                                      <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border bg-background p-4">
-                                          <Label htmlFor={`switch-${product.id}-${feature.id}`} className="font-normal flex flex-col">
-                                              {feature.name}
-                                              <span className="text-xs text-muted-foreground">ID: {feature.id}</span>
-                                          </Label>
-                                          <Switch
-                                              id={`switch-${product.id}-${feature.id}`}
-                                              checked={feature.enabled}
-                                              onCheckedChange={(checked) => handleFeatureToggle(product.id, feature.id, checked)}
-                                          />
-                                          <Select
-                                              value={feature.stage}
-                                              onValueChange={(value: ProductFeature['stage']) => handleFeatureStageChange(product.id, feature.id, value)}
-                                              disabled={!feature.enabled}
-                                          >
-                                              <SelectTrigger className="w-[180px]">
-                                                  <SelectValue placeholder={t.activationStage} />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                  {stageOptions.map(opt => (
-                                                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                                                  ))}
-                                              </SelectContent>
-                                          </Select>
-                                      </div>
-                                  ))}
+                              <div>
+                                  <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFormsTitle}</h4>
+                                  <div className="space-y-4">
+                                      {(product.features || []).map(feature => (
+                                          <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border bg-background p-4">
+                                              <Label htmlFor={`switch-${product.id}-${feature.id}`} className="font-normal flex flex-col">
+                                                  {feature.name}
+                                                  <span className="text-xs text-muted-foreground">ID: {feature.id}</span>
+                                              </Label>
+                                              <Switch
+                                                  id={`switch-${product.id}-${feature.id}`}
+                                                  checked={feature.enabled}
+                                                  onCheckedChange={(checked) => handleFeatureToggle(product.id, feature.id, checked)}
+                                              />
+                                              <Select
+                                                  value={feature.stage}
+                                                  onValueChange={(value: ProductFeature['stage']) => handleFeatureStageChange(product.id, feature.id, value)}
+                                                  disabled={!feature.enabled}
+                                              >
+                                                  <SelectTrigger className="w-[180px]">
+                                                      <SelectValue placeholder={t.activationStage} />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                      {stageOptions.map(opt => (
+                                                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                      ))}
+                                                  </SelectContent>
+                                              </Select>
+                                          </div>
+                                      ))}
+                                  </div>
                               </div>
                           </div>
-                      </div>
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-          </Accordion>
+                        </AccordionContent>
+                    </AccordionItem>
+                  </SortableProductItem>
+                ))}
+              </Accordion>
+            </SortableContext>
+          </DndContext>
         </CardContent>
       </Card>
     </div>
