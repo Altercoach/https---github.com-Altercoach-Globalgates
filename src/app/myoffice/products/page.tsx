@@ -103,7 +103,6 @@ export default function ProductsEditorPage() {
   const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
 
   useEffect(() => {
-    // Ensure features are populated on mount
     setSite(prevSite => {
         const siteWithFeatures = JSON.parse(JSON.stringify(prevSite));
         let updated = false;
@@ -123,14 +122,12 @@ export default function ProductsEditorPage() {
         });
         return updated ? siteWithFeatures : prevSite;
     });
-  }, []);
+  }, [setSite]);
 
-  const handleUpdate = (updater: (draft: SiteData) => SiteData, silent: boolean = false) => {
+  const handleUpdate = (updater: (draft: SiteData) => SiteData) => {
     setSite(prev => {
         const newSite = updater(JSON.parse(JSON.stringify(prev)));
-        if (!silent) {
-            toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
-        }
+        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
         return newSite;
     });
   };
@@ -148,7 +145,7 @@ export default function ProductsEditorPage() {
           }
           return p;
         })
-    }), true);
+    }));
   };
 
   const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
@@ -163,7 +160,7 @@ export default function ProductsEditorPage() {
             }
             return p;
         })
-    }), true);
+    }));
   };
 
   const handleFeatureStageChange = (productId: string, featureId: string, stage: ProductFeature['stage']) => {
@@ -178,7 +175,7 @@ export default function ProductsEditorPage() {
             }
             return p;
         })
-    }), true);
+    }));
   }
 
   const addNewProduct = () => {
@@ -230,8 +227,8 @@ export default function ProductsEditorPage() {
               onValueChange={setOpenAccordionItem}
           >
             {site.products.map(product => (
-                <AccordionItem value={product.id} key={product.id} className="border-b">
-                    <div className="flex items-center px-6 py-4 hover:bg-muted/50">
+                <AccordionItem value={product.id} key={product.id} className="border-b last:border-b-0">
+                    <div className="flex items-center justify-between px-6 py-4 hover:bg-muted/50">
                         <AccordionTrigger className="flex-1 text-left p-0 hover:no-underline">
                             <div>
                                 <p className="font-semibold">{product.name[langCode] || product.name.en}</p>
@@ -239,16 +236,15 @@ export default function ProductsEditorPage() {
                             </div>
                         </AccordionTrigger>
                         <div className="flex items-center gap-4 pl-4">
-                            <div className="flex items-center space-x-2">
-                                <Switch
-                                    id={`visible-${product.id}`}
-                                    checked={product.visible}
-                                    onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
-                                />
-                                <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
-                                    {product.visible ? <Eye className="h-4 w-4"/> : <EyeOff className="h-4 w-4"/>}
-                                </Label>
-                            </div>
+                            <Switch
+                                id={`visible-${product.id}`}
+                                checked={product.visible}
+                                onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
+                                aria-label={t.visible}
+                            />
+                            <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground">
+                                {product.visible ? <Eye className="h-4 w-4"/> : <EyeOff className="h-4 w-4"/>}
+                            </Label>
                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
                                 <Trash2 />
                             </Button>
