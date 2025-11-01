@@ -231,12 +231,14 @@ export default function ProductsEditorPage() {
           >
             {site.products.map(product => (
                 <AccordionItem value={product.id} key={product.id} className="border-b">
-                    <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
-                        <div className="flex-1 text-left">
-                            <p className="font-semibold">{product.name[langCode] || product.name.en}</p>
-                            <p className="text-sm text-muted-foreground">{t.productTypes[product.type]}</p>
-                        </div>
-                        <div className="flex items-center gap-4 pl-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center px-6 py-4 hover:bg-muted/50">
+                        <AccordionTrigger className="flex-1 text-left p-0 hover:no-underline">
+                            <div>
+                                <p className="font-semibold">{product.name[langCode] || product.name.en}</p>
+                                <p className="text-sm text-muted-foreground">{t.productTypes[product.type]}</p>
+                            </div>
+                        </AccordionTrigger>
+                        <div className="flex items-center gap-4 pl-4">
                             <div className="flex items-center space-x-2">
                                 <Switch
                                     id={`visible-${product.id}`}
@@ -251,7 +253,7 @@ export default function ProductsEditorPage() {
                                 <Trash2 />
                             </Button>
                         </div>
-                    </AccordionTrigger>
+                    </div>
                     <AccordionContent>
                       <div className="p-6 pt-2 space-y-4 bg-muted/20">
                           <div><Label>{t.nameLabel}</Label>
@@ -325,5 +327,3 @@ export default function ProductsEditorPage() {
     </div>
   );
 }
-
-    
