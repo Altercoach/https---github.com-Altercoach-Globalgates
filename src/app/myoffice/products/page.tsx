@@ -6,7 +6,7 @@ import { useSite } from '@/hooks/use-site';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -17,6 +17,7 @@ import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const labels = {
   es: {
@@ -93,38 +94,45 @@ const labels = {
 
 export default function ProductsEditorPage() {
   const { site, setSite } = useSite();
-  const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { toast } = useToast();
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
+  const [openAccordionItem, setOpenAccordionItem] = useState<string | undefined>();
 
   const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
 
   useEffect(() => {
-    const siteWithFeatures = JSON.parse(JSON.stringify(site));
-    siteWithFeatures.products.forEach((p: Product) => {
-      if (!p.features) {
-        p.features = JSON.parse(JSON.stringify(defaultFeatures));
-      } else {
-        const featureIds = p.features.map(f => f.id);
-        defaultFeatures.forEach(df => {
-          if (!featureIds.includes(df.id)) {
-            p.features!.push(JSON.parse(JSON.stringify(df)));
-          }
+    // Ensure features are populated on mount
+    setSite(prevSite => {
+        const siteWithFeatures = JSON.parse(JSON.stringify(prevSite));
+        let updated = false;
+        siteWithFeatures.products.forEach((p: Product) => {
+            if (!p.features) {
+                p.features = JSON.parse(JSON.stringify(defaultFeatures));
+                updated = true;
+            } else {
+                const featureIds = p.features.map(f => f.id);
+                defaultFeatures.forEach(df => {
+                    if (!featureIds.includes(df.id)) {
+                        p.features!.push(JSON.parse(JSON.stringify(df)));
+                        updated = true;
+                    }
+                });
+            }
         });
-      }
+        return updated ? siteWithFeatures : prevSite;
     });
-    setDraft(siteWithFeatures);
-  }, [site]);
+  }, []);
 
   const handleUpdate = (updater: (draft: SiteData) => SiteData, silent: boolean = false) => {
-    const newSite = updater(draft);
-    setDraft(newSite);
-    setSite(newSite); // Save instantly
-    if (!silent) {
-        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
-    }
+    setSite(prev => {
+        const newSite = updater(JSON.parse(JSON.stringify(prev)));
+        if (!silent) {
+            toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
+        }
+        return newSite;
+    });
   };
   
   const handleProductUpdate = (id: string, field: keyof Product, value: any, isMultilingual: boolean) => {
@@ -140,7 +148,7 @@ export default function ProductsEditorPage() {
           }
           return p;
         })
-    }), true); // silent update
+    }), true);
   };
 
   const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
@@ -174,8 +182,9 @@ export default function ProductsEditorPage() {
   }
 
   const addNewProduct = () => {
+    const newId = `prod_${Date.now()}`;
     const newProduct: Product = {
-        id: `prod_${Date.now()}`,
+        id: newId,
         visible: true,
         name: { en: 'New Plan', es: 'Nuevo Plan', fr: 'Nouveau Forfait' },
         type: 'one',
@@ -185,7 +194,8 @@ export default function ProductsEditorPage() {
         description: { en: 'Detailed description of the new plan.', es: 'Descripción detallada del nuevo plan.', fr: 'Description détaillée du nouveau forfait.' },
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
-    handleUpdate(prev => ({...prev, products: [...prev.products, newProduct]}));
+    handleUpdate(prev => ({...prev, products: [newProduct, ...prev.products]}));
+    setOpenAccordionItem(newId);
   };
 
   const removeProduct = (id: string) => {
@@ -210,93 +220,110 @@ export default function ProductsEditorPage() {
           <AlertTitle>{`${t.editingLanguage} ${language.name}`}</AlertTitle>
       </Alert>
 
-      <div className="space-y-4">
-        {draft.products.map(product => (
-            <Card key={product.id}>
-                <CardHeader className="flex flex-row items-start justify-between">
-                    <CardTitle className="text-lg leading-tight flex-1">
-                      <Input 
-                        value={product.name[langCode]} 
-                        onChange={e => handleProductUpdate(product.id, 'name', e.target.value, true)} 
-                        className="text-lg font-bold border-0 px-0 h-auto"
-                      />
-                    </CardTitle>
-                    <div className="flex items-center gap-4 pl-4">
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          id={`visible-${product.id}`}
-                          checked={product.visible}
-                          onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
-                        />
-                        <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
-                          {product.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
-                          {t.visible}
-                        </Label>
-                      </div>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
-                          <Trash2 />
-                      </Button>
-                    </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                      <div><Label>{t.typeLabel}</Label>
-                          <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v, false)}>
-                              <SelectTrigger><SelectValue/></SelectTrigger>
-                              <SelectContent>
-                                  <SelectItem value="one">{t.productTypes.one}</SelectItem>
-                                  <SelectItem value="sub">{t.productTypes.sub}</SelectItem>
-                                  <SelectItem value="info">{t.productTypes.info}</SelectItem>
-                              </SelectContent>
-                          </Select>
-                      </div>
-                      <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value), false)} /></div>
-                      <div className="sm:col-span-2"><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value, true)} /></div>
-                    </div>
-                    <div><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value, true)} /></div>
-                    <div>
-                      <Label>{t.fullDescLabel}</Label>
-                      <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value, true)} rows={4} />
-                    </div>
-                    
-                    <Separator className="my-6" />
-
-                    <div>
-                        <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFormsTitle}</h4>
-                        <div className="space-y-4">
-                            {(product.features || []).map(feature => (
-                                <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border p-4">
-                                    <Label htmlFor={`switch-${product.id}-${feature.id}`} className="font-normal flex flex-col">
-                                        {feature.name}
-                                        <span className="text-xs text-muted-foreground">ID: {feature.id}</span>
-                                    </Label>
-                                    <Switch
-                                        id={`switch-${product.id}-${feature.id}`}
-                                        checked={feature.enabled}
-                                        onCheckedChange={(checked) => handleFeatureToggle(product.id, feature.id, checked)}
-                                    />
-                                     <Select
-                                        value={feature.stage}
-                                        onValueChange={(value: ProductFeature['stage']) => handleFeatureStageChange(product.id, feature.id, value)}
-                                        disabled={!feature.enabled}
-                                    >
-                                        <SelectTrigger className="w-[180px]">
-                                            <SelectValue placeholder={t.activationStage} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {stageOptions.map(opt => (
-                                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            ))}
+      <Card>
+        <CardContent className="p-0">
+          <Accordion 
+              type="single" 
+              collapsible 
+              className="w-full"
+              value={openAccordionItem}
+              onValueChange={setOpenAccordionItem}
+          >
+            {site.products.map(product => (
+                <AccordionItem value={product.id} key={product.id} className="border-b">
+                    <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
+                        <div className="flex-1 text-left">
+                            <p className="font-semibold">{product.name[langCode] || product.name.en}</p>
+                            <p className="text-sm text-muted-foreground">{t.productTypes[product.type]}</p>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
-        ))}
-      </div>
+                        <div className="flex items-center gap-4 pl-4" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    id={`visible-${product.id}`}
+                                    checked={product.visible}
+                                    onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
+                                />
+                                <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
+                                    {product.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
+                                </Label>
+                            </div>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
+                                <Trash2 />
+                            </Button>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="p-6 pt-2 space-y-4 bg-muted/20">
+                          <div><Label>{t.nameLabel}</Label>
+                            <Input 
+                              value={product.name[langCode]} 
+                              onChange={e => handleProductUpdate(product.id, 'name', e.target.value, true)} 
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                            <div><Label>{t.typeLabel}</Label>
+                                <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v, false)}>
+                                    <SelectTrigger><SelectValue/></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="one">{t.productTypes.one}</SelectItem>
+                                        <SelectItem value="sub">{t.productTypes.sub}</SelectItem>
+                                        <SelectItem value="info">{t.productTypes.info}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value), false)} /></div>
+                            <div><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value, true)} /></div>
+                          </div>
+                          <div><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value, true)} /></div>
+                          <div>
+                            <Label>{t.fullDescLabel}</Label>
+                            <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value, true)} rows={4} />
+                          </div>
+                          
+                          <Separator className="my-6 bg-border" />
+
+                          <div>
+                              <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFormsTitle}</h4>
+                              <div className="space-y-4">
+                                  {(product.features || []).map(feature => (
+                                      <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border bg-background p-4">
+                                          <Label htmlFor={`switch-${product.id}-${feature.id}`} className="font-normal flex flex-col">
+                                              {feature.name}
+                                              <span className="text-xs text-muted-foreground">ID: {feature.id}</span>
+                                          </Label>
+                                          <Switch
+                                              id={`switch-${product.id}-${feature.id}`}
+                                              checked={feature.enabled}
+                                              onCheckedChange={(checked) => handleFeatureToggle(product.id, feature.id, checked)}
+                                          />
+                                          <Select
+                                              value={feature.stage}
+                                              onValueChange={(value: ProductFeature['stage']) => handleFeatureStageChange(product.id, feature.id, value)}
+                                              disabled={!feature.enabled}
+                                          >
+                                              <SelectTrigger className="w-[180px]">
+                                                  <SelectValue placeholder={t.activationStage} />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                  {stageOptions.map(opt => (
+                                                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                  ))}
+                                              </SelectContent>
+                                          </Select>
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
+                      </div>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+    
