@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -30,6 +30,7 @@ const labels = {
     questionnaires: "Cuestionarios",
     integrations: "Integraciones",
     admin: "Admin",
+    crm: "CRM",
     customerView: "Vista Cliente",
     loggedInAs: "Conectado como:",
     logout: "Cerrar Sesión",
@@ -44,6 +45,7 @@ const labels = {
     questionnaires: "Questionnaires",
     integrations: "Integrations",
     admin: "Admin",
+    crm: "CRM",
     customerView: "Customer View",
     loggedInAs: "Logged in as:",
     logout: "Logout",
@@ -58,6 +60,7 @@ const labels = {
     questionnaires: "Questionnaires",
     integrations: "Intégrations",
     admin: "Admin",
+    crm: "CRM",
     customerView: "Vue Client",
     loggedInAs: "Connecté en tant que:",
     logout: "Se déconnecter",
@@ -93,7 +96,9 @@ export default function MyOfficeLayout({
     { href: '/myoffice/products', label: t.plans, icon: <ShoppingBag /> },
     { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle /> },
-    { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck /> },
+    { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck />, children: [
+       { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
+    ]},
   ];
 
   if (auth.user?.role !== 'admin') {

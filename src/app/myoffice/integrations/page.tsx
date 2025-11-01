@@ -1,97 +1,78 @@
 
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { DollarSign, Bot, Puzzle } from 'lucide-react';
-import Image from 'next/image';
+import { Bot, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import Image from 'next/image';
 
 const labels = {
   es: {
-    pageTitle: "Integraciones",
-    pageSubtitle: "Conecta tu sitio con servicios de terceros.",
-    saveChanges: "Guardar Cambios",
-    toastSuccessTitle: "¡Configuración guardada!",
-    toastSuccessDescription: "Tus integraciones han sido actualizadas.",
-    apiKeyLabel: "API Key",
-    apiKeyPlaceholder: "Introduce tu API Key",
+    pageTitle: "Integraciones y Agente de IA",
+    pageSubtitle: "Conecta tus canales y configura tu asistente virtual.",
+    agentCardTitle: "Agente de IA Global",
+    agentCardDescription: "Configura la personalidad, conocimiento y reglas de tu agente de IA.",
+    configureAgent: "Configurar Agente",
+    channelsTitle: "Canales de Mensajería",
+    channelsDescription: "Activa los canales donde operará tu agente de IA. (Simulación)",
     integrations: {
-      stripe: { name: 'Stripe', description: 'Acepta pagos con tarjeta de crédito de forma segura en todo el mundo.' },
-      mercadopago: { name: 'Mercado Pago', description: 'Procesa pagos locales en Latinoamérica con las opciones más populares.' },
-      aiagent: { name: 'Agente de IA', description: 'Automatiza la atención al cliente con un asistente virtual inteligente.' },
+      whatsapp: { name: 'WhatsApp', description: 'Conecta con la API de WhatsApp Business.' },
+      messenger: { name: 'Facebook Messenger', description: 'Atiende a clientes en Messenger.' },
+      instagram: { name: 'Instagram DMs', description: 'Gestiona mensajes directos de Instagram.' },
+      telegram: { name: 'Telegram', description: 'Implementa tu agente en un bot de Telegram.' },
+      webchat: { name: 'Web Chat (Sitio Web)', description: 'Añade un widget de chat a tu página.' },
+      email: { name: 'Email', description: 'Responde a correos de soporte o ventas.' },
     }
   },
   en: {
-    pageTitle: "Integrations",
-    pageSubtitle: "Connect your site with third-party services.",
-    saveChanges: "Save Changes",
-    toastSuccessTitle: "Settings saved!",
-    toastSuccessDescription: "Your integrations have been updated.",
-    apiKeyLabel: "API Key",
-    apiKeyPlaceholder: "Enter your API Key",
+    pageTitle: "Integrations & AI Agent",
+    pageSubtitle: "Connect your channels and configure your virtual assistant.",
+    agentCardTitle: "Global AI Agent",
+    agentCardDescription: "Configure the personality, knowledge, and rules of your AI agent.",
+    configureAgent: "Configure Agent",
+    channelsTitle: "Messaging Channels",
+    channelsDescription: "Activate the channels where your AI agent will operate. (Simulation)",
     integrations: {
-      stripe: { name: 'Stripe', description: 'Accept credit card payments securely worldwide.' },
-      mercadopago: { name: 'Mercado Pago', description: 'Process local payments in Latin America with the most popular options.' },
-      aiagent: { name: 'AI Agent', description: 'Automate customer service with a smart virtual assistant.' },
+      whatsapp: { name: 'WhatsApp', description: 'Connect with the WhatsApp Business API.' },
+      messenger: { name: 'Facebook Messenger', description: 'Serve customers on Messenger.' },
+      instagram: { name: 'Instagram DMs', description: 'Manage Instagram direct messages.' },
+      telegram: { name: 'Telegram', description: 'Deploy your agent in a Telegram bot.' },
+      webchat: { name: 'Web Chat (Website)', description: 'Add a chat widget to your page.' },
+      email: { name: 'Email', description: 'Respond to support or sales emails.' },
     }
   },
   fr: {
-    pageTitle: "Intégrations",
-    pageSubtitle: "Connectez votre site à des services tiers.",
-    saveChanges: "Enregistrer les Modifications",
-    toastSuccessTitle: "Paramètres enregistrés !",
-    toastSuccessDescription: "Vos intégrations ont été mises à jour.",
-    apiKeyLabel: "Clé API",
-    apiKeyPlaceholder: "Entrez votre clé API",
+    pageTitle: "Intégrations & Agent IA",
+    pageSubtitle: "Connectez vos canaux et configurez votre assistant virtuel.",
+    agentCardTitle: "Agent IA Global",
+    agentCardDescription: "Configurez la personnalité, les connaissances et les règles de votre agent IA.",
+    configureAgent: "Configurer l'Agent",
+    channelsTitle: "Canaux de Messagerie",
+    channelsDescription: "Activez les canaux où votre agent IA fonctionnera. (Simulation)",
     integrations: {
-      stripe: { name: 'Stripe', description: 'Acceptez les paiements par carte de crédit en toute sécurité dans le monde entier.' },
-      mercadopago: { name: 'Mercado Pago', description: 'Traitez les paiements locaux en Amérique latine avec les options les plus populaires.' },
-      aiagent: { name: 'Agent IA', description: 'Automatisez le service client avec un assistant virtuel intelligent.' },
+      whatsapp: { name: 'WhatsApp', description: 'Connectez-vous à l\'API WhatsApp Business.' },
+      messenger: { name: 'Facebook Messenger', description: 'Servez les clients sur Messenger.' },
+      instagram: { name: 'Instagram DMs', description: 'Gérez les messages directs d\'Instagram.' },
+      telegram: { name: 'Telegram', description: 'Déployez votre agent dans un bot Telegram.' },
+      webchat: { name: 'Web Chat (Site Web)', description: 'Ajoutez un widget de chat à votre page.' },
+      email: { name: 'Email', description: 'Répondez aux e-mails de support ou de vente.' },
     }
   }
 };
 
 
-type IntegrationId = 'stripe' | 'mercadopago' | 'aiagent';
+type IntegrationId = 'whatsapp' | 'messenger' | 'instagram' | 'telegram' | 'webchat' | 'email';
 
-type Integration = {
-    id: IntegrationId;
-    enabled: boolean;
-    apiKey: string;
-    icon: React.ReactNode;
-};
-
-const initialIntegrations: Integration[] = [
-    { id: 'stripe', enabled: false, apiKey: '', icon: <DollarSign /> },
-    { id: 'mercadopago', enabled: false, apiKey: '', icon: <Image src="https://picsum.photos/32/32" width={24} height={24} alt="Mercado Pago" data-ai-hint="payment processor" /> },
-    { id: 'aiagent', enabled: true, apiKey: '********', icon: <Bot /> },
-];
-
+const channelIntegrations: IntegrationId[] = ['whatsapp', 'messenger', 'instagram', 'telegram', 'webchat', 'email'];
 
 export default function IntegrationsPage() {
-    const [integrations, setIntegrations] = useState<Integration[]>(initialIntegrations);
     const { toast } = useToast();
     const { language } = useLanguage();
     const t = labels[language.code as keyof typeof labels] || labels.en;
-
-    const handleToggle = (id: Integration['id']) => {
-        setIntegrations(prev => prev.map(int => int.id === id ? { ...int, enabled: !int.enabled } : int));
-    };
-
-    const handleApiKeyChange = (id: Integration['id'], value: string) => {
-        setIntegrations(prev => prev.map(int => int.id === id ? { ...int, apiKey: value } : int));
-    };
-
-    const saveChanges = () => {
-        console.log('Saving integrations:', integrations);
-        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
-    };
 
     return (
         <div className="space-y-6">
@@ -100,44 +81,41 @@ export default function IntegrationsPage() {
                 <p className="text-muted-foreground">{t.pageSubtitle}</p>
             </header>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                {integrations.map(integration => {
-                    const intl = t.integrations[integration.id];
-                    return (
-                        <Card key={integration.id}>
-                            <CardHeader>
-                                <div className="flex items-center gap-4">
-                                    <div className="text-accent">{integration.icon}</div>
-                                    <CardTitle>{intl.name}</CardTitle>
-                                    <Switch
-                                        className="ml-auto"
-                                        checked={integration.enabled}
-                                        onCheckedChange={() => handleToggle(integration.id)}
-                                        aria-label={`Enable ${intl.name}`}
-                                    />
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="text-sm text-muted-foreground">{intl.description}</p>
-                                <fieldset disabled={!integration.enabled} className="space-y-2">
-                                    <Label htmlFor={`apikey-${integration.id}`}>{t.apiKeyLabel}</Label>
-                                    <Input 
-                                        id={`apikey-${integration.id}`}
-                                        type="password"
-                                        placeholder={t.apiKeyPlaceholder}
-                                        value={integration.apiKey}
-                                        onChange={(e) => handleApiKeyChange(integration.id, e.target.value)}
-                                    />
-                                </fieldset>
-                            </CardContent>
-                        </Card>
-                    )
-                })}
-            </div>
+            <Card className="bg-primary/5 border-primary/20">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Bot /> {t.agentCardTitle}</CardTitle>
+                    <CardDescription>{t.agentCardDescription}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild>
+                        <Link href="/myoffice/agent">{t.configureAgent}</Link>
+                    </Button>
+                </CardContent>
+            </Card>
 
-            <div className="flex justify-end">
-                <Button onClick={saveChanges}>{t.saveChanges}</Button>
-            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t.channelsTitle}</CardTitle>
+                    <CardDescription>{t.channelsDescription}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {channelIntegrations.map(id => {
+                        const intl = t.integrations[id];
+                        return (
+                            <div key={id} className="p-4 border rounded-lg flex items-start gap-4">
+                                <MessageSquare className="h-6 w-6 text-muted-foreground mt-1"/>
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-semibold">{intl.name}</h3>
+                                        <Switch aria-label={`Enable ${intl.name}`} />
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-1">{intl.description}</p>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </CardContent>
+            </Card>
         </div>
     );
 }

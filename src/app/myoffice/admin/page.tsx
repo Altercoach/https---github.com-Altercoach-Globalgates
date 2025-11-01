@@ -30,7 +30,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MoreHorizontal, DollarSign, Users, ShoppingCart, Search, Filter, XCircle, PlayCircle, Trash2, Eye } from 'lucide-react';
+import { MoreHorizontal, DollarSign, Users, ShoppingCart, Search, Filter, XCircle, PlayCircle, Trash2, Eye, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import { es, enUS, fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -52,6 +52,7 @@ const labels = {
     activeSubscriptions: "Suscripciones Activas",
     activeSubscriptionsDesc: "Planes de suscripción mensuales",
     clients: "Clientes",
+    crm: "Supervisión de Agente (CRM)",
     searchPlaceholder: "Buscar por nombre o email...",
     filterByStatus: "Filtrar por estado",
     allStatuses: "Todos los estados",
@@ -88,6 +89,7 @@ const labels = {
     activeSubscriptions: "Active Subscriptions",
     activeSubscriptionsDesc: "Monthly subscription plans",
     clients: "Clients",
+    crm: "Agent Supervision (CRM)",
     searchPlaceholder: "Search by name or email...",
     filterByStatus: "Filter by status",
     allStatuses: "All statuses",
@@ -124,6 +126,7 @@ const labels = {
     activeSubscriptions: "Abonnements Actifs",
     activeSubscriptionsDesc: "Plans d'abonnement mensuels",
     clients: "Clients",
+    crm: "Supervision de l'Agent (CRM)",
     searchPlaceholder: "Rechercher par nom ou e-mail...",
     filterByStatus: "Filtrer par statut",
     allStatuses: "Tous les statuts",
@@ -193,24 +196,27 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    let message = '';
     let toastMessage = '';
-    setCustomers(prev => prev.map(c => {
-        if(selectedCustomerIds.includes(c.id)) {
-            switch(action) {
-                case 'suspend': c.status = 'Suspended'; toastMessage = t.clientsSuspended; break;
-                case 'activate': c.status = 'Active'; toastMessage = t.clientsReactivated; break;
-                case 'delete': return null;
-            }
-        }
-        return c;
-    }).filter(Boolean) as Customer[]);
-
+    
     if (action === 'delete') {
-      toastMessage = t.clientsDeleted;
+        setCustomers(prev => prev.filter(c => !selectedCustomerIds.includes(c.id)));
+        toastMessage = t.clientsDeleted;
+    } else {
+        setCustomers(prev => prev.map(c => {
+            if(selectedCustomerIds.includes(c.id)) {
+                if(action === 'suspend') {
+                    c.status = 'Suspended'; 
+                    toastMessage = t.clientsSuspended;
+                } else if(action === 'activate') {
+                    c.status = 'Active';
+                    toastMessage = t.clientsReactivated;
+                }
+            }
+            return c;
+        }));
     }
 
-    toast({ title: t.actionCompleted, description: `Se han ${toastMessage} correctamente.`});
+    toast({ title: t.actionCompleted, description: `${selectedCustomerIds.length} ${toastMessage}`});
     setSelectedCustomerIds([]);
   }
 
@@ -242,7 +248,7 @@ export default function AdminDashboardPage() {
         <p className="text-muted-foreground">{t.pageSubtitle}</p>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t.totalRevenue}</CardTitle>
@@ -271,6 +277,19 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{kpi.activeSubscriptions}</div>
             <p className="text-xs text-muted-foreground">{t.activeSubscriptionsDesc}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-accent bg-accent/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <MessageSquare />
+              {t.crm}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+             <Button asChild className="w-full">
+                <Link href="/myoffice/crm">Ver Conversaciones</Link>
+             </Button>
           </CardContent>
         </Card>
       </div>
