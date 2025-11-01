@@ -22,6 +22,7 @@ const labels = {
     editingLanguage: "Estás editando el contenido en",
     visible: "Visible en la página principal",
     addService: "Añadir Servicio",
+    deleteService: "Eliminar Servicio",
   },
   en: {
     pageTitle: "Services",
@@ -31,6 +32,7 @@ const labels = {
     editingLanguage: "You are editing the content in",
     visible: "Visible on homepage",
     addService: "Add Service",
+    deleteService: "Delete Service",
   },
   fr: {
     pageTitle: "Services",
@@ -40,6 +42,7 @@ const labels = {
     editingLanguage: "Vous éditez le contenu en",
     visible: "Visible sur la page d'accueil",
     addService: "Ajouter un Service",
+    deleteService: "Supprimer le Service",
   }
 };
 
@@ -49,15 +52,13 @@ export default function ServicesEditorPage() {
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
   
-  const handleTextUpdate = (serviceId: string, field: keyof Service, value: any) => {
+  const handleTextUpdate = (serviceId: string, field: 'title', value: any) => {
     setSite(prev => ({
       ...prev,
       services: prev.services.map(s => {
         if (s.id === serviceId) {
-          if (field === 'title') {
-            const newTitle = { ...s.title, [langCode]: value };
-            return { ...s, title: newTitle };
-          }
+          const newTitle = { ...s.title, [langCode]: value };
+          return { ...s, title: newTitle };
         }
         return s;
       })
@@ -121,6 +122,12 @@ export default function ServicesEditorPage() {
     setSite(prev => ({...prev, services: [...prev.services, newService]}));
   };
 
+  const removeService = (serviceId: string) => {
+    setSite(prev => ({
+        ...prev,
+        services: prev.services.filter(s => s.id !== serviceId)
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -144,11 +151,16 @@ export default function ServicesEditorPage() {
         {site.services.map((service) => (
           <Card key={service.id}>
             <CardHeader>
-              <Input 
-                className="text-lg font-bold border-0 px-0"
-                value={service.title[langCode]} 
-                onChange={e => handleTextUpdate(service.id, 'title', e.target.value)} 
-              />
+               <div className="flex items-start justify-between gap-2">
+                 <Input 
+                    className="text-lg font-bold border-0 px-0"
+                    value={service.title[langCode]} 
+                    onChange={e => handleTextUpdate(service.id, 'title', e.target.value)} 
+                  />
+                  <Button variant="ghost" size="icon" className="shrink-0 text-destructive hover:text-destructive" onClick={() => removeService(service.id)} aria-label={t.deleteService}>
+                      <Trash2 className="h-4 w-4" />
+                  </Button>
+               </div>
               <div className="flex items-center space-x-2 pt-2">
                 <Switch 
                   id={`visible-${service.id}`} 

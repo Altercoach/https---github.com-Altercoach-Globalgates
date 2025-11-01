@@ -1,6 +1,5 @@
 
 import type { SiteData } from '@/lib/types';
-import { defaultFeatures } from '@/lib/constants';
 
 export const DEFAULT_SITE_CONTENT: SiteData = {
   brand: {
@@ -34,19 +33,29 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
   },
   services: [
     { id: 'svc-social-media', visible: true, title: { es: 'Gestión de Redes Sociales', en: 'Social Media Management', fr: 'Gestion des Réseaux Sociaux' }, bullets: [
-      { es: 'Creatividad humana con IA predictiva', en: 'Human creativity with predictive AI', fr: 'Créativité humaine avec IA prédictive' },
-      { es: 'Lanzamiento express en 24-48 horas', en: 'Express launch in 24-48 hours', fr: 'Lancement express en 24-48 heures' },
-      { es: 'Monitoreo 24/7 y reportes con insights', en: '24/7 monitoring and reports with insights', fr: 'Surveillance 24/7 et rapports avec insights' },
+      { es: 'Creatividad humana con IA predictiva para máximo ROI.', en: 'Human creativity with predictive AI for maximum ROI.', fr: 'Créativité humaine avec IA prédictive pour un ROI maximal.' },
+      { es: 'Lanzamiento express en 24-48 horas y monitoreo 24/7.', en: 'Express launch in 24-48 hours and 24/7 monitoring.', fr: 'Lancement express en 24-48 heures et surveillance 24/7.' },
+      { es: 'Soporte VIP y reportes mensuales con insights accionables.', en: 'VIP support and monthly reports with actionable insights.', fr: 'Support VIP et rapports mensuels avec des informations exploitables.' },
     ]},
     { id: 'svc-ugc', visible: true, title: { es: 'Videos UGC Auténticos', en: 'Authentic UGC Videos', fr: 'Vidéos UGC Authentiques' }, bullets: [
-      { es: 'Scripts vendedores optimizados por IA', en: 'AI-optimized sales scripts', fr: 'Scripts de vente optimisés par IA' },
-      { es: 'Más de 3,500 creadores disponibles', en: 'Over 3,500 creators available', fr: 'Plus de 3 500 créateurs disponibles' },
-      { es: 'Análisis predictivo de performance', en: 'Predictive performance analysis', fr: 'Analyse prédictive de la performance' },
+      { es: 'Scripts vendedores optimizados por IA para persuasión.', en: 'AI-optimized sales scripts for persuasion.', fr: 'Scripts de vente optimisés par IA pour la persuasion.' },
+      { es: 'Acceso a más de 3,500 creadores de contenido.', en: 'Access to over 3,500 content creators.', fr: 'Accès à plus de 3 500 créateurs de contenu.' },
+      { es: 'Análisis predictivo de performance para campañas virales.', en: 'Predictive performance analysis for viral campaigns.', fr: 'Analyse prédictive des performances pour les campagnes virales.' },
     ]},
     { id: 'svc-branding', visible: true, title: { es: 'Diseño Gráfico y Marca', en: 'Graphic Design and Branding', fr: 'Design Graphique et Image de Marque' }, bullets: [
-      { es: 'Creación de identidad visual premium', en: 'Premium visual identity creation', fr: 'Création d\'identité visuelle premium' },
-      { es: 'Proceso en etapas con IA para variaciones', en: 'Staged process with AI for variations', fr: 'Processus par étapes avec IA pour les variations' },
-      { es: 'Manual de marca para consistencia total', en: 'Brand manual for total consistency', fr: 'Manuel de marque pour une cohérence totale' },
+      { es: 'Creación de identidad visual premium (logos, manual de marca).', en: 'Premium visual identity creation (logos, brand manual).', fr: 'Création d\'identité visuelle premium (logos, manuel de marque).' },
+      { es: 'Diseño de assets para marketing (flyers, tarjetas, menús).', en: 'Design of marketing assets (flyers, cards, menus).', fr: 'Conception de supports marketing (flyers, cartes, menus).' },
+      { es: 'Proceso en etapas con IA para variaciones de diseño rápidas.', en: 'Staged process with AI for quick design variations.', fr: 'Processus par étapes avec IA pour des variations de conception rapides.' },
+    ]},
+     { id: 'svc-all-in-one', visible: false, title: { es: 'Paquete Digital Integral', en: 'Comprehensive Digital Package', fr: 'Package Numérique Complet' }, bullets: [
+      { es: 'Solución completa: web, redes sociales y campañas.', en: 'Complete solution: web, social media, and campaigns.', fr: 'Solution complète : web, réseaux sociaux et campagnes.' },
+      { es: 'Desarrollo web express y embudo de ventas con IA.', en: 'Express web development and AI sales funnel.', fr: 'Développement web express et entonnoir de vente IA.' },
+      { es: 'Ahorro del 30% en comparación con servicios separados.', en: '30% savings compared to separate services.', fr: '30% d\'économies par rapport aux services séparés.' },
+    ]},
+     { id: 'svc-corporate', visible: false, title: { es: 'Soluciones Corporativas', en: 'Corporate Solutions', fr: 'Solutions d\'Entreprise' }, bullets: [
+      { es: 'Registro y protección de marca (Trademark).', en: 'Brand registration and protection (Trademark).', fr: 'Enregistrement et protection de la marque (Trademark).' },
+      { es: 'Valoración financiera de negocios para M&A o inversión.', en: 'Business valuation for M&A or investment.', fr: 'Évaluation d\'entreprise pour M&A ou investissement.' },
+      { es: 'Asesoría para la creación de fundaciones y A.C.', en: 'Consulting for the creation of foundations and non-profits.', fr: 'Conseil pour la création de fondations et d\'OSBL.' },
     ]},
   ],
   products: [
@@ -130,7 +139,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     },
     
     // UGC
-    { id: 'prod_ugc_1', name: { es: 'Creadores Auténticos (1 Video UGC)', en: 'Authentic Creators (1 UGC Video)', fr: 'Créateurs Authentiques (1 Vidéo UGC)' }, type: 'one', price: 500,
+    { id: 'prod_ugc_1', name: { es: 'Creadores Auténticos (UGC)', en: 'Authentic Creators (UGC)', fr: 'Créateurs Authentiques (UGC)' }, type: 'one', price: 500,
       badge: { es: 'UGC', en: 'UGC', fr: 'UGC' },
       note: { es: 'Video auténtico con creador real para máxima confianza y conversión.', en: 'Authentic video with a real creator for maximum trust and conversion.', fr: 'Vidéo authentique avec un vrai créateur pour une confiance et une conversion maximales.'},
       description: { es: 'Videos publicitarios auténticos con creadores reales. Incluye script vendedor optimizado por IA, edición pro, y trafficker por 30 días para monitoreo. UGC genera 5x más confianza que ads tradicionales.', en: 'Authentic advertising videos with real creators. Includes AI-optimized sales script, pro editing, and a trafficker for 30 days for monitoring. UGC generates 5x more trust than traditional ads.', fr: 'Vidéos publicitaires authentiques avec de vrais créateurs. Comprend un script de vente optimisé par IA, un montage professionnel et un trafficker pendant 30 jours pour le suivi. L\'UGC génère 5 fois plus de confiance que les publicités traditionnelles.' },
