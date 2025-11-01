@@ -62,7 +62,7 @@ export function AIChatWidget() {
   const { toast } = useToast();
   const { site } = useSite();
   const { auth } = useAuth();
-  const { language } = useLanguage();
+  const { language, getTranslation } = useLanguage();
 
   const isPayingCustomer = auth.user?.email === 'demo@cliente.com';
   
@@ -88,12 +88,12 @@ export function AIChatWidget() {
     const isRegisteredButNotPaying = auth.loggedIn && auth.user?.role === 'customer' && !isPayingCustomer;
     const prompt = isPayingCustomer ? customerSystemPrompt : leadSystemPrompt;
     
-    let finalPrompt = prompt.replace('Golden Key Agency', site.brand.name.en);
+    let finalPrompt = prompt.replace(/Golden Key Agency/g, getTranslation(site.brand.name));
     if(isPayingCustomer && auth.user) {
         finalPrompt = finalPrompt.replace('[Nombre Cliente]', auth.user.email);
     }
     return finalPrompt;
-  }, [isPayingCustomer, auth.loggedIn, auth.user, site.brand.name.en]);
+  }, [isPayingCustomer, auth.loggedIn, auth.user, site.brand.name, getTranslation]);
 
   useEffect(() => {
     if (isWidgetOpen && initialMessage) {

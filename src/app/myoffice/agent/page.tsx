@@ -78,8 +78,8 @@ REGLAS:
 3. Si no sabes una respuesta, di: "Excelente pregunta. Permíteme consultarlo con un especialista para darte la información precisa. ¿Me das tu correo para contactarte?". Y registra el lead.
 4. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.`;
 
-const defaultKnowledgeBase = `https://goldenkeyagency.website/products
-https://goldenkeyagency.website/contact
+const defaultKnowledgeBase = `https://goldenkey.agency/products
+https://goldenkey.agency/contact
 
 Horario de atención humana: Lunes a Viernes, 9am - 6pm (Hora del Pacífico).
 Promoción actual: 10% de descuento en el plan 'Portal Maestro Digital' para nuevos clientes. Código: LAUNCH10.`;

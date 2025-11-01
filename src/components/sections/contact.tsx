@@ -107,7 +107,7 @@ export function Contact() {
           <div className="space-y-4 text-left">
             <div className="flex items-center gap-3">
               <Mail className="h-5 w-5 text-accent" />
-              <a href="mailto:atencion@goldenkeyagency.website">atencion@goldenkeyagency.website</a>
+              <a href="mailto:atencion@goldenkey.agency">atencion@goldenkey.agency</a>
             </div>
              <div className="flex items-center gap-3">
               <WhatsAppIcon className="h-5 w-5 text-accent" />
