@@ -52,64 +52,56 @@ export default function ServicesEditorPage() {
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
   
+  const handleUpdate = (updater: (prev: Service[]) => Service[]) => {
+    setSite(prevSite => ({
+      ...prevSite,
+      services: updater(prevSite.services)
+    }));
+  };
+  
   const handleTextUpdate = (serviceId: string, field: 'title', value: any) => {
-    setSite(prev => ({
-      ...prev,
-      services: prev.services.map(s => {
-        if (s.id === serviceId) {
-          const newTitle = { ...s.title, [langCode]: value };
-          return { ...s, title: newTitle };
-        }
-        return s;
-      })
+    handleUpdate(services => services.map(s => {
+      if (s.id === serviceId) {
+        const newTitle = { ...s.title, [langCode]: value };
+        return { ...s, title: newTitle };
+      }
+      return s;
     }));
   };
   
   const handleVisibilityToggle = (serviceId: string, checked: boolean) => {
-    setSite(prev => ({ 
-      ...prev, 
-      services: prev.services.map(s => 
-        s.id === serviceId ? { ...s, visible: checked } : s
-      ) 
-    }));
+    handleUpdate(services => services.map(s => 
+      s.id === serviceId ? { ...s, visible: checked } : s
+    ));
   };
 
   const handleBulletChange = (serviceId: string, bulletIndex: number, newText: string) => {
-    setSite(prev => ({
-      ...prev,
-      services: prev.services.map(s => {
-        if (s.id === serviceId) {
-          const newBullets = [...s.bullets];
-          newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
-          return { ...s, bullets: newBullets };
-        }
-        return s;
-      })
+    handleUpdate(services => services.map(s => {
+      if (s.id === serviceId) {
+        const newBullets = [...s.bullets];
+        newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
+        return { ...s, bullets: newBullets };
+      }
+      return s;
     }));
   };
 
   const addBullet = (serviceId: string) => {
-    setSite(prev => ({
-        ...prev,
-        services: prev.services.map(s => {
-            if(s.id === serviceId) {
-                return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New Feature', fr: 'Nouvelle fonctionnalité'}]}
-            }
-            return s;
-        })
-    }))
+    handleUpdate(services => services.map(s => {
+      if(s.id === serviceId) {
+        return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New Feature', fr: 'Nouvelle fonctionnalité'}]}
+      }
+      return s;
+    }));
   };
 
   const removeBullet = (serviceId: string, bulletIndex: number) => {
-    setSite(prev => ({
-        ...prev,
-        services: prev.services.map(s => {
-            if(s.id === serviceId) {
-                return {...s, bullets: s.bullets.filter((_, i) => i !== bulletIndex)}
-            }
-            return s;
-        })
-    }))
+    handleUpdate(services => services.map(s => {
+      if(s.id === serviceId) {
+        return {...s, bullets: s.bullets.filter((_, i) => i !== bulletIndex)}
+      }
+      return s;
+    }));
   };
 
   const addNewService = () => {
@@ -119,14 +111,11 @@ export default function ServicesEditorPage() {
       title: { es: 'Nuevo Servicio', en: 'New Service', fr: 'Nouveau Service' },
       bullets: [{ es: 'Nueva característica', en: 'New feature', fr: 'Nouvelle fonctionnalité' }]
     };
-    setSite(prev => ({...prev, services: [...prev.services, newService]}));
+    handleUpdate(services => [...services, newService]);
   };
 
   const removeService = (serviceId: string) => {
-    setSite(prev => ({
-        ...prev,
-        services: prev.services.filter(s => s.id !== serviceId)
-    }));
+    handleUpdate(services => services.filter(s => s.id !== serviceId));
   };
 
   return (
@@ -196,3 +185,5 @@ export default function ServicesEditorPage() {
     </div>
   );
 }
+
+    
