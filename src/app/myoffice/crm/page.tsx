@@ -75,7 +75,7 @@ export default function CrmPage() {
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
     return (
-        <div className="flex flex-col h-[calc(100vh-120px)]">
+        <div className="flex flex-col h-full">
             <header className="mb-4">
                 <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
                 <p className="text-muted-foreground">{t.pageSubtitle}</p>

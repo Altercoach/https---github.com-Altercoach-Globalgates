@@ -96,9 +96,8 @@ export default function MyOfficeLayout({
     { href: '/myoffice/products', label: t.plans, icon: <ShoppingBag /> },
     { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle /> },
-    { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck />, children: [
-       { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
-    ]},
+    { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck />},
+    { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
   ];
 
   if (auth.user?.role !== 'admin') {
@@ -174,3 +173,5 @@ export default function MyOfficeLayout({
     </SidebarProvider>
   );
 }
+
+    
