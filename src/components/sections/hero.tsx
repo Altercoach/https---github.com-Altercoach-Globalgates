@@ -6,22 +6,26 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
 import { CheckCircle } from 'lucide-react';
 import { useSite } from '@/hooks/use-site';
+import Link from 'next/link';
 
 const labels = {
   es: {
     explorePlans: "Explorar Planes",
+    signupFree: "Regístrate Gratis",
     bullet1: "Automatización con Agentes de IA",
     bullet2: "Embudos de Venta (Funnels) Medibles",
     bullet3: "Marca, Contenido y Anuncios",
   },
   en: {
     explorePlans: "Explore Plans",
+    signupFree: "Sign Up Free",
     bullet1: "Automation with AI Agents",
     bullet2: "Measurable Sales Funnels",
     bullet3: "Brand, Content, and Ads",
   },
   fr: {
     explorePlans: "Explorer les Forfaits",
+    signupFree: "Inscrivez-vous Gratuitement",
     bullet1: "Automatisation avec des Agents IA",
     bullet2: "Entonnoirs de Vente Mesurables",
     bullet3: "Marque, Contenu et Publicités",
@@ -66,13 +70,16 @@ export function Hero() {
                 </li>
             </ul>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button onClick={scrollToPlans} size="lg">
+              <Button asChild size="lg">
+                <Link href="/signup">{t.signupFree}</Link>
+              </Button>
+              <Button onClick={scrollToPlans} size="lg" variant="secondary">
                 {t.explorePlans}
               </Button>
             </div>
           </div>
           <Image
-            src={site.brand.heroImage || 'https://picsum.photos/seed/rocket/600/400'}
+            src={site.brand.heroImage || '/hero-default.jpg'}
             alt="Hero Image"
             width={600}
             height={400}

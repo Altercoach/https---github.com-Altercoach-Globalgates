@@ -18,53 +18,7 @@ import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import type { AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { useLanguage } from '@/hooks/use-language';
-
-const chartData = [
-  { month: "Enero", leads: 186, closed: 20 },
-  { month: "Febrero", leads: 305, closed: 35 },
-  { month: "Marzo", leads: 237, closed: 25 },
-  { month: "Abril", leads: 273, closed: 40 },
-  { month: "Mayo", leads: 209, closed: 22 },
-  { month: "Junio", leads: 214, closed: 31 },
-];
-
-const chartConfig = {
-  leads: {
-    label: "Leads Generados",
-    color: "hsl(var(--chart-1))",
-  },
-  closed: {
-    label: "Ventas Cerradas",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
-
-const pendingActionsData = {
-  es: [
-    { id: 'brief-marketing', title: 'Brief de Marketing Profesional', description: 'Completa este formulario para que podamos crear tu estrategia.', href: '/questionnaire/brief-marketing'},
-    { id: 'eval-negocio', title: 'Evaluación de Negocio (Doctor RX)', description: 'Ayúdanos a entender tu negocio para un diagnóstico preciso.', href: '/questionnaire/eval-001'},
-    { id: 'agent-training', title: 'Entrenamiento de Agente de IA', description: 'Proporciona la información para configurar tu asistente virtual.', href: '/questionnaire/agent-training'},
-    { id: 'satisfaction-survey', title: 'Encuesta de Satisfacción', description: 'Tu opinión nos ayuda a mejorar nuestros servicios.', href: '/questionnaire/satisfaction-survey'},
-  ],
-  en: [
-    { id: 'brief-marketing', title: 'Professional Marketing Brief', description: 'Complete this form so we can create your strategy.', href: '/questionnaire/brief-marketing'},
-    { id: 'eval-negocio', title: 'Business Evaluation (Doctor RX)', description: 'Help us understand your business for an accurate diagnosis.', href: '/questionnaire/eval-001'},
-    { id: 'agent-training', title: 'AI Agent Training', description: 'Provide the information to configure your virtual assistant.', href: '/questionnaire/agent-training'},
-    { id: 'satisfaction-survey', title: 'Satisfaction Survey', description: 'Your feedback helps us improve our services.', href: '/questionnaire/satisfaction-survey'},
-  ],
-  fr: [
-    { id: 'brief-marketing', title: 'Brief de Marketing Professionnel', description: 'Remplissez ce formulaire pour que nous puissions créer votre stratégie.', href: '/questionnaire/brief-marketing'},
-    { id: 'eval-negocio', title: 'Évaluation d\'Entreprise (Docteur RX)', description: 'Aidez-nous à comprendre votre entreprise pour un diagnostic précis.', href: '/questionnaire/eval-001'},
-    { id: 'agent-training', title: 'Formation d\'Agent IA', description: 'Fournissez les informations pour configurer votre assistant virtuel.', href: '/questionnaire/agent-training'},
-    { id: 'satisfaction-survey', title: 'Enquête de Satisfaction', description: 'Vos commentaires nous aident à améliorer nos services.', href: '/questionnaire/satisfaction-survey'},
-  ]
-}
-
-const visibleAnalysesData = {
-  es: [ { id: 'analysis-eval-001', title: 'Análisis de Evaluación de Negocio', analysis: { swot: { strengths: "Producto estrella (cold brew) con alta demanda potencial.", weaknesses: "Poca presencia de marca y falta de un canal de ventas digital claro.", opportunities: "Mercado local en crecimiento para cafés de especialidad.", threats: "Competencia de cafeterías establecidas en la zona centro." }, recommendations: "1. **Lanzar Campaña de Branding Local**: Enfocarse en Instagram para dar a conocer el 'cold brew'.\n2. **Implementar Funnel de Ventas**: Crear una landing page para capturar leads interesados en pedidos grandes.\n\n**Plan Sugerido**: Contratar 'Setup Funnel' y 'Marketing de Contenido'." } } ],
-  en: [ { id: 'analysis-eval-001', title: 'Business Evaluation Analysis', analysis: { swot: { strengths: "Star product (cold brew) with high potential demand.", weaknesses: "Low brand presence and lack of a clear digital sales channel.", opportunities: "Growing local market for specialty coffees.", threats: "Competition from established coffee shops downtown." }, recommendations: "1. **Launch Local Branding Campaign**: Focus on Instagram to promote the 'cold brew'.\n2. **Implement Sales Funnel**: Create a landing page to capture leads interested in large orders.\n\n**Suggested Plan**: Hire 'Setup Funnel' and 'Content Marketing'." } } ],
-  fr: [ { id: 'analysis-eval-001', title: 'Analyse de l\'Évaluation d\'Entreprise', analysis: { swot: { strengths: "Produit phare (cold brew) avec une forte demande potentielle.", weaknesses: "Faible présence de marque et absence de canal de vente numérique clair.", opportunities: "Marché local en croissance pour les cafés de spécialité.", threats: "Concurrence des cafés établis au centre-ville." }, recommendations: "1. **Lancer une campagne de branding locale**: Se concentrer sur Instagram pour faire connaître le 'cold brew'.\n2. **Mettre en place un entonnoir de vente**: Créer une page de destination pour capturer les prospects intéressés par les grosses commandes.\n\n**Plan suggéré**: Engager 'Setup Funnel' et 'Marketing de Contenu'." } } ],
-};
+import { chartData, chartConfig, pendingActionsData, visibleAnalysesData } from '@/lib/data/dashboard-data';
 
 const labels = {
   es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', funnelPerformance: 'Rendimiento del Embudo de Ventas', funnelDescription: 'Leads generados vs. Ventas cerradas en los últimos 6 meses.', analysisAndResults: 'Análisis y Resultados', analysisDescription: 'Revisa los análisis y recomendaciones estratégicas que hemos preparado para ti.', viewAnalysis: 'Ver Análisis', swotAnalysis: 'Análisis FODA', strengths: 'Fortalezas', opportunities: 'Oportunidades', weaknesses: 'Debilidades', threats: 'Amenazas', strategicRecommendations: 'Recomendaciones Estratégicas', noAnalysisAvailable: 'Aún no hay análisis disponibles.', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para avanzar con tu estrategia.', complete: 'Completar', analysisDialogDescription: 'Un resumen del análisis FODA y las recomendaciones estratégicas para tu negocio.' },

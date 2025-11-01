@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Bot, Send, X, Loader2, User, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,13 +14,16 @@ import { chat } from '@/ai/flows/chat-flow';
 import type { ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useSite } from '@/hooks/use-site';
+import { useAuth } from '@/hooks/use-auth';
+import { useLanguage } from '@/hooks/use-language';
+import { visibleAnalysesData, chartData } from '@/lib/data/dashboard-data';
 
 type Message = {
   role: 'user' | 'model';
   content: string;
 };
 
-const systemPrompt = `Eres 'Asistente Pro', un agente de ventas y soporte al cliente para Golden Key. Tu rol es ser amigable, proactivo y muy eficiente.
+const leadSystemPrompt = `Eres 'Asistente Pro', un agente de ventas y soporte al cliente para Golden Key. Tu rol es ser amigable, proactivo y muy eficiente.
 OBJETIVO: Convertir visitantes en leads calificados, resolver dudas de primer nivel sobre los planes y servicios, y ayudar a los usuarios a elegir el mejor plan para ellos.
 REGLAS:
 1. Si un usuario tiene dudas sobre un plan, explica sus beneficios y anímale a añadirlo al carrito. Tu objetivo final es la venta.
@@ -31,8 +34,16 @@ REGLAS:
 6. Si no sabes una respuesta, di: "Excelente pregunta. Permíteme consultarlo con un especialista para darte la información precisa. ¿Me das tu correo para contactarte?". Y registra el lead.
 7. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad sobre los detalles de los productos y servicios.`;
 
+const customerSystemPrompt = `Eres 'Asesor Estratégico Pro', un account manager de IA para clientes de Golden Key. Tu rol es ser un socio estratégico, proactivo y orientado a resultados.
+OBJETIVO: Analizar el estado actual del cliente, identificar oportunidades de crecimiento y proponer activamente 'upgrades' o servicios complementarios que impulsen sus resultados.
+REGLAS:
+1. Siempre reconoce que estás hablando con un cliente valioso. Empieza con un saludo como "Hola [Nombre Cliente], qué bueno verte por aquí. ¿En qué puedo ayudarte a optimizar tu estrategia hoy?".
+2. Utiliza la información del cliente (plan actual, KPIs, análisis de negocio) de tu BASE DE CONOCIMIENTO para dar respuestas híper-personalizadas.
+3. Si el cliente pregunta algo general, responde y luego pivota hacia una oportunidad de mejora. Ejemplo: "Claro, sobre tu pregunta... Por cierto, he visto que tu tasa de conversión es del 15%. El plan 'Setup Funnel' podría duplicar esa métrica. ¿Te gustaría que te cuente más?".
+4. Tu principal objetivo es el UPSELL. Identifica las debilidades o áreas de oportunidad del cliente y conecta directamente esa necesidad con uno de los planes o servicios superiores que no tenga contratado.
+5. Si no sabes una respuesta, di: "Excelente pregunta. Estoy consultando la información más reciente con el equipo estratégico para darte una respuesta precisa. Te contactaré por correo en breve."
+6. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.`;
 
-const knowledgeBase = `Golden Key ofrece planes de marketing digital y branding. Los detalles específicos de cada plan (precios, qué incluyen, etc.) deben ser extraídos de la conversación y el contexto proporcionado por el usuario.`;
 
 export function AIChatWidget() {
   const { isWidgetOpen, setIsWidgetOpen, initialMessage, clearInitialMessage } = useChatWidget();
@@ -42,12 +53,44 @@ export function AIChatWidget() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { site } = useSite();
+  const { auth } = useAuth();
+  const { language } = useLanguage();
+
+  const isCustomer = auth.loggedIn && auth.user?.role === 'customer';
+  
+  const knowledgeBase = useMemo(() => {
+    let base = `PRODUCTS:\n${JSON.stringify(site.products)}\n\nSOLUTIONS:\n${JSON.stringify(site.services)}`;
+    if(isCustomer) {
+        const kpis = {
+            totalLeads: chartData.reduce((acc, item) => acc + item.leads, 0),
+            totalClosed: chartData.reduce((acc, item) => acc + item.closed, 0),
+            conversionRate: `${(chartData.reduce((acc, item) => acc + item.closed, 0) / chartData.reduce((acc, item) => acc + item.leads, 0) * 100).toFixed(1)}%`,
+        };
+        const customerAnalyses = visibleAnalysesData[language.code as keyof typeof visibleAnalysesData] || visibleAnalysesData.en;
+        base += `\n\n--- CUSTOMER DATA ---\n`;
+        base += `CUSTOMER_NAME: ${auth.user?.email}\n`;
+        base += `CURRENT_PLAN: "Marketing de Contenido" (Ejemplo)\n`;
+        base += `KPIS: ${JSON.stringify(kpis)}\n`;
+        base += `BUSINESS_ANALYSIS: ${JSON.stringify(customerAnalyses)}\n`;
+    }
+    return base;
+  }, [site, isCustomer, auth.user, language.code]);
+  
+  const systemPrompt = useMemo(() => {
+    const prompt = isCustomer ? customerSystemPrompt : leadSystemPrompt;
+    let finalPrompt = prompt.replace('Golden Key', site.brand.name.en);
+    if(isCustomer && auth.user) {
+        finalPrompt = finalPrompt.replace('[Nombre Cliente]', auth.user.email);
+    }
+    return finalPrompt;
+  }, [isCustomer, site.brand.name.en, auth.user]);
 
   useEffect(() => {
     if (isWidgetOpen && initialMessage) {
-      setMessages([{ role: 'user', content: initialMessage }]);
+      const firstMessage = { role: 'user' as const, content: initialMessage };
+      setMessages([firstMessage]);
       setInput(''); 
-      handleSend(initialMessage);
+      handleSend([firstMessage], initialMessage);
       clearInitialMessage();
     } else if (!isWidgetOpen) {
        setMessages([]);
@@ -64,26 +107,22 @@ export function AIChatWidget() {
     }, 100);
   };
 
-  const handleSend = async (messageContent?: string) => {
-    const userMessage = messageContent || input.trim();
-    if (!userMessage) return;
-
-    const newMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
-    setMessages(newMessages);
-    setInput('');
+  const handleSend = async (currentMessages: Message[], userMessageContent: string) => {
+    if (!userMessageContent) return;
+    
     setIsLoading(true);
     scrollToBottom();
 
     try {
-        const chatHistory = newMessages.map(m => ({
-            role: m.role as 'user' | 'model',
+        const chatHistory = currentMessages.map(m => ({
+            role: m.role,
             content: m.content
         }));
 
         const chatInput: ChatInput = {
-            history: chatHistory.slice(0, -1), // History without the last user message
-            systemPrompt: systemPrompt.replace('Golden Key', site.brand.name.en),
-            knowledgeBase: `PRODUCTS:\n${JSON.stringify(site.products)}\n\nSOLUTIONS:\n${JSON.stringify(site.services)}\n\n${knowledgeBase}`
+            history: chatHistory, // Pass the full history including current message
+            systemPrompt: systemPrompt,
+            knowledgeBase: knowledgeBase
         };
 
         const result = await chat(chatInput);
@@ -102,6 +141,16 @@ export function AIChatWidget() {
         scrollToBottom();
     }
   };
+
+  const submitMessage = () => {
+      const userMessage = input.trim();
+      if (!userMessage) return;
+
+      const newMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
+      setMessages(newMessages);
+      setInput('');
+      handleSend(newMessages, userMessage);
+  }
 
   return (
     <>
@@ -166,7 +215,7 @@ export function AIChatWidget() {
                 onKeyDown={e => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    handleSend();
+                    submitMessage();
                   }
                 }}
                 disabled={isLoading}
@@ -174,7 +223,7 @@ export function AIChatWidget() {
               <Button
                 size="icon"
                 className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                onClick={() => handleSend()}
+                onClick={submitMessage}
                 disabled={isLoading || !input.trim()}
               >
                 <Send className="h-4 w-4" />
@@ -186,5 +235,3 @@ export function AIChatWidget() {
     </>
   );
 }
-
-    

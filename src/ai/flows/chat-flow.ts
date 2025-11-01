@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A simple chat flow for the AI Agent.
@@ -42,7 +43,7 @@ const prompt = ai.definePrompt({
   {{{knowledgeBase}}}
   --- END KNOWLEDGE BASE ---
 
-  Here is the conversation history:
+  Here is the conversation history (the last message is the user's current message):
   {{#each history}}
     {{#if isUser}}
       User: {{{content}}}
@@ -81,6 +82,6 @@ const chatFlow = ai.defineFlow(
     if (!output) {
       throw new Error('The AI failed to generate a response.');
     }
-    return output;
+    return { response: output.response };
   }
 );
