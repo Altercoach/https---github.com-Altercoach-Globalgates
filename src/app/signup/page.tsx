@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { useLanguage } from '@/hooks/use-language';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 
 const labels = {
   es: {
@@ -20,7 +21,7 @@ const labels = {
     submitButton: "Crear Cuenta",
     backButton: "Volver al Inicio",
     toastTitle: "¡Cuenta Creada!",
-    toastDescription: "Ahora puedes iniciar sesión con tus nuevas credenciales.",
+    toastDescription: "Hemos creado tu cuenta. Ahora serás dirigido a tu panel de cliente.",
   },
   en: {
     title: "Create Account",
@@ -30,7 +31,7 @@ const labels = {
     submitButton: "Create Account",
     backButton: "Back to Home",
     toastTitle: "Account Created!",
-    toastDescription: "You can now log in with your new credentials.",
+    toastDescription: "We've created your account. You will now be directed to your customer dashboard.",
   },
   fr: {
     title: "Créer un Compte",
@@ -40,7 +41,7 @@ const labels = {
     submitButton: "Créer un Compte",
     backButton: "Retour à l'accueil",
     toastTitle: "Compte Créé !",
-    toastDescription: "Vous pouvez maintenant vous connecter avec vos nouveaux identifiants.",
+    toastDescription: "Nous avons créé votre compte. Vous allez maintenant être redirigé vers votre tableau de bord client.",
   }
 }
 
@@ -50,19 +51,20 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const { toast } = useToast();
   const { language } = useLanguage();
+  const { login } = useAuth();
   const router = useRouter();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would call an API endpoint
+    // In a real app, this would call an API endpoint to register the user
     toast({
       title: t.toastTitle,
       description: t.toastDescription,
     });
-    // Redirect to login after "creation"
-    router.push('/login');
+    // Log the user in as a 'customer' role but they won't have paid status yet.
+    login(email, 'customer');
   };
 
   return (

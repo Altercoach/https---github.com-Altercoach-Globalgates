@@ -57,11 +57,11 @@ export function AIChatWidget() {
   const { auth } = useAuth();
   const { language } = useLanguage();
 
-  const isCustomer = auth.loggedIn && auth.user?.role === 'customer';
+  const isPayingCustomer = auth.user?.email === 'demo@cliente.com';
   
   const knowledgeBase = useMemo(() => {
     let base = `PRODUCTS:\n${JSON.stringify(site.products)}\n\nSOLUTIONS:\n${JSON.stringify(site.services)}`;
-    if(isCustomer) {
+    if(isPayingCustomer) {
         const kpis = {
             totalLeads: chartData.reduce((acc, item) => acc + item.leads, 0),
             totalClosed: chartData.reduce((acc, item) => acc + item.closed, 0),
@@ -75,16 +75,18 @@ export function AIChatWidget() {
         base += `BUSINESS_ANALYSIS: ${JSON.stringify(customerAnalyses)}\n`;
     }
     return base;
-  }, [site, isCustomer, auth.user, language.code]);
+  }, [site, isPayingCustomer, auth.user, language.code]);
   
   const systemPrompt = useMemo(() => {
-    const prompt = isCustomer ? customerSystemPrompt : leadSystemPrompt;
+    const isRegisteredButNotPaying = auth.loggedIn && auth.user?.role === 'customer' && !isPayingCustomer;
+    const prompt = isPayingCustomer ? customerSystemPrompt : leadSystemPrompt;
+    
     let finalPrompt = prompt.replace('Golden Key', site.brand.name.en);
-    if(isCustomer && auth.user) {
+    if(isPayingCustomer && auth.user) {
         finalPrompt = finalPrompt.replace('[Nombre Cliente]', auth.user.email);
     }
     return finalPrompt;
-  }, [isCustomer, site.brand.name.en, auth.user]);
+  }, [isPayingCustomer, auth.loggedIn, auth.user, site.brand.name.en]);
 
   useEffect(() => {
     if (isWidgetOpen && initialMessage) {
@@ -236,5 +238,3 @@ export function AIChatWidget() {
     </>
   );
 }
-
-    
