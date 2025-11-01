@@ -11,7 +11,7 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { ThemeProvider } from '@/contexts/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'GlobalGate Agency',
+  title: 'Golden Key Agency',
   description: 'Strategic marketing, automation, and AI to unlock your growth.',
 };
 

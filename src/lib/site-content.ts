@@ -4,9 +4,9 @@ import type { SiteData } from '@/lib/types';
 export const DEFAULT_SITE_CONTENT: SiteData = {
   brand: {
     name: {
-      es: 'Golden Key',
-      en: 'Golden Key',
-      fr: 'Clé Dorée',
+      es: 'Golden Key Agency',
+      en: 'Golden Key Agency',
+      fr: 'Agence Clé Dorée',
     },
     tagline: {
       es: 'Marketing Estratégico, Automatización e IA que abren las puertas a tu crecimiento',
