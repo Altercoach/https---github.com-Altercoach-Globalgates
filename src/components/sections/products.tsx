@@ -36,7 +36,7 @@ export function Products() {
   const { site } = useSite();
   const t = labels[language.code] || labels.en;
 
-  const products = site.products;
+  const products = site.products.filter(p => p.visible);
 
   return (
     <section id="plans" className="w-full bg-muted/40 py-12 md:py-24 lg:py-32">

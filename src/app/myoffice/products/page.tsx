@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import type { SiteData, Product, ProductFeature, MultilingualString } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, FileText, Info } from 'lucide-react';
+import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -35,12 +35,12 @@ const labels = {
     fullDescLabel: "Descripción Completa",
     includedFormsTitle: "Formularios Incluidos y Disparadores",
     activationStage: "Etapa de activación",
-    saveChanges: "Guardar Cambios",
     toastSuccessTitle: "¡Cambios guardados!",
     toastSuccessDescription: "Tus planes y servicios han sido actualizados.",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
     stageOptions: { onboarding: 'Al contratar', campaign_start: 'Al iniciar campaña', campaign_end: 'Al finalizar campaña', on_demand: 'Bajo demanda' },
-    editingLanguage: "Estás editando el contenido en"
+    editingLanguage: "Estás editando el contenido en",
+    visible: "Visible en la página principal"
   },
   en: {
     pageTitle: "Plans & Services",
@@ -58,12 +58,12 @@ const labels = {
     fullDescLabel: "Full Description",
     includedFormsTitle: "Included Forms & Triggers",
     activationStage: "Activation Stage",
-    saveChanges: "Save Changes",
     toastSuccessTitle: "Changes saved!",
     toastSuccessDescription: "Your plans and services have been updated.",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
     stageOptions: { onboarding: 'Onboarding', campaign_start: 'On campaign start', campaign_end: 'On campaign end', on_demand: 'On demand' },
-    editingLanguage: "You are editing the content in"
+    editingLanguage: "You are editing the content in",
+    visible: "Visible on homepage"
   },
   fr: {
     pageTitle: "Forfaits et Services",
@@ -81,12 +81,12 @@ const labels = {
     fullDescLabel: "Description Complète",
     includedFormsTitle: "Formulaires et Déclencheurs Inclus",
     activationStage: "Étape d'activation",
-    saveChanges: "Enregistrer les Modifications",
     toastSuccessTitle: "Changements enregistrés !",
     toastSuccessDescription: "Vos forfaits et services ont été mis à jour.",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
     stageOptions: { onboarding: 'À l\'intégration', campaign_start: 'Au début de la campagne', campaign_end: 'À la fin de la campagne', on_demand: 'À la demande' },
-    editingLanguage: "Vous éditez le contenu en"
+    editingLanguage: "Vous éditez le contenu en",
+    visible: "Visible sur la page d'accueil"
   }
 };
 
@@ -118,30 +118,35 @@ export default function ProductsEditorPage() {
     setDraft(siteWithFeatures);
   }, [site]);
 
-  const saveChanges = () => {
-    setSite(draft);
-    toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
+  const handleUpdate = (updater: (draft: SiteData) => SiteData, silent: boolean = false) => {
+    const newSite = updater(draft);
+    setDraft(newSite);
+    setSite(newSite); // Save instantly
+    if (!silent) {
+        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
+    }
   };
   
-  const handleProductUpdate = (id: string, field: keyof Product, value: any) => {
-    setDraft(prev => ({
+  const handleProductUpdate = (id: string, field: keyof Product, value: any, isMultilingual: boolean) => {
+    handleUpdate(prev => ({
         ...prev,
         products: prev.products.map(p => {
           if (p.id === id) {
-            if (field === 'name' || field === 'note' || field === 'description' || field === 'badge') {
-              const multilingualValue = p[field] as MultilingualString;
+            if (isMultilingual) {
+              const multilingualValue = p[field as keyof Product] as MultilingualString;
               return { ...p, [field]: { ...multilingualValue, [langCode]: value } };
             }
             return { ...p, [field]: value };
           }
           return p;
         })
-    }));
+    }), true); // silent update
   };
 
   const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
-    setDraft(prev => {
-        const newProducts = prev.products.map(p => {
+    handleUpdate(prev => ({
+        ...prev,
+        products: prev.products.map(p => {
             if (p.id === productId && p.features) {
                 const newFeatures = p.features.map(f => 
                     f.id === featureId ? { ...f, enabled } : f
@@ -149,14 +154,14 @@ export default function ProductsEditorPage() {
                 return { ...p, features: newFeatures };
             }
             return p;
-        });
-        return { ...prev, products: newProducts };
-    });
+        })
+    }), true);
   };
 
   const handleFeatureStageChange = (productId: string, featureId: string, stage: ProductFeature['stage']) => {
-     setDraft(prev => {
-        const newProducts = prev.products.map(p => {
+     handleUpdate(prev => ({
+        ...prev,
+        products: prev.products.map(p => {
             if (p.id === productId && p.features) {
                 const newFeatures = p.features.map(f => 
                     f.id === featureId ? { ...f, stage } : f
@@ -164,14 +169,14 @@ export default function ProductsEditorPage() {
                 return { ...p, features: newFeatures };
             }
             return p;
-        });
-        return { ...prev, products: newProducts };
-    });
+        })
+    }), true);
   }
 
   const addNewProduct = () => {
     const newProduct: Product = {
         id: `prod_${Date.now()}`,
+        visible: true,
         name: { en: 'New Plan', es: 'Nuevo Plan', fr: 'Nouveau Forfait' },
         type: 'one',
         price: 100,
@@ -180,11 +185,11 @@ export default function ProductsEditorPage() {
         description: { en: 'Detailed description of the new plan.', es: 'Descripción detallada del nuevo plan.', fr: 'Description détaillée du nouveau forfait.' },
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
-    setDraft(prev => ({...prev, products: [...prev.products, newProduct]}));
+    handleUpdate(prev => ({...prev, products: [...prev.products, newProduct]}));
   };
 
   const removeProduct = (id: string) => {
-    setDraft(prev => ({...prev, products: prev.products.filter(p => p.id !== id)}));
+    handleUpdate(prev => ({...prev, products: prev.products.filter(p => p.id !== id)}));
   }
 
   return (
@@ -209,16 +214,34 @@ export default function ProductsEditorPage() {
         {draft.products.map(product => (
             <Card key={product.id}>
                 <CardHeader className="flex flex-row items-start justify-between">
-                    <CardTitle className="text-lg leading-tight">{product.name[langCode]}</CardTitle>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
-                        <Trash2 />
-                    </Button>
+                    <CardTitle className="text-lg leading-tight flex-1">
+                      <Input 
+                        value={product.name[langCode]} 
+                        onChange={e => handleProductUpdate(product.id, 'name', e.target.value, true)} 
+                        className="text-lg font-bold border-0 px-0 h-auto"
+                      />
+                    </CardTitle>
+                    <div className="flex items-center gap-4 pl-4">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id={`visible-${product.id}`}
+                          checked={product.visible}
+                          onCheckedChange={(checked) => handleProductUpdate(product.id, 'visible', checked, false)}
+                        />
+                        <Label htmlFor={`visible-${product.id}`} className="text-sm font-normal text-muted-foreground flex items-center">
+                          {product.visible ? <Eye className="mr-2 h-4 w-4"/> : <EyeOff className="mr-2 h-4 w-4"/>}
+                          {t.visible}
+                        </Label>
+                      </div>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeProduct(product.id)}>
+                          <Trash2 />
+                      </Button>
+                    </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                      <div className="sm:col-span-2"><Label>{t.nameLabel}</Label><Input value={product.name[langCode]} onChange={e => handleProductUpdate(product.id, 'name', e.target.value)} /></div>
                       <div><Label>{t.typeLabel}</Label>
-                          <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v)}>
+                          <Select value={product.type} onValueChange={(v) => handleProductUpdate(product.id, 'type', v, false)}>
                               <SelectTrigger><SelectValue/></SelectTrigger>
                               <SelectContent>
                                   <SelectItem value="one">{t.productTypes.one}</SelectItem>
@@ -227,13 +250,13 @@ export default function ProductsEditorPage() {
                               </SelectContent>
                           </Select>
                       </div>
-                      <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value))} /></div>
-                      <div className="sm:col-span-2"><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value)} /></div>
-                      <div className="sm:col-span-2"><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value)} /></div>
+                      <div><Label>{t.priceLabel}</Label><Input type="number" value={product.price} onChange={e => handleProductUpdate(product.id, 'price', Number(e.target.value), false)} /></div>
+                      <div className="sm:col-span-2"><Label>{t.badgeLabel}</Label><Input value={product.badge[langCode]} onChange={e => handleProductUpdate(product.id, 'badge', e.target.value, true)} /></div>
                     </div>
+                    <div><Label>{t.noteLabel}</Label><Input value={product.note[langCode]} onChange={e => handleProductUpdate(product.id, 'note', e.target.value, true)} /></div>
                     <div>
                       <Label>{t.fullDescLabel}</Label>
-                      <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value)} rows={4} />
+                      <Textarea value={product.description[langCode]} onChange={e => handleProductUpdate(product.id, 'description', e.target.value, true)} rows={4} />
                     </div>
                     
                     <Separator className="my-6" />
@@ -274,10 +297,6 @@ export default function ProductsEditorPage() {
             </Card>
         ))}
       </div>
-      
-       <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>{t.saveChanges}</Button>
-        </div>
     </div>
   );
 }

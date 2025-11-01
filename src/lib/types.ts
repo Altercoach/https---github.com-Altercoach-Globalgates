@@ -25,6 +25,7 @@ export type Product = {
   longDescription?: MultilingualString;
   whatIncludes?: MultilingualString;
   whatFor?: MultilingualString;
+  visible: boolean;
 };
 
 export type Service = {
