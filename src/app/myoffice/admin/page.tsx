@@ -375,7 +375,11 @@ export default function AdminDashboardPage() {
                               <Eye className="mr-2"/>{t.viewDetails}
                             </Link>
                            </DropdownMenuItem>
-                           <DropdownMenuItem>{t.sendMessage}</DropdownMenuItem>
+                           <DropdownMenuItem asChild>
+                             <a href={`mailto:${customer.email}`} className="flex items-center cursor-pointer">
+                               {t.sendMessage}
+                             </a>
+                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
