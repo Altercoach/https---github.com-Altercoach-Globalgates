@@ -9,15 +9,15 @@ import type { MultilingualString } from '@/lib/types';
 
 const labels = {
     es: {
-        title: "Servicios Estratégicos",
+        title: "Nuestras Soluciones",
         subtitle: "Soluciones integradas para adquisición, conversión y retención de clientes."
     },
     en: {
-        title: "Strategic Services",
+        title: "Our Solutions",
         subtitle: "Integrated solutions for customer acquisition, conversion, and retention."
     },
     fr: {
-        title: "Services Stratégiques",
+        title: "Nos Solutions",
         subtitle: "Solutions intégrées pour l'acquisition, la conversion et la fidélisation des clients."
     }
 };
@@ -30,7 +30,7 @@ export function Services() {
   const services = site.services.filter(s => s.visible);
 
   return (
-    <section id="services" className="w-full py-12 md:py-24 lg:py-32 bg-background">
+    <section id="solutions" className="w-full py-12 md:py-24 lg:py-32 bg-background">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">

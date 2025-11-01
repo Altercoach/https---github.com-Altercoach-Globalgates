@@ -14,24 +14,24 @@ import { useSite } from '@/hooks/use-site';
 
 const navLabels = {
   es: {
-    services: 'Servicios',
-    plans: 'Planes',
+    solutions: 'Soluciones',
+    plans: 'Planes y Servicios',
     contact: 'Contacto',
     myOffice: 'Mi Oficina',
     dashboard: 'Panel',
     login: 'Iniciar Sesión'
   },
   en: {
-    services: 'Services',
-    plans: 'Plans',
+    solutions: 'Solutions',
+    plans: 'Plans & Services',
     contact: 'Contact',
     myOffice: 'My Office',
     dashboard: 'Dashboard',
     login: 'Login'
   },
     fr: {
-    services: 'Services',
-    plans: 'Forfaits',
+    solutions: 'Solutions',
+    plans: 'Forfaits et Services',
     contact: 'Contact',
     myOffice: 'Mon Bureau',
     dashboard: 'Tableau de bord',
@@ -50,7 +50,7 @@ export function Header() {
   const labels = navLabels[language.code as keyof typeof navLabels] || navLabels.en;
   
   const navItems = [
-    { label: labels.services, id: 'services' },
+    { label: labels.solutions, id: 'solutions' },
     { label: labels.plans, id: 'plans' },
     { label: labels.contact, id: 'contact' },
   ];

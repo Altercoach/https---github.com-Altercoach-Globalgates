@@ -25,8 +25,8 @@ import { useLanguage } from '@/hooks/use-language';
 const labels = {
   es: {
     brand: "Marca",
-    services: "Servicios",
-    products: "Productos",
+    solutions: "Soluciones",
+    plans: "Planes y Servicios",
     questionnaires: "Cuestionarios",
     integrations: "Integraciones",
     admin: "Admin",
@@ -39,8 +39,8 @@ const labels = {
   },
   en: {
     brand: "Brand",
-    services: "Services",
-    products: "Products",
+    solutions: "Solutions",
+    plans: "Plans & Services",
     questionnaires: "Questionnaires",
     integrations: "Integrations",
     admin: "Admin",
@@ -53,8 +53,8 @@ const labels = {
   },
   fr: {
     brand: "Marque",
-    services: "Services",
-    products: "Produits",
+    solutions: "Solutions",
+    plans: "Forfaits et Services",
     questionnaires: "Questionnaires",
     integrations: "Intégrations",
     admin: "Admin",
@@ -89,8 +89,8 @@ export default function MyOfficeLayout({
 
   const menuItems = [
     { href: '/myoffice/brand', label: t.brand, icon: <Store /> },
-    { href: '/myoffice/services', label: t.services, icon: <LayoutGrid /> },
-    { href: '/myoffice/products', label: t.products, icon: <ShoppingBag /> },
+    { href: '/myoffice/services', label: t.solutions, icon: <LayoutGrid /> },
+    { href: '/myoffice/products', label: t.plans, icon: <ShoppingBag /> },
     { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle /> },
     { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck /> },

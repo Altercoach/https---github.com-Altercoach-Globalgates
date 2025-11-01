@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState } from 'react';
 import { useSite } from '@/hooks/use-site';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,110 +11,128 @@ import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 const labels = {
   es: {
-    pageTitle: "Servicios",
-    pageSubtitle: "Gestiona los servicios que muestras en tu página de inicio.",
+    pageTitle: "Soluciones",
+    pageSubtitle: "Gestiona las soluciones que muestras en tu página de inicio.",
     newFeature: "Nueva característica",
     addFeature: "Añadir Característica",
     editingLanguage: "Estás editando el contenido en",
     visible: "Visible en la página principal",
-    addService: "Añadir Servicio",
-    deleteService: "Eliminar Servicio",
+    addService: "Añadir Solución",
+    deleteService: "Eliminar Solución",
+    toastSuccessTitle: "¡Cambios guardados!",
+    toastSuccessDescription: "Tus soluciones han sido actualizadas.",
   },
   en: {
-    pageTitle: "Services",
-    pageSubtitle: "Manage the services you display on your homepage.",
+    pageTitle: "Solutions",
+    pageSubtitle: "Manage the solutions you display on your homepage.",
     newFeature: "New feature",
     addFeature: "Add Feature",
     editingLanguage: "You are editing the content in",
     visible: "Visible on homepage",
-    addService: "Add Service",
-    deleteService: "Delete Service",
+    addService: "Add Solution",
+    deleteService: "Delete Solution",
+    toastSuccessTitle: "Changes saved!",
+    toastSuccessDescription: "Your solutions have been updated.",
   },
   fr: {
-    pageTitle: "Services",
-    pageSubtitle: "Gérez les services que vous affichez sur votre page d'accueil.",
+    pageTitle: "Solutions",
+    pageSubtitle: "Gérez les solutions que vous affichez sur votre page d'accueil.",
     newFeature: "Nouvelle fonctionnalité",
     addFeature: "Ajouter une Caractéristique",
     editingLanguage: "Vous éditez le contenu en",
     visible: "Visible sur la page d'accueil",
-    addService: "Ajouter un Service",
-    deleteService: "Supprimer le Service",
+    addService: "Ajouter une Solution",
+    deleteService: "Supprimer la Solution",
+    toastSuccessTitle: "Changements enregistrés !",
+    toastSuccessDescription: "Vos solutions ont été mises à jour.",
   }
 };
 
 export default function ServicesEditorPage() {
   const { site, setSite } = useSite();
   const { language } = useLanguage();
+  const { toast } = useToast();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
   
-  const handleUpdate = (updater: (prev: Service[]) => Service[]) => {
-    setSite(prevSite => ({
-      ...prevSite,
-      services: updater(prevSite.services)
-    }));
+  const handleUpdate = (updater: (prev: Service[]) => Service[], silent: boolean = false) => {
+    setSite(prevSite => {
+      const newSite = { ...prevSite, services: updater(prevSite.services) };
+      if (!silent) {
+        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
+      }
+      return newSite;
+    });
   };
   
   const handleTextUpdate = (serviceId: string, field: 'title', value: any) => {
-    handleUpdate(services => services.map(s => {
+    const updater = (services: Service[]) => services.map(s => {
       if (s.id === serviceId) {
         const newTitle = { ...s.title, [langCode]: value };
         return { ...s, title: newTitle };
       }
       return s;
-    }));
+    });
+    handleUpdate(updater);
   };
   
   const handleVisibilityToggle = (serviceId: string, checked: boolean) => {
-    handleUpdate(services => services.map(s => 
+    const updater = (services: Service[]) => services.map(s => 
       s.id === serviceId ? { ...s, visible: checked } : s
-    ));
+    );
+    handleUpdate(updater);
   };
 
   const handleBulletChange = (serviceId: string, bulletIndex: number, newText: string) => {
-    handleUpdate(services => services.map(s => {
+    const updater = (services: Service[]) => services.map(s => {
       if (s.id === serviceId) {
         const newBullets = [...s.bullets];
         newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
         return { ...s, bullets: newBullets };
       }
       return s;
-    }));
+    });
+     handleUpdate(updater);
   };
 
   const addBullet = (serviceId: string) => {
-    handleUpdate(services => services.map(s => {
+    const updater = (services: Service[]) => services.map(s => {
       if(s.id === serviceId) {
         return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New Feature', fr: 'Nouvelle fonctionnalité'}]}
       }
       return s;
-    }));
+    });
+    handleUpdate(updater);
   };
 
   const removeBullet = (serviceId: string, bulletIndex: number) => {
-    handleUpdate(services => services.map(s => {
+    const updater = (services: Service[]) => services.map(s => {
       if(s.id === serviceId) {
         return {...s, bullets: s.bullets.filter((_, i) => i !== bulletIndex)}
       }
       return s;
-    }));
+    });
+    handleUpdate(updater);
   };
 
   const addNewService = () => {
     const newService: Service = {
       id: `svc_${Date.now()}`,
       visible: true,
-      title: { es: 'Nuevo Servicio', en: 'New Service', fr: 'Nouveau Service' },
+      title: { es: 'Nueva Solución', en: 'New Solution', fr: 'Nouvelle Solution' },
       bullets: [{ es: 'Nueva característica', en: 'New feature', fr: 'Nouvelle fonctionnalité' }]
     };
-    handleUpdate(services => [...services, newService]);
+    const updater = (services: Service[]) => [...services, newService];
+    handleUpdate(updater);
   };
 
   const removeService = (serviceId: string) => {
-    handleUpdate(services => services.filter(s => s.id !== serviceId));
+    const updater = (services: Service[]) => services.filter(s => s.id !== serviceId);
+    handleUpdate(updater);
   };
 
   return (
@@ -185,5 +202,3 @@ export default function ServicesEditorPage() {
     </div>
   );
 }
-
-    

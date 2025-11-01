@@ -8,21 +8,21 @@ import { useSite } from '@/hooks/use-site';
 
 const labels = {
   es: {
-    title: "Planes y Paquetes",
+    title: "Planes y Servicios",
     subtitle: "Compra en línea, crea tu cuenta y gestiona tus servicios. Las suscripciones se renuevan automáticamente.",
     disclaimer1: "* Branding (8 publicaciones): el costo de pauta publicitaria no está incluido (inversión mínima de $250 USD).",
     disclaimer2: "* Branding (4 publicaciones): el costo del servicio es igual al monto de la pauta publicitaria (inversión mínima de $250 USD).",
     disclaimer3: "* Estudio de Mercado GRATIS al contratar un plan anual de Funnel, Branding o Contenido.",
   },
   en: {
-    title: "Plans and Packages",
+    title: "Plans & Services",
     subtitle: "Buy online, create your account, and manage your services. Subscriptions are automatically renewed.",
     disclaimer1: "* Branding (8 posts): advertising cost is not included (minimum investment of $250 USD).",
     disclaimer2: "* Branding (4 posts): service cost equals the ad spend amount (minimum $250 USD).",
     disclaimer3: "* FREE Market Research when hiring an annual Funnel, Branding, or Content plan.",
   },
   fr: {
-    title: "Forfaits et Paquets",
+    title: "Forfaits et Services",
     subtitle: "Achetez en ligne, créez votre compte et gérez vos services. Les abonnements sont renouvelés automatiquement.",
     disclaimer1: "* Branding (8 publications) : le coût de la publicité n'est pas inclus (investissement minimum de 250 $ US).",
     disclaimer2: "* Branding (4 publications) : le coût du service est égal au montant des dépenses publicitaires (minimum 250 $ US).",

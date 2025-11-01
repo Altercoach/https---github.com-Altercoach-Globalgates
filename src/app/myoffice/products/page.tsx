@@ -20,12 +20,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const labels = {
   es: {
-    pageTitle: "Productos y Planes",
-    pageSubtitle: "Gestiona los productos y planes de suscripción que ofreces.",
-    addProduct: "Añadir Producto",
-    newProduct: "Nuevo Producto",
+    pageTitle: "Planes y Servicios",
+    pageSubtitle: "Gestiona los planes y servicios que ofreces.",
+    addProduct: "Añadir Plan",
+    newProduct: "Nuevo Plan",
     newProductDesc: "Una breve descripción.",
-    newProductDetail: "Descripción detallada del nuevo producto.",
+    newProductDetail: "Descripción detallada del nuevo plan.",
     newBadge: "Nuevo",
     nameLabel: "Nombre",
     typeLabel: "Tipo",
@@ -37,18 +37,18 @@ const labels = {
     activationStage: "Etapa de activación",
     saveChanges: "Guardar Cambios",
     toastSuccessTitle: "¡Cambios guardados!",
-    toastSuccessDescription: "Tus productos han sido actualizados.",
+    toastSuccessDescription: "Tus planes y servicios han sido actualizados.",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
     stageOptions: { onboarding: 'Al contratar', campaign_start: 'Al iniciar campaña', campaign_end: 'Al finalizar campaña', on_demand: 'Bajo demanda' },
     editingLanguage: "Estás editando el contenido en"
   },
   en: {
-    pageTitle: "Products & Plans",
-    pageSubtitle: "Manage the products and subscription plans you offer.",
-    addProduct: "Add Product",
-    newProduct: "New Product",
+    pageTitle: "Plans & Services",
+    pageSubtitle: "Manage the plans and services you offer.",
+    addProduct: "Add Plan",
+    newProduct: "New Plan",
     newProductDesc: "A short description.",
-    newProductDetail: "Detailed description of the new product.",
+    newProductDetail: "Detailed description of the new plan.",
     newBadge: "New",
     nameLabel: "Name",
     typeLabel: "Type",
@@ -60,18 +60,18 @@ const labels = {
     activationStage: "Activation Stage",
     saveChanges: "Save Changes",
     toastSuccessTitle: "Changes saved!",
-    toastSuccessDescription: "Your products have been updated.",
+    toastSuccessDescription: "Your plans and services have been updated.",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
     stageOptions: { onboarding: 'Onboarding', campaign_start: 'On campaign start', campaign_end: 'On campaign end', on_demand: 'On demand' },
     editingLanguage: "You are editing the content in"
   },
   fr: {
-    pageTitle: "Produits et Forfaits",
-    pageSubtitle: "Gérez les produits et les plans d'abonnement que vous proposez.",
-    addProduct: "Ajouter un Produit",
-    newProduct: "Nouveau Produit",
+    pageTitle: "Forfaits et Services",
+    pageSubtitle: "Gérez les forfaits et les services que vous proposez.",
+    addProduct: "Ajouter un Forfait",
+    newProduct: "Nouveau Forfait",
     newProductDesc: "Une courte description.",
-    newProductDetail: "Description détaillée du nouveau produit.",
+    newProductDetail: "Description détaillée du nouveau forfait.",
     newBadge: "Nouveau",
     nameLabel: "Nom",
     typeLabel: "Type",
@@ -83,7 +83,7 @@ const labels = {
     activationStage: "Étape d'activation",
     saveChanges: "Enregistrer les Modifications",
     toastSuccessTitle: "Changements enregistrés !",
-    toastSuccessDescription: "Vos produits ont été mis à jour.",
+    toastSuccessDescription: "Vos forfaits et services ont été mis à jour.",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
     stageOptions: { onboarding: 'À l\'intégration', campaign_start: 'Au début de la campagne', campaign_end: 'À la fin de la campagne', on_demand: 'À la demande' },
     editingLanguage: "Vous éditez le contenu en"
@@ -172,12 +172,12 @@ export default function ProductsEditorPage() {
   const addNewProduct = () => {
     const newProduct: Product = {
         id: `prod_${Date.now()}`,
-        name: { en: 'New Product', es: 'Nuevo Producto', fr: 'Nouveau Produit' },
+        name: { en: 'New Plan', es: 'Nuevo Plan', fr: 'Nouveau Forfait' },
         type: 'one',
         price: 100,
         badge: { en: 'New', es: 'Nuevo', fr: 'Nouveau' },
         note: { en: 'A short description.', es: 'Una breve descripción.', fr: 'Une courte description.' },
-        description: { en: 'Detailed description of the new product.', es: 'Descripción detallada del nuevo producto.', fr: 'Description détaillée du nouveau produit.' },
+        description: { en: 'Detailed description of the new plan.', es: 'Descripción detallada del nuevo plan.', fr: 'Description détaillée du nouveau forfait.' },
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
     setDraft(prev => ({...prev, products: [...prev.products, newProduct]}));
