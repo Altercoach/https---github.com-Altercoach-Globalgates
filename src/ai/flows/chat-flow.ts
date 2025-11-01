@@ -20,6 +20,7 @@ const ChatInputSchema = z.object({
   history: z.array(ChatHistorySchema).describe("The conversation history."),
   systemPrompt: z.string().describe("The master prompt that defines the AI agent's persona and rules."),
   knowledgeBase: z.string().describe("Additional information the agent can use as a source of truth."),
+  language: z.string().describe("The language for the response (e.g., 'es', 'en', 'fr')."),
 });
 export type ChatInput = z.infer<typeof ChatInputSchema>;
 
@@ -36,7 +37,9 @@ const prompt = ai.definePrompt({
   name: 'chatPrompt',
   input: { schema: ChatInputSchema },
   output: { schema: ChatOutputSchema },
-  prompt: `{{{systemPrompt}}}
+  prompt: `You MUST respond in the following language: {{{language}}}
+
+  {{{systemPrompt}}}
 
   Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
   --- KNOWLEDGE BASE ---

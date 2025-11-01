@@ -132,7 +132,8 @@ export function AIChatWidget() {
         const chatInput: ChatInput = {
             history: chatHistory, // Pass the full history including current message
             systemPrompt: systemPrompt,
-            knowledgeBase: knowledgeBase
+            knowledgeBase: knowledgeBase,
+            language: language.code,
         };
 
         const result = await chat(chatInput);
@@ -245,5 +246,3 @@ export function AIChatWidget() {
     </>
   );
 }
-
-    
