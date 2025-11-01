@@ -45,7 +45,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     { 
       id: 'svc-ugc', 
       visible: true, 
-      title: { es: 'Videos UGC Auténticos', en: 'Authentic UGC Videos', fr: 'Vidéos UGC Authentiques' }, 
+      title: { es: 'Creación de Contenido (UGC)', en: 'Content Creation (UGC)', fr: 'Création de Contenu (UGC)' }, 
       bullets: [
         { es: 'Scripts vendedores optimizados por IA para persuasión.', en: 'AI-optimized sales scripts for persuasion.', fr: 'Scripts de vente optimisés par IA pour la persuasion.' },
         { es: 'Acceso a más de 3,500 creadores de contenido.', en: 'Access to over 3,500 content creators.', fr: 'Accès à plus de 3 500 créateurs de contenu.' },
@@ -58,7 +58,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       title: { es: 'Diseño Gráfico y Marca', en: 'Graphic Design and Branding', fr: 'Design Graphique et Image de Marque' }, 
       bullets: [
         { es: 'Creación de identidad visual premium (logos, manual de marca).', en: 'Premium visual identity creation (logos, brand manual).', fr: 'Création d\'identité visuelle premium (logos, manuel de marque).' },
-        { es: 'Diseño de assets para marketing (flyers, tarjetas, menús).', en: 'Design of marketing assets (flyers, cards, menus).', fr: 'Conception de supports marketing (flyers, cartes, menus).' },
+        { es: 'Diseño de recursos para marketing (flyers, tarjetas, menús).', en: 'Design of marketing assets (flyers, cards, menus).', fr: 'Conception de supports marketing (flyers, cartes, menus).' },
         { es: 'Proceso en etapas con IA para variaciones de diseño rápidas.', en: 'Staged process with AI for quick design variations.', fr: 'Processus par étapes avec IA pour des variations de conception rapides.' },
       ]
     },
@@ -157,19 +157,19 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     { 
       id: 'prod_cp_2', visible: true, name: { es: 'Paquete de Contenido 15', en: 'Content Pack 15', fr: 'Pack Contenu 15' }, type: 'one', price: 250,
       badge: { es: 'Contenido', en: 'Content', fr: 'Contenu' },
-      note: { es: 'Creación de 15 assets visuales. Incluye hasta 8 videos.', en: 'Creation of 15 visual assets. Includes up to 8 videos.', fr: 'Création de 15 ressources visuelles. Comprend jusqu\'à 8 vidéos.'},
-      description: { es: 'Servicio standalone para generar assets visuales premium en Canva (editables), basado en tu brief. No incluye publicación, pero sí optimización IA para viralidad.', en: 'Standalone service to generate premium visual assets in Canva (editable), based on your brief. Does not include publishing, but does include AI optimization for virality.', fr: 'Service autonome pour générer des ressources visuelles premium dans Canva (modifiables), basé sur votre brief. Ne comprend pas la publication, mais inclut l\'optimisation IA pour la viralité.' },
+      note: { es: 'Creación de 15 recursos visuales. Incluye hasta 8 videos.', en: 'Creation of 15 visual assets. Includes up to 8 videos.', fr: 'Création de 15 ressources visuelles. Comprend jusqu\'à 8 vidéos.'},
+      description: { es: 'Servicio standalone para generar recursos visuales premium en Canva (editables), basado en tu brief. No incluye publicación, pero sí optimización IA para viralidad.', en: 'Standalone service to generate premium visual assets in Canva (editable), based on your brief. Does not include publishing, but does include AI optimization for virality.', fr: 'Service autonome pour générer des ressources visuelles premium dans Canva (modifiables), basé sur votre brief. Ne comprend pas la publication, mais inclut l\'optimisation IA pour la viralité.' },
     },
     { 
       id: 'prod_cp_3', visible: true, name: { es: 'Paquete de Contenido 20', en: 'Content Pack 20', fr: 'Pack Contenu 20' }, type: 'one', price: 300,
       badge: { es: 'Contenido', en: 'Content', fr: 'Contenu' },
-      note: { es: '20 assets, incluyendo 10 videos y variaciones automáticas con IA.', en: '20 assets, including 10 videos and automatic AI variations.', fr: '20 ressources, dont 10 vidéos et des variations automatiques par IA.'},
+      note: { es: '20 recursos, incluyendo 10 videos y variaciones automáticas con IA.', en: '20 assets, including 10 videos and automatic AI variations.', fr: '20 ressources, dont 10 vidéos et des variations automatiques par IA.'},
       description: { es: 'Un paquete más grande para quienes necesitan un flujo constante de contenido. La IA sugiere variaciones de diseño para A/B testing.', en: 'A larger package for those who need a constant flow of content. AI suggests design variations for A/B testing.', fr: 'Un package plus grand pour ceux qui ont besoin d\'un flux constant de contenu. L\'IA suggère des variations de design pour les tests A/B.' },
     },
     { 
       id: 'prod_cp_4', visible: true, name: { es: 'Paquete de Contenido 30', en: 'Content Pack 30', fr: 'Pack Contenu 30' }, type: 'one', price: 350,
       badge: { es: 'Contenido', en: 'Content', fr: 'Contenu' },
-      note: { es: '30 assets con 15 videos y optimización de engagement completa.', en: '30 assets with 15 videos and full engagement optimization.', fr: '30 ressources avec 15 vidéos et optimisation complète de l\'engagement.'},
+      note: { es: '30 recursos con 15 videos y optimización de engagement completa.', en: '30 assets with 15 videos and full engagement optimization.', fr: '30 ressources avec 15 vidéos et optimisation complète de l\'engagement.'},
       description: { es: 'Nuestro paquete de contenido más completo, ideal para tener material para más de un mes y para campañas de alto impacto.', en: 'Our most complete content package, ideal for having material for more than a month and for high-impact campaigns.', fr: 'Notre pack de contenu le plus complet, idéal pour avoir du matériel pour plus d\'un mois et pour des campagnes à fort impact.' },
     },
     
@@ -191,7 +191,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       id: 'prod_brand_1', visible: true, name: { es: 'Forja de Marca', en: 'Brand Forge', fr: 'Forge de Marque' }, type: 'one', price: 750,
       badge: { es: 'Branding', en: 'Branding', fr: 'Marque' },
       note: { es: 'Creación de identidad visual: 3 propuestas de logo y manual de marca.', en: 'Visual identity creation: 3 logo proposals and brand manual.', fr: 'Création d\'identité visuelle : 3 propositions de logo et manuel de marque.'},
-      description: { es: 'Creación de identidad visual premium, desde logos a assets. Proceso en etapas con IA para variaciones rápidas. Construye un branding duradero, con manual para consistencia.', en: 'Creation of premium visual identity, from logos to assets. Staged process with AI for quick variations. Build lasting branding, with a manual for consistency.', fr: 'Création d\'identité visuelle premium, des logos aux ressources. Processus par étapes avec IA pour des variations rapides. Construisez une image de marque durable, avec un manuel pour la cohérence.' },
+      description: { es: 'Creación de identidad visual premium, desde logos a recursos. Proceso en etapas con IA para variaciones rápidas. Construye un branding duradero, con manual para consistencia.', en: 'Creation of premium visual identity, from logos to assets. Staged process with AI for quick variations. Build lasting branding, with a manual for consistency.', fr: 'Création d\'identité visuelle premium, des logos aux ressources. Processus par étapes avec IA pour des variations rapides. Construisez une image de marque durable, avec un manuel pour la cohérence.' },
     },
     { 
       id: 'prod_brand_2', visible: true, name: { es: 'Diseño de Flyer "Spark"', en: 'Flyer Design "Spark"', fr: 'Design de Flyer "Spark"' }, type: 'one', price: 150,
@@ -244,3 +244,5 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     },
   ],
 };
+
+    
