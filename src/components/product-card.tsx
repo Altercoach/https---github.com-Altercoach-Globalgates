@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -19,8 +18,9 @@ import {
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog";
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Wand } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { useChatWidget } from '@/hooks/use-chat-widget';
 
 interface ProductCardProps {
   product: Product;
@@ -39,6 +39,8 @@ const labels = {
     free: "Gratis",
     whatIncludes: "Qué Incluye",
     whatFor: "Para Qué Sirve",
+    askMore: "Pregúntame más",
+    askMoreInitialMessage: "Hola, me gustaría saber más sobre el plan",
   },
   en: {
     contactUs: "Contact Us",
@@ -52,6 +54,8 @@ const labels = {
     free: "Free",
     whatIncludes: "What's Included",
     whatFor: "What It's For",
+    askMore: "Ask me more",
+    askMoreInitialMessage: "Hi, I'd like to know more about the plan",
   },
   fr: {
     contactUs: "Contactez-nous",
@@ -65,6 +69,8 @@ const labels = {
     free: "Gratuit",
     whatIncludes: "Ce qui est inclus",
     whatFor: "À quoi ça sert",
+    askMore: "Demandez-moi plus",
+    askMoreInitialMessage: "Bonjour, j'aimerais en savoir plus sur le forfait",
   }
 };
 
@@ -73,6 +79,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const { toast } = useToast();
   const { language, getTranslation } = useLanguage();
+  const { openChatWidget } = useChatWidget();
   const t = labels[language.code] || labels.en;
   
   const isInfo = product.type === 'info';
@@ -97,6 +104,9 @@ export function ProductCard({ product }: ProductCardProps) {
     addToCart({ ...product, name: productName });
   }
 
+  const handleAskMore = () => {
+    openChatWidget(`${t.askMoreInitialMessage} "${productName}".`);
+  }
 
   return (
     <Dialog>
@@ -165,20 +175,26 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
           </div>
         </div>
-        <DialogFooter className="mt-auto pt-4 border-t">
-            <DialogClose asChild>
-                <Button variant="outline">{t.close}</Button>
-            </DialogClose>
-           {isInfo ? (
-                <Button variant="default" className="w-full" onClick={() => { handleInfoClick(); }}>{t.requestInfo}</Button>
-            ) : (
+        <DialogFooter className="mt-auto pt-4 border-t sm:justify-between gap-2">
+             <Button variant="secondary" onClick={handleAskMore}>
+                <Wand className="mr-2"/>
+                {t.askMore}
+            </Button>
+            <div className='flex gap-2'>
                 <DialogClose asChild>
-                    <Button onClick={handleAddToCart}>
-                        <ShoppingCart className="mr-2" />
-                        {t.addToCart}
-                    </Button>
+                    <Button variant="outline">{t.close}</Button>
                 </DialogClose>
-            )}
+               {isInfo ? (
+                    <Button variant="default" className="w-full" onClick={() => { handleInfoClick(); }}>{t.requestInfo}</Button>
+                ) : (
+                    <DialogClose asChild>
+                        <Button onClick={handleAddToCart}>
+                            <ShoppingCart className="mr-2" />
+                            {t.addToCart}
+                        </Button>
+                    </DialogClose>
+                )}
+            </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
