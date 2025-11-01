@@ -22,6 +22,7 @@ const labels = {
     you: "Tú (Humano)",
     humanRequested: "Intervención Humana Solicitada",
     takeOver: "Tomar Control",
+    attentionNeeded: "Necesita Atención",
   },
   en: {
     pageTitle: "Supervision Center (CRM)",
@@ -33,6 +34,7 @@ const labels = {
     you: "You (Human)",
     humanRequested: "Human Intervention Requested",
     takeOver: "Take Over",
+    attentionNeeded: "Attention Needed",
   },
   fr: {
     pageTitle: "Centre de Supervision (CRM)",
@@ -44,6 +46,7 @@ const labels = {
     you: "Vous (Humain)",
     humanRequested: "Intervention Humaine Demandée",
     takeOver: "Prendre le Contrôle",
+    attentionNeeded: "Attention Requise",
   }
 };
 
@@ -59,7 +62,7 @@ const chatHistory = [
     { from: 'user', text: 'El de contenido, el paquete de 15.', avatar: 'https://i.pravatar.cc/150?u=carlos' },
     { from: 'agent', text: 'Perfecto. El "Paquete de Contenido 15" te da 15 recursos visuales, incluyendo 8 videos, por un pago único de $250. ¿Te gustaría añadirlo a tu carrito?' },
     { from: 'user', text: 'Sí, pero quiero usar el descuento del 10% que vi.', avatar: 'https://i.pravatar.cc/150?u=carlos' },
-    { from: 'agent', text: 'Entendido. El código de descuento LAUNCH10 aplica para el plan "Portal Maestro Digital". El "Paquete de Contenido 15" no tiene un descuento activo en este momento.' },
+    { from: 'agent', text: 'Entiendo. El código de descuento LAUNCH10 aplica para el plan "Portal Maestro Digital". El "Paquete de Contenido 15" no tiene un descuento activo en este momento.' },
     { from: 'user', text: 'Uhm, qué mal. En la web decía otra cosa. ¿Puedes ayudarme? No funciona el código de descuento.', avatar: 'https://i.pravatar.cc/150?u=carlos' },
     { from: 'agent', text: 'Entiendo tu frustración, Carlos. La información que tengo es que el código es solo para el plan "Portal Maestro Digital". Sin embargo, entiendo que puede ser confuso. ¿Te gustaría que un especialista de nuestro equipo revise tu caso? Puedo notificar a un humano para que te asista personalmente.' },
     { from: 'human_request', text: 'El usuario ha solicitado intervención humana.' },
@@ -109,7 +112,7 @@ export default function CrmPage() {
                                     <div className="flex justify-between items-start mt-1">
                                        <p className="text-sm text-muted-foreground truncate">{convo.lastMessage}</p>
                                        {convo.unread > 0 && <Badge className="bg-accent text-accent-foreground">{convo.unread}</Badge>}
-                                       {convo.needsAttention && <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> Alerta</Badge>}
+                                       {convo.needsAttention && <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {t.attentionNeeded}</Badge>}
                                     </div>
                                 </div>
                             </button>
@@ -128,7 +131,7 @@ export default function CrmPage() {
                                 </Avatar>
                                 <div>
                                     <p className="font-semibold">{selectedConversation.name}</p>
-                                    {selectedConversation.needsAttention && <p className="text-xs text-destructive">{t.humanRequested}</p>}
+                                    {selectedConversation.needsAttention && <p className="text-xs text-destructive font-semibold">{t.humanRequested}</p>}
                                 </div>
                             </div>
                             <ScrollArea className="flex-1 p-4 space-y-4">
@@ -175,3 +178,5 @@ export default function CrmPage() {
         </div>
     );
 }
+
+    

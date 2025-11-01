@@ -17,6 +17,7 @@ import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { visibleAnalysesData, chartData } from '@/lib/data/dashboard-data';
+import { initialCustomers } from '@/lib/constants';
 
 type Message = {
   role: 'user' | 'model';
@@ -45,7 +46,7 @@ REGLAS:
     *   **Ejemplo (Amenaza Externa)**: "He analizado a tu competencia. Noté que están muy activos en TikTok. Para no perder terreno, te recomiendo añadir nuestro 'Tridente Digital VIP' para expandir tu alcance a esa plataforma. ¿Revisamos los detalles?".
 4.  **Upsell Basado en el Éxito**: ¡Usa los buenos resultados como trampolín!
     *   **Ejemplo**: "¡Felicidades! Tus KPIs muestran que los leads generados subieron un 30% el último mes. Es el momento perfecto para capitalizar. Te sugiero el 'Setup Funnel' para convertir esos leads de forma más eficiente y que no se escape ninguna venta."
-5.  **Re-engagement de Clientes (Si aplica)**: Si detectas que un cliente ha cancelado, tu objetivo es recuperarlo.
+5.  **Re-engagement de Clientes (Si aplica)**: Si detectas en la BASE DE CONOCIMIENTO que un cliente ha cancelado, tu objetivo es recuperarlo.
     *   **Paso 1 (Encuesta Conversacional)**: "Noté que pausaste tu servicio. Para nosotros es muy importante entender tu experiencia. ¿Podrías contarme qué podríamos haber hecho mejor?".
     *   **Paso 2 (Oferta de Retorno)**: Basado en su respuesta, ofrece una solución concreta. "Entiendo, lamento que la comunicación no fuera fluida. Hemos implementado mejoras en esa área. Me gustaría ofrecerte un descuento de bienvenida si decides volver a probar."
 6.  **Regla de Escalado**: Si no sabes una respuesta, di: "Excelente pregunta. Estoy consultando la información más reciente con el equipo estratégico para darte una respuesta precisa. Te contactaré por correo en breve."
@@ -66,8 +67,9 @@ export function AIChatWidget() {
   const isPayingCustomer = auth.user?.email === 'demo@cliente.com';
   
   const knowledgeBase = useMemo(() => {
-    let base = `PRODUCTS:\n${JSON.stringify(site.products)}\n\nSOLUTIONS:\n${JSON.stringify(site.services)}`;
-    if(isPayingCustomer) {
+    let base = `SITE_PRODUCTS:\n${JSON.stringify(site.products)}\n\nSITE_SOLUTIONS:\n${JSON.stringify(site.services)}`;
+    if(isPayingCustomer && auth.user) {
+        const customerData = initialCustomers.find(c => c.email === auth.user!.email);
         const kpis = {
             totalLeads: chartData.reduce((acc, item) => acc + item.leads, 0),
             totalClosed: chartData.reduce((acc, item) => acc + item.closed, 0),
@@ -75,10 +77,9 @@ export function AIChatWidget() {
         };
         const customerAnalyses = visibleAnalysesData[language.code as keyof typeof visibleAnalysesData] || visibleAnalysesData.en;
         base += `\n\n--- CUSTOMER DATA ---\n`;
-        base += `CUSTOMER_NAME: ${auth.user?.email}\n`;
-        base += `CURRENT_PLAN: "Marketing de Contenido" (Ejemplo)\n`;
-        base += `KPIS: ${JSON.stringify(kpis)}\n`;
-        base += `BUSINESS_ANALYSIS: ${JSON.stringify(customerAnalyses)}\n`;
+        base += `CUSTOMER_INFO: ${JSON.stringify(customerData)}\n`;
+        base += `CUSTOMER_KPIS: ${JSON.stringify(kpis)}\n`;
+        base += `CUSTOMER_BUSINESS_ANALYSIS: ${JSON.stringify(customerAnalyses)}\n`;
     }
     return base;
   }, [site, isPayingCustomer, auth.user, language.code]);
@@ -244,3 +245,5 @@ export function AIChatWidget() {
     </>
   );
 }
+
+    
