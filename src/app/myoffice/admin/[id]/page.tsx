@@ -57,7 +57,7 @@ const labels = {
     status: "Estado",
     activeServices: "Servicios Activos",
     service: "Servicio",
-    type: "Tipo",
+    type: "Type",
     subType: "Suscripción",
     oneTimeType: "Pago Único",
     assignedQuestionnaires: "Cuestionarios Asignados",
@@ -190,7 +190,12 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
                     <p><strong>{t.plan}:</strong> {customerData.plan}</p>
                     <p><strong>{t.totalRevenue}:</strong> {formatCurrency(customerData.revenue, currency)}</p>
                     <p><strong>{t.memberSince}:</strong> {format(customerData.signupDate, "dd MMM, yyyy", { locale })}</p>
-                    <p><strong>{t.status}:</strong> <Badge variant={getStatusBadgeVariant(customerData.status)} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>{customerData.status}</Badge></p>
+                    <div className="flex items-center gap-2">
+                      <strong>{t.status}:</strong> 
+                      <Badge variant={getStatusBadgeVariant(customerData.status)} className={customerData.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}>
+                        {customerData.status}
+                      </Badge>
+                    </div>
                 </CardContent>
             </Card>
             <Card className="md:col-span-2">
