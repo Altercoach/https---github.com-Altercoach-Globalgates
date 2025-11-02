@@ -19,7 +19,6 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(un
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { site, isMounted: isSiteMounted } = useSite();
-  const { toast } = useToast();
   const [language, setLanguageState] = useState<Language>(LANGUAGES[0]);
   const [isMounted, setIsMounted] = useState(false);
   const [translatedSite, setTranslatedSite] = useState<SiteData | null>(null);
