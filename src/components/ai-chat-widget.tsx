@@ -168,7 +168,7 @@ export function AIChatWidget() {
       {/* Chat Bubble */}
       {!isWidgetOpen && (
         <Button
-          className="fixed bottom-4 right-4 h-16 w-16 rounded-full shadow-lg z-50 flex items-center justify-center"
+          className="fixed bottom-4 right-4 h-16 w-16 rounded-full shadow-lg z-[100] flex items-center justify-center"
           onClick={() => setIsWidgetOpen(true)}
         >
           <Bot className="h-8 w-8" />
@@ -177,7 +177,7 @@ export function AIChatWidget() {
 
       {/* Chat Widget */}
       {isWidgetOpen && (
-        <Card className="fixed bottom-4 right-4 w-[90vw] md:w-80 h-[500px] shadow-2xl z-50 flex flex-col animate-in slide-in-from-bottom-5 fade-in-50 duration-300">
+        <Card className="fixed bottom-4 right-4 w-[90vw] md:w-80 h-[500px] shadow-2xl z-[100] flex flex-col animate-in slide-in-from-bottom-5 fade-in-50 duration-300">
           <CardHeader className="flex-row items-center justify-between p-4 border-b">
             <div className='flex items-center gap-2'>
               <Sparkles className="h-6 w-6 text-accent" />
@@ -246,5 +246,3 @@ export function AIChatWidget() {
     </>
   );
 }
-
-    

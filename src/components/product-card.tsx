@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -143,9 +144,9 @@ export function ProductCard({ product }: ProductCardProps) {
         <DialogHeader>
           <DialogTitle>{productName}</DialogTitle>
           {productBadge && (
-            <DialogDescription>
-              <Badge variant="outline" className="border-accent text-accent mt-2">{productBadge}</Badge>
-            </DialogDescription>
+            <div className="mt-2">
+              <Badge variant="outline" className="border-accent text-accent">{productBadge}</Badge>
+            </div>
           )}
         </DialogHeader>
         <div className="py-4 overflow-y-auto pr-6 text-sm">
