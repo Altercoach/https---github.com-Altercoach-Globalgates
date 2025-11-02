@@ -1,17 +1,17 @@
 
 'use client';
 
+import { useState } from 'react';
 import { useSite } from '@/hooks/use-site';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Service, MultilingualString } from '@/lib/types';
+import type { Service, MultilingualString, SiteData } from '@/lib/types';
 import { PlusCircle, Trash2, Info, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
 
 const labels = {
   es: {
@@ -23,8 +23,7 @@ const labels = {
     visible: "Visible en la página principal",
     addService: "Añadir Solución",
     deleteService: "Eliminar Solución",
-    toastSuccessTitle: "¡Cambios guardados!",
-    toastSuccessDescription: "Tus soluciones han sido actualizadas.",
+    saveChanges: "Guardar Cambios",
   },
   en: {
     pageTitle: "Solutions",
@@ -35,8 +34,7 @@ const labels = {
     visible: "Visible on homepage",
     addService: "Add Solution",
     deleteService: "Delete Solution",
-    toastSuccessTitle: "Changes saved!",
-    toastSuccessDescription: "Your solutions have been updated.",
+    saveChanges: "Save Changes",
   },
   fr: {
     pageTitle: "Solutions",
@@ -47,76 +45,64 @@ const labels = {
     visible: "Visible sur la page d'accueil",
     addService: "Ajouter une Solution",
     deleteService: "Supprimer la Solution",
-    toastSuccessTitle: "Changements enregistrés !",
-    toastSuccessDescription: "Vos solutions ont été mises à jour.",
+    saveChanges: "Enregistrer les Modifications",
   }
 };
 
 export default function ServicesEditorPage() {
-  const { site, setSite } = useSite();
+  const { site, setSite, saveSite } = useSite();
+  const [draft, setDraft] = useState<SiteData['services']>(() => JSON.parse(JSON.stringify(site.services)));
   const { language } = useLanguage();
-  const { toast } = useToast();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
-  
-  const handleUpdate = (updater: (prev: Service[]) => Service[], silent: boolean = false) => {
-    setSite(prevSite => {
-      const newSite = { ...prevSite, services: updater(prevSite.services) };
-      if (!silent) {
-        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
-      }
-      return newSite;
-    });
+
+  const handleUpdate = (updater: (draftServices: Service[]) => Service[]) => {
+    setDraft(updater);
   };
   
   const handleTextUpdate = (serviceId: string, field: 'title', value: any) => {
-    const updater = (services: Service[]) => services.map(s => {
+    handleUpdate(services => services.map(s => {
       if (s.id === serviceId) {
         const newTitle = { ...s.title, [langCode]: value };
         return { ...s, title: newTitle };
       }
       return s;
-    });
-    handleUpdate(updater);
+    }));
   };
   
   const handleVisibilityToggle = (serviceId: string, checked: boolean) => {
-    const updater = (services: Service[]) => services.map(s => 
+    handleUpdate(services => services.map(s => 
       s.id === serviceId ? { ...s, visible: checked } : s
-    );
-    handleUpdate(updater);
+    ));
   };
 
   const handleBulletChange = (serviceId: string, bulletIndex: number, newText: string) => {
-    const updater = (services: Service[]) => services.map(s => {
+    handleUpdate(services => services.map(s => {
       if (s.id === serviceId) {
         const newBullets = [...s.bullets];
         newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
         return { ...s, bullets: newBullets };
       }
       return s;
-    });
-     handleUpdate(updater);
+    }));
   };
 
   const addBullet = (serviceId: string) => {
-    const updater = (services: Service[]) => services.map(s => {
+    handleUpdate(services => services.map(s => {
       if(s.id === serviceId) {
         return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New Feature', fr: 'Nouvelle fonctionnalité'}]}
       }
       return s;
-    });
-    handleUpdate(updater);
+    }));
   };
 
   const removeBullet = (serviceId: string, bulletIndex: number) => {
-    const updater = (services: Service[]) => services.map(s => {
+    handleUpdate(services => services.map(s => {
       if(s.id === serviceId) {
         return {...s, bullets: s.bullets.filter((_, i) => i !== bulletIndex)}
       }
       return s;
-    });
-    handleUpdate(updater);
+    }));
   };
 
   const addNewService = () => {
@@ -126,14 +112,17 @@ export default function ServicesEditorPage() {
       title: { es: 'Nueva Solución', en: 'New Solution', fr: 'Nouvelle Solution' },
       bullets: [{ es: 'Nueva característica', en: 'New feature', fr: 'Nouvelle fonctionnalité' }]
     };
-    const updater = (services: Service[]) => [...services, newService];
-    handleUpdate(updater);
+    handleUpdate(services => [...services, newService]);
   };
 
   const removeService = (serviceId: string) => {
-    const updater = (services: Service[]) => services.filter(s => s.id !== serviceId);
-    handleUpdate(updater);
+    handleUpdate(services => services.filter(s => s.id !== serviceId));
   };
+
+  const handleSaveChanges = () => {
+    saveSite({ ...site, services: draft });
+  };
+
 
   return (
     <div className="space-y-6">
@@ -154,7 +143,7 @@ export default function ServicesEditorPage() {
       </Alert>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {site.services.map((service) => (
+        {draft.map((service) => (
           <Card key={service.id}>
             <CardHeader>
                <div className="flex items-start justify-between gap-2">
@@ -199,6 +188,11 @@ export default function ServicesEditorPage() {
           </Card>
         ))}
       </div>
+      <div className="flex justify-end">
+        <Button onClick={handleSaveChanges}>{t.saveChanges}</Button>
+      </div>
     </div>
   );
 }
+
+    

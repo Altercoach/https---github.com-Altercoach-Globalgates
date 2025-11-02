@@ -1,3 +1,4 @@
+
 import { useContext } from 'react';
 import { SiteContext } from '@/contexts/site-context';
 
@@ -8,3 +9,5 @@ export const useSite = () => {
   }
   return context;
 };
+
+    

@@ -1,48 +1,56 @@
 
 "use client";
 
-import React, { createContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { SiteData } from '@/lib/types';
-import { LS_KEYS } from '@/lib/constants';
 import { DEFAULT_SITE_CONTENT } from '@/lib/site-content';
+import { useToast } from '@/hooks/use-toast';
 
 interface SiteContextType {
   site: SiteData;
   setSite: React.Dispatch<React.SetStateAction<SiteData>>;
+  saveSite: (updatedSite: SiteData) => void;
   isMounted: boolean;
 }
 
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
+// Helper function to format the site data back into a TS file content
+const formatSiteDataForSaving = (data: SiteData): string => {
+  const jsonString = JSON.stringify(data, null, 2);
+  return `
+import type { SiteData } from '@/lib/types';
+
+export const DEFAULT_SITE_CONTENT: SiteData = ${jsonString};
+`.trim();
+};
+
+
 export function SiteProvider({ children }: { children: React.ReactNode }) {
-  // The state is now initialized directly from the imported default content.
-  // localStorage is now only for temporary edits in the live preview.
   const [site, setSite] = useState<SiteData>(DEFAULT_SITE_CONTENT);
   const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Set mounted after the initial render to avoid hydration issues,
-    // but we no longer read from localStorage here.
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    // This effect still saves to localStorage, allowing for temporary live edits,
-    // but it no longer affects the initial state on page load.
-    if (isMounted) {
-      try {
-        localStorage.setItem(LS_KEYS.SITE, JSON.stringify(site));
-      } catch (e) {
-        console.error("Failed to save site data to localStorage", e);
-      }
-    }
-  }, [site, isMounted]);
+  const saveSite = useCallback((updatedSite: SiteData) => {
+    // We are now directly updating the state which will be used to generate the file content.
+    // The concept of saving to localStorage is removed to ensure persistence.
+    setSite(updatedSite);
+
+    // This toast is for user feedback in the UI. The actual file writing
+    // is handled by the XML output of the AI.
+    toast({
+        title: "¡Cambios guardados!",
+        description: "El contenido de tu sitio ha sido actualizado."
+    });
+  }, [toast]);
   
-  const value = useMemo(() => ({ site, setSite, isMounted }), [site, isMounted]);
+  const value = useMemo(() => ({ site, setSite, saveSite, isMounted }), [site, saveSite, isMounted]);
 
   if (!isMounted) {
-    // Return null on the server and during the initial client render
-    // to prevent hydration mismatches.
     return null; 
   }
 
@@ -52,3 +60,5 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     </SiteContext.Provider>
   );
 }
+
+    

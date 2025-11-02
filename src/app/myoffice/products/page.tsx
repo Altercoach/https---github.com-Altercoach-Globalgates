@@ -12,8 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import type { SiteData, Product, ProductFeature, MultilingualString } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff, GripVertical } from 'lucide-react';
+import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff, GripVertical, Save } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -53,8 +52,7 @@ const labels = {
     fullDescLabel: "Descripción Completa",
     includedFormsTitle: "Formularios Incluidos y Disparadores",
     activationStage: "Etapa de activación",
-    toastSuccessTitle: "¡Cambios guardados!",
-    toastSuccessDescription: "Tus planes y servicios han sido actualizados.",
+    saveChanges: "Guardar Cambios",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
     stageOptions: { onboarding: 'Al contratar', campaign_start: 'Al iniciar campaña', campaign_end: 'Al finalizar campaña', on_demand: 'Bajo demanda' },
     editingLanguage: "Estás editando el contenido en",
@@ -76,8 +74,7 @@ const labels = {
     fullDescLabel: "Full Description",
     includedFormsTitle: "Included Forms & Triggers",
     activationStage: "Activation Stage",
-    toastSuccessTitle: "Changes saved!",
-    toastSuccessDescription: "Your plans and services have been updated.",
+    saveChanges: "Save Changes",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
     stageOptions: { onboarding: 'Onboarding', campaign_start: 'On campaign start', campaign_end: 'On campaign end', on_demand: 'On demand' },
     editingLanguage: "You are editing the content in",
@@ -99,8 +96,7 @@ const labels = {
     fullDescLabel: "Description Complète",
     includedFormsTitle: "Formulaires et Déclencheurs Inclus",
     activationStage: "Étape d'activation",
-    toastSuccessTitle: "Changements enregistrés !",
-    toastSuccessDescription: "Vos forfaits et services ont été mis à jour.",
+    saveChanges: "Enregistrer les Modifications",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
     stageOptions: { onboarding: 'À l\'intégration', campaign_start: 'Au début de la campagne', campaign_end: 'À la fin de la campagne', on_demand: 'À la demande' },
     editingLanguage: "Vous éditez le contenu en",
@@ -129,8 +125,25 @@ const SortableProductItem = ({ product, children }: { product: Product, children
 };
 
 export default function ProductsEditorPage() {
-  const { site, setSite } = useSite();
-  const { toast } = useToast();
+  const { site, saveSite, setSite } = useSite();
+  const [draft, setDraft] = useState<SiteData['products']>(() => {
+    // Ensure every product has features
+    const productsWithFeatures = site.products.map(p => {
+        if (!p.features) {
+            p.features = JSON.parse(JSON.stringify(defaultFeatures));
+        } else {
+            const featureIds = p.features.map(f => f.id);
+            defaultFeatures.forEach(df => {
+                if (!featureIds.includes(df.id)) {
+                    p.features!.push(JSON.parse(JSON.stringify(df)));
+                }
+            });
+        }
+        return p;
+    });
+    return JSON.parse(JSON.stringify(productsWithFeatures));
+  });
+  
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
@@ -139,38 +152,30 @@ export default function ProductsEditorPage() {
   const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
 
   useEffect(() => {
-    setSite(prevSite => {
-        const siteWithFeatures = JSON.parse(JSON.stringify(prevSite));
-        let updated = false;
-        siteWithFeatures.products.forEach((p: Product) => {
-            if (!p.features) {
-                p.features = JSON.parse(JSON.stringify(defaultFeatures));
-                updated = true;
-            } else {
-                const featureIds = p.features.map(f => f.id);
-                defaultFeatures.forEach(df => {
-                    if (!featureIds.includes(df.id)) {
-                        p.features!.push(JSON.parse(JSON.stringify(df)));
-                        updated = true;
-                    }
-                });
-            }
-        });
-        return updated ? siteWithFeatures : prevSite;
+    const productsWithFeatures = site.products.map(p => {
+        if (!p.features) {
+            p.features = JSON.parse(JSON.stringify(defaultFeatures));
+        } else {
+            const featureIds = p.features.map(f => f.id);
+            defaultFeatures.forEach(df => {
+                if (!featureIds.includes(df.id)) {
+                    p.features!.push(JSON.parse(JSON.stringify(df)));
+                }
+            });
+        }
+        return p;
     });
-  }, [setSite]);
+    setDraft(JSON.parse(JSON.stringify(productsWithFeatures)));
+  }, [site.products]);
 
-  const handleUpdate = (updater: (draft: SiteData) => SiteData) => {
-    setSite(prev => {
-        const newSite = updater(JSON.parse(JSON.stringify(prev)));
-        return newSite;
-    });
+
+  const handleUpdate = (updater: (currentDraft: Product[]) => Product[]) => {
+    setDraft(updater);
   };
   
   const handleProductUpdate = (id: string, field: keyof Product, value: any, isMultilingual: boolean) => {
-    handleUpdate(prev => ({
-        ...prev,
-        products: prev.products.map(p => {
+    handleUpdate(prev => 
+        prev.map(p => {
           if (p.id === id) {
             if (isMultilingual) {
               const multilingualValue = p[field as keyof Product] as MultilingualString;
@@ -180,13 +185,12 @@ export default function ProductsEditorPage() {
           }
           return p;
         })
-    }));
+    );
   };
 
   const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
-    handleUpdate(prev => ({
-        ...prev,
-        products: prev.products.map(p => {
+    handleUpdate(prev => 
+        prev.map(p => {
             if (p.id === productId && p.features) {
                 const newFeatures = p.features.map(f => 
                     f.id === featureId ? { ...f, enabled } : f
@@ -195,13 +199,12 @@ export default function ProductsEditorPage() {
             }
             return p;
         })
-    }));
+    );
   };
 
   const handleFeatureStageChange = (productId: string, featureId: string, stage: ProductFeature['stage']) => {
-     handleUpdate(prev => ({
-        ...prev,
-        products: prev.products.map(p => {
+     handleUpdate(prev => 
+        prev.map(p => {
             if (p.id === productId && p.features) {
                 const newFeatures = p.features.map(f => 
                     f.id === featureId ? { ...f, stage } : f
@@ -210,7 +213,7 @@ export default function ProductsEditorPage() {
             }
             return p;
         })
-    }));
+    );
   }
 
   const addNewProduct = () => {
@@ -226,13 +229,17 @@ export default function ProductsEditorPage() {
         description: { en: 'Detailed description of the new plan.', es: 'Descripción detallada del nuevo plan.', fr: 'Description détaillée du nouveau forfait.' },
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
-    handleUpdate(prev => ({...prev, products: [newProduct, ...prev.products]}));
+    handleUpdate(prev => [newProduct, ...prev]);
     setOpenAccordionItem(newId);
   };
 
   const removeProduct = (id: string) => {
-    handleUpdate(prev => ({...prev, products: prev.products.filter(p => p.id !== id)}));
+    handleUpdate(prev => prev.filter(p => p.id !== id));
   }
+
+  const handleSaveChanges = () => {
+    saveSite({ ...site, products: draft });
+  };
   
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -244,13 +251,10 @@ export default function ProductsEditorPage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      handleUpdate(prev => {
-        const oldIndex = prev.products.findIndex(p => p.id === active.id);
-        const newIndex = prev.products.findIndex(p => p.id === over.id);
-        return {
-          ...prev,
-          products: arrayMove(prev.products, oldIndex, newIndex),
-        };
+      handleUpdate(items => {
+        const oldIndex = items.findIndex(p => p.id === active.id);
+        const newIndex = items.findIndex(p => p.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
       });
     }
   };
@@ -276,7 +280,7 @@ export default function ProductsEditorPage() {
       <Card>
         <CardContent className="p-0">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={site.products.map(p => p.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={draft.map(p => p.id)} strategy={verticalListSortingStrategy}>
               <Accordion 
                   type="single" 
                   collapsible 
@@ -284,7 +288,7 @@ export default function ProductsEditorPage() {
                   value={openAccordionItem}
                   onValueChange={setOpenAccordionItem}
               >
-                {site.products.map(product => (
+                {draft.map(product => (
                   <SortableProductItem key={product.id} product={product}>
                     <AccordionItem value={product.id} className="border-b last:border-b-0">
                         <div className="flex items-center justify-between px-6 py-4 hover:bg-muted/50">
@@ -382,6 +386,11 @@ export default function ProductsEditorPage() {
           </DndContext>
         </CardContent>
       </Card>
+      <div className="flex justify-end">
+        <Button onClick={handleSaveChanges}><Save className="mr-2"/>{t.saveChanges}</Button>
+      </div>
     </div>
   );
 }
+
+    

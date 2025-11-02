@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import type { SiteData } from '@/lib/types';
 import Image from 'next/image';
-import { useToast } from '@/hooks/use-toast';
 import { Upload, Info } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -80,9 +79,8 @@ const labels = {
 
 
 export default function BrandEditorPage() {
-  const { site, setSite } = useSite();
+  const { site, saveSite } = useSite();
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
-  const { toast } = useToast();
   const { language } = useLanguage();
   const langCode = language.code;
   const t = labels[langCode] || labels.en;
@@ -91,9 +89,8 @@ export default function BrandEditorPage() {
     setDraft(JSON.parse(JSON.stringify(site)));
   }, [site]);
 
-  const saveChanges = () => {
-    setSite(draft);
-    toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
+  const handleSaveChanges = () => {
+    saveSite(draft);
   };
   
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -190,7 +187,7 @@ export default function BrandEditorPage() {
         </Card>
 
         <div className="flex justify-end gap-2">
-            <Button onClick={saveChanges}>{t.saveChanges}</Button>
+            <Button onClick={handleSaveChanges}>{t.saveChanges}</Button>
         </div>
     </div>
   );
