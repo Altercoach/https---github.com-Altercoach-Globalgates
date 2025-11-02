@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import type { SiteData } from '@/lib/types';
 import Image from 'next/image';
-import { Upload, Info } from 'lucide-react';
+import { Upload, Info, Save } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -89,7 +89,7 @@ export default function BrandEditorPage() {
     setDraft(JSON.parse(JSON.stringify(site)));
   }, [site]);
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     saveSite(draft);
   };
   
@@ -140,8 +140,8 @@ export default function BrandEditorPage() {
                 <CardDescription>{t.brandDetailsSubtitle}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div><Label>{t.brandNameLabel}</Label><Input className="border-0 px-0" value={draft.brand.name[langCode]} onChange={e => handleTextChange('brand', 'name', e.target.value)} /></div>
-                <div><Label>{t.taglineLabel}</Label><Input className="border-0 px-0" value={draft.brand.tagline[langCode]} onChange={e => handleTextChange('brand', 'tagline', e.target.value)} /></div>
+                <div><Label>{t.brandNameLabel}</Label><Input value={draft.brand.name[langCode]} onChange={e => handleTextChange('brand', 'name', e.target.value)} /></div>
+                <div><Label>{t.taglineLabel}</Label><Input value={draft.brand.tagline[langCode]} onChange={e => handleTextChange('brand', 'tagline', e.target.value)} /></div>
             </CardContent>
         </Card>
 
@@ -152,8 +152,8 @@ export default function BrandEditorPage() {
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                    <div><Label>{t.heroTitleLabel}</Label><Input className="border-0 px-0" value={draft.brand.heroTitle[langCode]} onChange={e => handleTextChange('brand', 'heroTitle', e.target.value)} /></div>
-                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea className="border-0 px-0" value={draft.brand.heroSubtitle[langCode]} onChange={e => handleTextChange('brand', 'heroSubtitle', e.target.value)} rows={5} /></div>
+                    <div><Label>{t.heroTitleLabel}</Label><Input value={draft.brand.heroTitle[langCode]} onChange={e => handleTextChange('brand', 'heroTitle', e.target.value)} /></div>
+                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea value={draft.brand.heroSubtitle[langCode]} onChange={e => handleTextChange('brand', 'heroSubtitle', e.target.value)} rows={5} /></div>
                 </div>
                  <div className="space-y-2">
                     <Label>{t.heroImageLabel}</Label>
@@ -187,10 +187,8 @@ export default function BrandEditorPage() {
         </Card>
 
         <div className="flex justify-end gap-2">
-            <Button onClick={handleSaveChanges}>{t.saveChanges}</Button>
+            <Button onClick={handleSaveChanges}><Save className="mr-2" /> {t.saveChanges}</Button>
         </div>
     </div>
   );
 }
-
-    
