@@ -52,7 +52,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart, hasPurchased, isMounted]);
 
   const addToCart = useCallback((prod: { id: string; name: string; price: number; type: 'one' | 'sub'; interval?: 'month' | null }) => {
-    if (!prod || prod.type === 'info') {
+    if (prod.type === 'info') {
       toast({
         title: 'Plan Informativo',
         description: 'Este es un plan informativo. Contáctanos para activarlo.',
@@ -71,14 +71,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           x.id === prod.id ? { ...x, qty: clampQty(x.qty + 1) } : x
         );
       }
-      return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type, interval: prod.interval || null, qty: 1 }];
+      return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type, qty: 1 }];
     });
     
-    if (!cart.some(item => item.id === prod.id)) {
-      toast({ description: 'Añadido al carrito.' });
-    }
+    toast({ description: 'Añadido al carrito.' });
     setIsCartOpen(true);
-  }, [toast, cart]);
+  }, [toast]);
 
   const removeFromCart = (id: string) => setCart((prev) => prev.filter((x) => x.id !== id));
   
@@ -126,7 +124,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     hasPurchased,
     isCartOpen,
     setIsCartOpen,
-  }), [cart, addToCart, totals, checkout, hasPurchased, isCartOpen]);
+  }), [cart, addToCart, totals, hasPurchased, isCartOpen]);
   
   if (!isMounted) {
     return null;
