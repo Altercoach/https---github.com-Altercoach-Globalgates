@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Bot, Send, X, Loader2, User, Sparkles, ChevronDown } from 'lucide-react';
+import { Bot, Send, X, User, Sparkles, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -227,8 +227,10 @@ export function AIChatWidget() {
                            <AvatarImage src={agentPersona.avatar} alt={agentName} />
                            <AvatarFallback>{agentPersona.firstName.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <div className="max-w-[80%] p-3 rounded-lg bg-muted flex items-center">
-                            <Loader2 className="h-5 w-5 animate-spin"/>
+                        <div className="max-w-[80%] p-3 rounded-lg bg-muted flex items-center space-x-1">
+                            <span className="h-2 w-2 bg-muted-foreground rounded-full animate-pulse [animation-delay:-0.3s]"></span>
+                            <span className="h-2 w-2 bg-muted-foreground rounded-full animate-pulse [animation-delay:-0.15s]"></span>
+                            <span className="h-2 w-2 bg-muted-foreground rounded-full animate-pulse"></span>
                         </div>
                     </div>
                 )}
@@ -266,3 +268,5 @@ export function AIChatWidget() {
     </>
   );
 }
+
+    
