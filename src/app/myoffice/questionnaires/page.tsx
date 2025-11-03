@@ -5,20 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { PlusCircle, FileText, CheckCircle, Clock, Bot } from 'lucide-react';
+import { PlusCircle, FileText, CheckCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { es, enUS, fr } from 'date-fns/locale';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useLanguage } from '@/hooks/use-language';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
 
 const sampleQuestionnaires = [
   {
@@ -55,10 +46,8 @@ const labels = {
     pageTitle: "Cuestionarios de Clientes",
     pageSubtitle: "Crea, envía y revisa los cuestionarios de tus clientes.",
     newQuestionnaire: "Nuevo Cuestionario",
-    templatesTitle: "Gestión de Plantillas",
-    templatesDescription: "Asigna un cuestionario a un cliente para recopilar información clave.",
     recentSubmissions: "Envíos Recientes",
-    recentSubmissionsDesc: "Lista de cuestionarios enviados a clientes.",
+    recentSubmissionsDesc: "Lista de cuestionarios generados y enviados a clientes.",
     client: "Cliente",
     type: "Tipo",
     sentDate: "Fecha de Envío",
@@ -68,18 +57,13 @@ const labels = {
     viewSubmission: "Ver Envío",
     completed: "Completado",
     pending: "Pendiente",
-    newEval: "Evaluación de Negocio",
-    newBrief: "Brief de Marketing",
-    newAgentTraining: "Entrenamiento de Agente IA"
   },
   en: {
     pageTitle: "Customer Questionnaires",
     pageSubtitle: "Create, send, and review your customers' questionnaires.",
     newQuestionnaire: "New Questionnaire",
-    templatesTitle: "Template Management",
-    templatesDescription: "Assign a questionnaire to a client to gather key information.",
     recentSubmissions: "Recent Submissions",
-    recentSubmissionsDesc: "List of questionnaires sent to customers.",
+    recentSubmissionsDesc: "List of questionnaires generated and sent to customers.",
     client: "Client",
     type: "Type",
     sentDate: "Sent Date",
@@ -89,18 +73,13 @@ const labels = {
     viewSubmission: "View Submission",
     completed: "Completed",
     pending: "Pending",
-    newEval: "Business Evaluation",
-    newBrief: "Marketing Brief",
-    newAgentTraining: "AI Agent Training"
   },
   fr: {
     pageTitle: "Questionnaires Clients",
     pageSubtitle: "Créez, envoyez et examinez les questionnaires de vos clients.",
     newQuestionnaire: "Nouveau Questionnaire",
-    templatesTitle: "Gestion des Modèles",
-    templatesDescription: "Assignez un questionnaire à un client pour recueillir des informations clés.",
     recentSubmissions: "Soumissions Récentes",
-    recentSubmissionsDesc: "Liste des questionnaires envoyés aux clients.",
+    recentSubmissionsDesc: "Liste des questionnaires générés et envoyés aux clients.",
     client: "Client",
     type: "Type",
     sentDate: "Date d'envoi",
@@ -110,9 +89,6 @@ const labels = {
     viewSubmission: "Voir la Soumission",
     completed: "Complété",
     pending: "En attente",
-    newEval: "Évaluation d'Entreprise",
-    newBrief: "Brief de Marketing",
-    newAgentTraining: "Formation d'Agent IA"
   }
 };
 
@@ -129,33 +105,13 @@ export default function QuestionnairesPage() {
           <h1 className="font-headline text-3xl font-bold">{t.pageTitle}</h1>
           <p className="text-muted-foreground">{t.pageSubtitle}</p>
         </div>
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button>
-                    <PlusCircle className="mr-2" />
-                    {t.newQuestionnaire}
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuLabel>{t.newQuestionnaire}</DropdownMenuLabel>
-                <DropdownMenuItem asChild>
-                    <Link href="/myoffice/questionnaires/new"><FileText className="mr-2"/>{t.newEval}</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href="/questionnaire/brief-marketing"><FileText className="mr-2"/>{t.newBrief}</Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                    <Link href="/questionnaire/agent-training"><Bot className="mr-2"/>{t.newAgentTraining}</Link>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <Button asChild>
+          <Link href="/myoffice/questionnaires/new">
+            <PlusCircle className="mr-2" />
+            {t.newQuestionnaire}
+          </Link>
+        </Button>
       </header>
-
-      <Alert>
-        <FileText className="h-4 w-4" />
-        <AlertTitle>{t.templatesTitle}</AlertTitle>
-        <AlertDescription>{t.templatesDescription}</AlertDescription>
-      </Alert>
 
       <Card>
         <CardHeader>
