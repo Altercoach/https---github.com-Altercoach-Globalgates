@@ -125,7 +125,7 @@ export default function ServicesEditorPage() {
       title: { es: 'Nueva Solución', en: 'New Solution', fr: 'Nouvelle Solution' },
       bullets: [{ es: 'Nueva característica', en: 'New feature', fr: 'Nouvelle fonctionnalité' }]
     };
-    handleUpdate(prev => ({ ...prev, services: [...prev.services, newService] }));
+    handleUpdate(prev => ({ ...prev, services: [newService, ...prev.services] }));
   };
 
   const removeService = (serviceId: string) => {
