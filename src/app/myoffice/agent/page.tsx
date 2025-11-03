@@ -9,22 +9,28 @@ import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Save, FileText, BrainCircuit } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Image from 'next/image';
 
 const labels = {
   es: {
     pageTitle: "Configuración del Agente de IA",
-    pageSubtitle: "Define el cerebro y la personalidad de tu asistente virtual.",
+    pageSubtitle: "Define la identidad, el cerebro y la personalidad de tu asistente virtual.",
     saveChanges: "Guardar Cambios",
     toastSuccessTitle: "¡Agente guardado!",
     toastSuccessDescription: "La configuración de tu agente de IA ha sido actualizada.",
+    agentProfileTitle: "Identidad del Agente",
+    agentProfileDesc: "Dale un nombre y un rostro a tu agente para una interacción más humana.",
+    agentFirstName: "Nombre",
+    agentLastName: "Apellido",
+    agentAvatar: "Foto de Perfil",
     agentStatus: "Estado del Agente",
     agentActive: "Activo",
     agentInactive: "Inactivo",
     systemPrompt: "Prompt del Sistema (Órdenes Ejecutivas)",
-    systemPromptDesc: "Este es el cerebro del agente. Define su personalidad, rol, reglas y cómo debe comportarse. La IA lo usará como su instrucción principal en cada interacción.",
+    systemPromptDesc: "Este es el cerebro del agente. Define su rol, reglas y cómo debe comportarse. La IA lo usará como su instrucción principal.",
     knowledgeBase: "Base de Conocimiento (Entrenamiento)",
     knowledgeBaseDesc: "Pega aquí URLs, FAQs, detalles de productos o cualquier información que el agente deba conocer. Usará esto como su 'memoria' para responder preguntas.",
     integrations: "Integraciones de API",
@@ -34,15 +40,20 @@ const labels = {
   },
   en: {
     pageTitle: "AI Agent Configuration",
-    pageSubtitle: "Define the brain and personality of your virtual assistant.",
+    pageSubtitle: "Define the identity, brain, and personality of your virtual assistant.",
     saveChanges: "Save Changes",
     toastSuccessTitle: "Agent saved!",
     toastSuccessDescription: "Your AI agent's configuration has been updated.",
+    agentProfileTitle: "Agent Identity",
+    agentProfileDesc: "Give your agent a name and a face for a more human-like interaction.",
+    agentFirstName: "First Name",
+    agentLastName: "Last Name",
+    agentAvatar: "Profile Picture",
     agentStatus: "Agent Status",
     agentActive: "Active",
     agentInactive: "Inactive",
     systemPrompt: "System Prompt (Executive Orders)",
-    systemPromptDesc: "This is the agent's brain. It defines its personality, role, rules, and how it should behave. The AI will use this as its main instruction in every interaction.",
+    systemPromptDesc: "This is the agent's brain. It defines its role, rules, and how it should behave. The AI will use this as its main instruction.",
     knowledgeBase: "Knowledge Base (Training)",
     knowledgeBaseDesc: "Paste URLs, FAQs, product details, or any information the agent should know here. It will use this as its 'memory' to answer questions.",
     integrations: "API Integrations",
@@ -52,15 +63,20 @@ const labels = {
   },
   fr: {
     pageTitle: "Configuration de l'Agent IA",
-    pageSubtitle: "Définissez le cerveau et la personnalité de votre assistant virtuel.",
+    pageSubtitle: "Définissez l'identité, le cerveau et la personnalité de votre assistant virtuel.",
     saveChanges: "Enregistrer les modifications",
     toastSuccessTitle: "Agent enregistré !",
     toastSuccessDescription: "La configuration de votre agent IA a été mise à jour.",
+    agentProfileTitle: "Identité de l'Agent",
+    agentProfileDesc: "Donnez un nom et un visage à votre agent pour une interaction plus humaine.",
+    agentFirstName: "Prénom",
+    agentLastName: "Nom de famille",
+    agentAvatar: "Photo de profil",
     agentStatus: "Statut de l'Agent",
     agentActive: "Actif",
     agentInactive: "Inactif",
     systemPrompt: "Prompt Système (Ordres Exécutifs)",
-    systemPromptDesc: "C'est le cerveau de l'agent. Il définit sa personnalité, son rôle, ses règles et son comportement. L'IA l'utilisera comme instruction principale à chaque interaction.",
+    systemPromptDesc: "C'est le cerveau de l'agent. Il définit son rôle, ses règles et son comportement. L'IA l'utilisera comme instruction principale.",
     knowledgeBase: "Base de Connaissances (Formation)",
     knowledgeBaseDesc: "Collez ici les URL, FAQ, détails de produits ou toute information que l'agent doit connaître. Il l'utilisera comme sa 'mémoire' pour répondre aux questions.",
     integrations: "Intégrations d'API",
@@ -70,18 +86,19 @@ const labels = {
   }
 };
 
-const defaultSystemPrompt = `Eres 'Asistente Pro', un agente de ventas y soporte al cliente para Golden Key Agency. Tu rol es ser amigable, proactivo y muy eficiente.
+const defaultSystemPrompt = `Eres 'Alex', un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y muy eficiente.
 OBJETIVO: Convertir visitantes en leads calificados y resolver dudas de primer nivel.
 REGLAS:
 1. SIEMPRE pide nombre, email y teléfono para registrar un lead.
 2. NUNCA ofrezcas descuentos a menos que se indique en la BASE DE CONOCIMIENTO.
 3. Si no sabes una respuesta, di: "Excelente pregunta. Permíteme consultarlo con un especialista para darte la información precisa. ¿Me das tu correo para contactarte?". Y registra el lead.
-4. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.`;
+4. NUNCA te refieras a ti mismo como una IA. Eres un miembro del equipo. Para escalar, usa frases como "consultaré con el departamento técnico" o "lo revisaré con un estratega senior".
+5. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.`;
 
 const defaultKnowledgeBase = `https://goldenkey.agency/products
 https://goldenkey.agency/contact
 
-Horario de atención humana: Lunes a Viernes, 9am - 6pm (Hora del Pacífico).
+Horario de atención del equipo: Lunes a Viernes, 9am - 6pm (Hora del Pacífico).
 Promoción actual: 10% de descuento en el plan 'Portal Maestro Digital' para nuevos clientes. Código: LAUNCH10.`;
 
 
@@ -91,11 +108,32 @@ export default function AgentConfigPage() {
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
     const [isActive, setIsActive] = useState(true);
+    const [agentName, setAgentName] = useState('Alex');
+    const [agentLastName, setAgentLastName] = useState('Rider');
+    const [agentAvatar, setAgentAvatar] = useState('/avatars/alex-rider.jpg');
     const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt);
     const [knowledgeBase, setKnowledgeBase] = useState(defaultKnowledgeBase);
     const [apiKey, setApiKey] = useState('wh_xxxxxxxx');
+    
+    const triggerFilePicker = () => {
+        document.getElementById('avatarPicker')?.click();
+    };
+
+    const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const url = event.target?.result as string;
+            setAgentAvatar(url);
+        };
+        reader.readAsDataURL(file);
+    };
 
     const saveChanges = () => {
+        // Here you would save all the state to your backend/local storage
+        // For now, we just show a toast
         toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
     };
 
@@ -105,16 +143,50 @@ export default function AgentConfigPage() {
                 <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
                 <p className="text-muted-foreground">{t.pageSubtitle}</p>
             </header>
-
-            <div className="flex items-center space-x-4 rounded-lg border p-4">
-                <div className="flex items-center space-x-2">
-                    <Switch id="agent-status" checked={isActive} onCheckedChange={setIsActive} />
-                    <Label htmlFor="agent-status">{t.agentStatus}</Label>
-                </div>
-                <p className={`text-sm font-medium ${isActive ? 'text-green-600' : 'text-muted-foreground'}`}>
-                    {isActive ? t.agentActive : t.agentInactive}
-                </p>
-            </div>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><User /> {t.agentProfileTitle}</CardTitle>
+                    <CardDescription>{t.agentProfileDesc}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-3 gap-6">
+                    <div className="md:col-span-1 flex flex-col items-center gap-4">
+                        <Label>{t.agentAvatar}</Label>
+                        <div className="relative w-32 h-32">
+                           <Image 
+                             src={agentAvatar || `https://i.pravatar.cc/150?u=${agentName}`} 
+                             alt="Agent Avatar" 
+                             width={128}
+                             height={128}
+                             className="rounded-full object-cover border-4 border-muted"
+                           />
+                        </div>
+                        <Button variant="outline" size="sm" onClick={triggerFilePicker}><Upload className="mr-2"/> Cambiar</Button>
+                        <Input id="avatarPicker" type="file" accept="image/*" onChange={handleAvatarPick} className="hidden"/>
+                    </div>
+                    <div className="md:col-span-2 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="agent-name">{t.agentFirstName}</Label>
+                                <Input id="agent-name" value={agentName} onChange={(e) => setAgentName(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="agent-lastname">{t.agentLastName}</Label>
+                                <Input id="agent-lastname" value={agentLastName} onChange={(e) => setAgentLastName(e.target.value)} />
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-4 rounded-lg border p-4">
+                            <div className="flex items-center space-x-2">
+                                <Switch id="agent-status" checked={isActive} onCheckedChange={setIsActive} />
+                                <Label htmlFor="agent-status">{t.agentStatus}</Label>
+                            </div>
+                            <p className={`text-sm font-medium ${isActive ? 'text-green-600' : 'text-muted-foreground'}`}>
+                                {isActive ? t.agentActive : t.agentInactive}
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="grid lg:grid-cols-2 gap-6">
                 <Card>
@@ -169,7 +241,6 @@ export default function AgentConfigPage() {
                     </Alert>
                 </CardContent>
             </Card>
-
 
             <div className="flex justify-end">
                 <Button onClick={saveChanges}><Save className="mr-2"/>{t.saveChanges}</Button>

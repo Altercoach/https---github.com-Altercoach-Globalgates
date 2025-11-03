@@ -14,37 +14,37 @@ import { Badge } from '@/components/ui/badge';
 const labels = {
   es: {
     pageTitle: "Centro de Supervisión (CRM)",
-    pageSubtitle: "Supervisa las conversaciones de tu Agente de IA e interviene cuando sea necesario.",
+    pageSubtitle: "Supervisa las conversaciones del equipo e interviene cuando sea necesario.",
     searchPlaceholder: "Buscar conversaciones...",
     noConversation: "Selecciona una conversación para empezar.",
     messagePlaceholder: "Escribe tu respuesta...",
-    agent: "Agente IA",
-    you: "Tú (Humano)",
-    humanRequested: "Intervención Humana Solicitada",
+    agent: "Alex Rider",
+    you: "Tú (Supervisor)",
+    humanRequested: "Intervención Solicitada",
     takeOver: "Tomar Control",
     attentionNeeded: "Necesita Atención",
   },
   en: {
     pageTitle: "Supervision Center (CRM)",
-    pageSubtitle: "Supervise your AI Agent's conversations and intervene when necessary.",
+    pageSubtitle: "Supervise team conversations and intervene when necessary.",
     searchPlaceholder: "Search conversations...",
     noConversation: "Select a conversation to start.",
     messagePlaceholder: "Type your response...",
-    agent: "AI Agent",
-    you: "You (Human)",
-    humanRequested: "Human Intervention Requested",
+    agent: "Alex Rider",
+    you: "You (Supervisor)",
+    humanRequested: "Intervention Requested",
     takeOver: "Take Over",
     attentionNeeded: "Attention Needed",
   },
   fr: {
     pageTitle: "Centre de Supervision (CRM)",
-    pageSubtitle: "Supervisez les conversations de votre Agent IA et intervenez si nécessaire.",
+    pageSubtitle: "Supervisez les conversations de l'équipe et intervenez si nécessaire.",
     searchPlaceholder: "Rechercher des conversations...",
     noConversation: "Sélectionnez une conversation pour commencer.",
     messagePlaceholder: "Écrivez votre réponse...",
-    agent: "Agent IA",
-    you: "Vous (Humain)",
-    humanRequested: "Intervention Humaine Demandée",
+    agent: "Alex Rider",
+    you: "Vous (Superviseur)",
+    humanRequested: "Intervention Demandée",
     takeOver: "Prendre le Contrôle",
     attentionNeeded: "Attention Requise",
   }
@@ -64,8 +64,8 @@ const chatHistory = [
     { from: 'user', text: 'Sí, pero quiero usar el descuento del 10% que vi.', avatar: 'https://i.pravatar.cc/150?u=carlos' },
     { from: 'agent', text: 'Entiendo. El código de descuento LAUNCH10 aplica para el plan "Portal Maestro Digital". El "Paquete de Contenido 15" no tiene un descuento activo en este momento.' },
     { from: 'user', text: 'Uhm, qué mal. En la web decía otra cosa. ¿Puedes ayudarme? No funciona el código de descuento.', avatar: 'https://i.pravatar.cc/150?u=carlos' },
-    { from: 'agent', text: 'Entiendo tu frustración, Carlos. La información que tengo es que el código es solo para el plan "Portal Maestro Digital". Sin embargo, entiendo que puede ser confuso. ¿Te gustaría que un especialista de nuestro equipo revise tu caso? Puedo notificar a un humano para que te asista personalmente.' },
-    { from: 'human_request', text: 'El usuario ha solicitado intervención humana.' },
+    { from: 'agent', text: 'Entiendo tu frustración, Carlos. La información que tengo es que el código es solo para el plan "Portal Maestro Digital". Sin embargo, entiendo que puede ser confuso. Permíteme pasarte con un especialista de nuestro equipo para que revise tu caso y te asista personalmente.' },
+    { from: 'human_request', text: 'El usuario ha solicitado intervención.' },
 ];
 
 
@@ -73,6 +73,12 @@ export default function CrmPage() {
     const [selectedConversation, setSelectedConversation] = useState(conversations[1]);
     const { language } = useLanguage();
     const t = labels[language.code as keyof typeof labels] || labels.en;
+    
+    // Placeholder for agent persona - in a real app, this would be fetched
+    const agentPersona = {
+        name: 'Alex Rider',
+        avatarUrl: '/avatars/alex-rider.jpg'
+    }
 
     return (
         <div className="flex flex-col h-full">
@@ -154,7 +160,12 @@ export default function CrmPage() {
                                         <div className={cn("max-w-xs md:max-w-md lg:max-w-lg p-3 rounded-lg", isUser ? "bg-muted" : "bg-primary text-primary-foreground")}>
                                             <p className="text-sm">{msg.text}</p>
                                         </div>
-                                         {!isUser && <Avatar className="h-8 w-8"><AvatarFallback><Bot /></AvatarFallback></Avatar>}
+                                         {!isUser && 
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
+                                                <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                         }
                                     </div>
                                    )
                                })}
@@ -178,5 +189,3 @@ export default function CrmPage() {
         </div>
     );
 }
-
-    

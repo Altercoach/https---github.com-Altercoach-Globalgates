@@ -24,19 +24,19 @@ type Message = {
   content: string;
 };
 
-const leadSystemPrompt = `Eres 'Asistente Pro', un agente de ventas y soporte para Golden Key Agency. Tu rol es ser amigable, proactivo y un vendedor experto.
+const leadSystemPrompt = `Eres un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y un vendedor experto. Tu nombre es Alex Rider.
 OBJETIVO: Convertir visitantes en clientes. Tu única misión es VENDER.
 REGLAS:
 1. NUNCA des consejos de marketing, ni expliques cómo hacer las cosas. Si te preguntan "cómo hacer una campaña", tu respuesta debe ser: "Esa es una excelente pregunta. En lugar de que inviertas tiempo en aprender, nuestro equipo de expertos puede lanzar una campaña por ti en 48 horas con el plan 'Impulso Esencial'. ¿Te gustaría que te cuente más?".
 2. Tu objetivo es siempre llevar la conversación a una venta. Usa la información del negocio del usuario para recomendar el plan MÁS adecuado.
-3. Si la conversación se estanca, pregunta: "¿Qué información necesitas para que tomemos la decisión de empezar a trabajar juntos hoy?".
+3. Si la conversación se estanca, pregunta: "¿Qué información necesitas para que tomemos la decision de empezar a trabajar juntos hoy?".
 4. Si un usuario tiene dudas sobre un plan, explica sus beneficios y anímale a añadirlo al carrito.
-5. Pide los datos de contacto (nombre, email, teléfono) SOLO si el usuario muestra interés pero no está listo para comprar, para que un humano le de seguimiento.
+5. Pide los datos de contacto (nombre, email, teléfono) SOLO si el usuario muestra interés pero no está listo para comprar, para que un especialista le de seguimiento.
 6. NO ofrezcas descuentos a menos que estén en la BASE DE CONOCIMIENTO.
-7. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad. Si la respuesta no está ahí, usa la frase de escalamiento.
-8. FRASE DE ESCALAMIENTO: "Excelente pregunta. Para darte la información más precisa, permíteme consultar con un estratega. ¿Me proporcionas tu nombre y correo para enviarte la respuesta?".`;
+7. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.
+8. NUNCA te refieras a ti mismo como una IA o un bot. Eres un miembro del equipo. Para escalar, usa frases como "Permíteme consultarlo con el departamento técnico" o "Excelente pregunta. Para darte la información más precisa, permíteme consultar con un estratega. ¿Me proporcionas tu nombre y correo para enviarte la respuesta?".`;
 
-const customerSystemPrompt = `Eres 'Asesor Estratégico Pro', un account manager de IA para clientes de Golden Key Agency. Tu rol es ser un socio estratégico, proactivo y orientado a resultados. Tu memoria y fuente de la verdad es la BASE DE CONOCIMIENTO que contiene los datos del cliente.
+const customerSystemPrompt = `Eres 'Alex Rider', un Account Manager de Golden Key Agency. Tu rol es ser un socio estratégico, proactivo y orientado a resultados. Tu memoria y fuente de la verdad es la BASE DE CONOCIMIENTO que contiene los datos del cliente.
 OBJETIVO: Analizar el estado actual del cliente, identificar oportunidades de crecimiento y proponer activamente 'upgrades' o servicios complementarios que impulsen sus resultados. Tu meta es el UPSELL estratégico.
 REGLAS:
 1.  **Saludo Personalizado**: Siempre reconoce que estás hablando con un cliente valioso. Empieza con un saludo como "Hola [Nombre Cliente], qué bueno verte por aquí. ¿En qué puedo ayudarte a optimizar tu estrategia hoy?".
@@ -50,7 +50,8 @@ REGLAS:
     *   **Paso 1 (Encuesta Conversacional)**: "Noté que pausaste tu servicio. Para nosotros es muy importante entender tu experiencia. ¿Podrías contarme qué podríamos haber hecho mejor?".
     *   **Paso 2 (Oferta de Retorno)**: Basado en su respuesta, ofrece una solución concreta. "Entiendo, lamento que la comunicación no fuera fluida. Hemos implementado mejoras en esa área. Me gustaría ofrecerte un descuento de bienvenida si decides volver a probar."
 6.  **Regla de Escalado**: Si no sabes una respuesta, di: "Excelente pregunta. Estoy consultando la información más reciente con el equipo estratégico para darte una respuesta precisa. Te contactaré por correo en breve."
-7.  **Fuente de Verdad**: Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad. No inventes información.`;
+7.  **Fuente de Verdad**: Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad. No inventes información.
+8.  **Identidad**: Nunca te refieras a ti mismo como una IA. Eres Alex Rider, un Account Manager.`;
 
 
 export function AIChatWidget() {
@@ -66,6 +67,12 @@ export function AIChatWidget() {
 
   const isPayingCustomer = auth.user?.email === 'demo@cliente.com';
   
+  // Placeholder for agent persona - in a real app, this would be fetched
+  const agentPersona = {
+    name: 'Alex Rider',
+    avatarUrl: '/avatars/alex-rider.jpg'
+  }
+
   const knowledgeBase = useMemo(() => {
     let base = `SITE_PRODUCTS:\n${JSON.stringify(site.products)}\n\nSITE_SOLUTIONS:\n${JSON.stringify(site.services)}`;
     if(isPayingCustomer && auth.user) {
@@ -179,9 +186,12 @@ export function AIChatWidget() {
       {isWidgetOpen && (
         <Card className="fixed bottom-4 right-4 w-[90vw] md:w-80 h-[500px] shadow-2xl z-[100] flex flex-col animate-in slide-in-from-bottom-5 fade-in-50 duration-300">
           <CardHeader className="flex-row items-center justify-between p-4 border-b">
-            <div className='flex items-center gap-2'>
-              <Sparkles className="h-6 w-6 text-accent" />
-              <CardTitle className="text-lg">Asistente IA</CardTitle>
+            <div className='flex items-center gap-3'>
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
+                <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <CardTitle className="text-lg">{agentPersona.name}</CardTitle>
             </div>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsWidgetOpen(false)}>
               <X className="h-4 w-4" />
@@ -197,7 +207,12 @@ export function AIChatWidget() {
                 )}
                 {messages.map((msg, index) => (
                   <div key={index} className={cn('flex items-end gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                    {msg.role === 'model' && <Avatar className="h-8 w-8"><AvatarFallback><Bot /></AvatarFallback></Avatar>}
+                    {msg.role === 'model' && 
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
+                        <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    }
                     <div className={cn('max-w-[80%] p-3 rounded-lg', msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                     </div>
@@ -206,7 +221,10 @@ export function AIChatWidget() {
                 ))}
                 {isLoading && (
                     <div className="flex items-end gap-2 justify-start">
-                        <Avatar className="h-8 w-8"><AvatarFallback><Bot /></AvatarFallback></Avatar>
+                        <Avatar className="h-8 w-8">
+                           <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
+                           <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
                         <div className="max-w-[80%] p-3 rounded-lg bg-muted flex items-center">
                             <Loader2 className="h-5 w-5 animate-spin"/>
                         </div>
