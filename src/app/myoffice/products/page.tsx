@@ -125,86 +125,54 @@ const SortableProductItem = ({ product, children }: { product: Product, children
 };
 
 export default function ProductsEditorPage() {
-  const { site, saveSite, setSite } = useSite();
-  const [draft, setDraft] = useState<SiteData['products']>(() => {
-    // Ensure every product has features
-    const productsWithFeatures = site.products.map(p => {
-        if (!p.features) {
-            p.features = JSON.parse(JSON.stringify(defaultFeatures));
-        } else {
-            const featureIds = p.features.map(f => f.id);
-            defaultFeatures.forEach(df => {
-                if (!featureIds.includes(df.id)) {
-                    p.features!.push(JSON.parse(JSON.stringify(df)));
-                }
-            });
-        }
-        return p;
-    });
-    return JSON.parse(JSON.stringify(productsWithFeatures));
-  });
-  
+  const { site, setSite, setHasUnsavedChanges } = useSite();
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
   const [openAccordionItem, setOpenAccordionItem] = useState<string | undefined>();
 
   const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
-
-  useEffect(() => {
-    const productsWithFeatures = site.products.map(p => {
-        if (!p.features) {
-            p.features = JSON.parse(JSON.stringify(defaultFeatures));
-        } else {
-            const featureIds = p.features.map(f => f.id);
-            defaultFeatures.forEach(df => {
-                if (!featureIds.includes(df.id)) {
-                    p.features!.push(JSON.parse(JSON.stringify(df)));
-                }
-            });
-        }
-        return p;
-    });
-    setDraft(JSON.parse(JSON.stringify(productsWithFeatures)));
-  }, [site.products]);
-
-
-  const handleUpdate = (updater: (currentDraft: Product[]) => Product[]) => {
-    setDraft(updater);
+  
+  const handleUpdate = (updater: (currentDraft: SiteData) => SiteData) => {
+    setSite(updater);
+    setHasUnsavedChanges(true);
   };
   
   const handleProductUpdate = (id: string, field: keyof Product, value: any, isMultilingual: boolean) => {
-    handleUpdate(prev => 
-        prev.map(p => {
-          if (p.id === id) {
-            if (isMultilingual) {
-              const multilingualValue = p[field as keyof Product] as MultilingualString;
-              return { ...p, [field]: { ...multilingualValue, [langCode]: value } };
-            }
-            return { ...p, [field]: value };
+    handleUpdate(prev => ({
+      ...prev,
+      products: prev.products.map(p => {
+        if (p.id === id) {
+          if (isMultilingual) {
+            const multilingualValue = p[field as keyof Product] as MultilingualString;
+            return { ...p, [field]: { ...multilingualValue, [langCode]: value } };
           }
-          return p;
-        })
-    );
+          return { ...p, [field]: value };
+        }
+        return p;
+      })
+    }));
   };
 
   const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
-    handleUpdate(prev => 
-        prev.map(p => {
-            if (p.id === productId && p.features) {
-                const newFeatures = p.features.map(f => 
-                    f.id === featureId ? { ...f, enabled } : f
-                );
-                return { ...p, features: newFeatures };
-            }
-            return p;
-        })
-    );
+    handleUpdate(prev => ({
+      ...prev,
+      products: prev.products.map(p => {
+          if (p.id === productId && p.features) {
+              const newFeatures = p.features.map(f => 
+                  f.id === featureId ? { ...f, enabled } : f
+              );
+              return { ...p, features: newFeatures };
+          }
+          return p;
+      })
+    }));
   };
 
   const handleFeatureStageChange = (productId: string, featureId: string, stage: ProductFeature['stage']) => {
-     handleUpdate(prev => 
-        prev.map(p => {
+     handleUpdate(prev => ({
+        ...prev,
+        products: prev.products.map(p => {
             if (p.id === productId && p.features) {
                 const newFeatures = p.features.map(f => 
                     f.id === featureId ? { ...f, stage } : f
@@ -213,7 +181,7 @@ export default function ProductsEditorPage() {
             }
             return p;
         })
-    );
+    }));
   }
 
   const addNewProduct = () => {
@@ -229,17 +197,13 @@ export default function ProductsEditorPage() {
         description: { en: 'Detailed description of the new plan.', es: 'Descripción detallada del nuevo plan.', fr: 'Description détaillée du nouveau forfait.' },
         features: JSON.parse(JSON.stringify(defaultFeatures))
     };
-    handleUpdate(prev => [newProduct, ...prev]);
+    handleUpdate(prev => ({ ...prev, products: [newProduct, ...prev.products] }));
     setOpenAccordionItem(newId);
   };
 
   const removeProduct = (id: string) => {
-    handleUpdate(prev => prev.filter(p => p.id !== id));
+    handleUpdate(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id) }));
   }
-
-  const handleSaveChanges = () => {
-    saveSite({ ...site, products: draft });
-  };
   
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -251,10 +215,13 @@ export default function ProductsEditorPage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      handleUpdate(items => {
-        const oldIndex = items.findIndex(p => p.id === active.id);
-        const newIndex = items.findIndex(p => p.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
+      handleUpdate(prevSite => {
+        const oldIndex = prevSite.products.findIndex(p => p.id === active.id);
+        const newIndex = prevSite.products.findIndex(p => p.id === over.id);
+        return {
+          ...prevSite,
+          products: arrayMove(prevSite.products, oldIndex, newIndex),
+        };
       });
     }
   };
@@ -280,7 +247,7 @@ export default function ProductsEditorPage() {
       <Card>
         <CardContent className="p-0">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={draft.map(p => p.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={site.products.map(p => p.id)} strategy={verticalListSortingStrategy}>
               <Accordion 
                   type="single" 
                   collapsible 
@@ -288,7 +255,7 @@ export default function ProductsEditorPage() {
                   value={openAccordionItem}
                   onValueChange={setOpenAccordionItem}
               >
-                {draft.map(product => (
+                {site.products.map(product => (
                   <SortableProductItem key={product.id} product={product}>
                     <AccordionItem value={product.id} className="border-b last:border-b-0">
                         <div className="flex items-center justify-between px-6 py-4 hover:bg-muted/50">
@@ -386,11 +353,6 @@ export default function ProductsEditorPage() {
           </DndContext>
         </CardContent>
       </Card>
-      <div className="flex justify-end">
-        <Button onClick={handleSaveChanges}><Save className="mr-2"/>{t.saveChanges}</Button>
-      </div>
     </div>
   );
 }
-
-    

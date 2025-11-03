@@ -79,7 +79,7 @@ const labels = {
 
 
 export default function BrandEditorPage() {
-  const { site, saveSite } = useSite();
+  const { site, setSite, setHasUnsavedChanges } = useSite();
   const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
   const { language } = useLanguage();
   const langCode = language.code;
@@ -88,10 +88,6 @@ export default function BrandEditorPage() {
   useEffect(() => {
     setDraft(JSON.parse(JSON.stringify(site)));
   }, [site]);
-
-  const handleSaveChanges = async () => {
-    saveSite(draft);
-  };
   
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -100,7 +96,8 @@ export default function BrandEditorPage() {
     const reader = new FileReader();
     reader.onload = (event) => {
         const url = event.target?.result as string;
-        setDraft(prev => ({ ...prev, brand: { ...prev.brand, heroImage: url } }));
+        setSite(prev => ({ ...prev, brand: { ...prev.brand, heroImage: url } }));
+        setHasUnsavedChanges(true);
     };
     reader.readAsDataURL(file);
   };
@@ -109,8 +106,8 @@ export default function BrandEditorPage() {
     document.getElementById('heroImagePicker')?.click();
   }
 
-  const handleTextChange = (field: keyof SiteData['brand'], subField: 'name' | 'tagline' | 'heroTitle' | 'heroSubtitle', value: string) => {
-    setDraft(prev => ({
+  const handleTextChange = (subField: 'name' | 'tagline' | 'heroTitle' | 'heroSubtitle', value: string) => {
+    setSite(prev => ({
         ...prev,
         brand: {
             ...prev.brand,
@@ -120,6 +117,7 @@ export default function BrandEditorPage() {
             }
         }
     }));
+    setHasUnsavedChanges(true);
   };
 
   return (
@@ -140,8 +138,8 @@ export default function BrandEditorPage() {
                 <CardDescription>{t.brandDetailsSubtitle}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div><Label>{t.brandNameLabel}</Label><Input value={draft.brand.name[langCode]} onChange={e => handleTextChange('brand', 'name', e.target.value)} /></div>
-                <div><Label>{t.taglineLabel}</Label><Input value={draft.brand.tagline[langCode]} onChange={e => handleTextChange('brand', 'tagline', e.target.value)} /></div>
+                <div><Label>{t.brandNameLabel}</Label><Input value={site.brand.name[langCode]} onChange={e => handleTextChange('name', e.target.value)} /></div>
+                <div><Label>{t.taglineLabel}</Label><Input value={site.brand.tagline[langCode]} onChange={e => handleTextChange('tagline', e.target.value)} /></div>
             </CardContent>
         </Card>
 
@@ -152,15 +150,15 @@ export default function BrandEditorPage() {
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                    <div><Label>{t.heroTitleLabel}</Label><Input value={draft.brand.heroTitle[langCode]} onChange={e => handleTextChange('brand', 'heroTitle', e.target.value)} /></div>
-                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea value={draft.brand.heroSubtitle[langCode]} onChange={e => handleTextChange('brand', 'heroSubtitle', e.target.value)} rows={5} /></div>
+                    <div><Label>{t.heroTitleLabel}</Label><Input value={site.brand.heroTitle[langCode]} onChange={e => handleTextChange('heroTitle', e.target.value)} /></div>
+                    <div><Label>{t.heroSubtitleLabel}</Label><Textarea value={site.brand.heroSubtitle[langCode]} onChange={e => handleTextChange('heroSubtitle', e.target.value)} rows={5} /></div>
                 </div>
                  <div className="space-y-2">
                     <Label>{t.heroImageLabel}</Label>
                     <Card className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed">
-                      {draft.brand.heroImage ? (
+                      {site.brand.heroImage ? (
                           <div className="relative h-full w-full">
-                              <Image src={draft.brand.heroImage} alt="Vista previa del Héroe" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="rounded-md object-contain p-2" />
+                              <Image src={site.brand.heroImage} alt="Vista previa del Héroe" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="rounded-md object-contain p-2" />
                           </div>
                       ) : (
                         <div className="text-center">
@@ -173,7 +171,7 @@ export default function BrandEditorPage() {
                         </div>
                       )}
                     </Card>
-                     {draft.brand.heroImage && (
+                     {site.brand.heroImage && (
                         <div className="text-center">
                             <Button variant="outline" size="sm" className="mt-2" onClick={triggerFilePicker}>
                                 <Upload className="mr-2"/>
@@ -185,10 +183,6 @@ export default function BrandEditorPage() {
                 </div>
             </CardContent>
         </Card>
-
-        <div className="flex justify-end gap-2">
-            <Button onClick={handleSaveChanges}><Save className="mr-2" /> {t.saveChanges}</Button>
-        </div>
     </div>
   );
 }

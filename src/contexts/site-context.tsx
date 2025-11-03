@@ -9,8 +9,9 @@ import { useToast } from '@/hooks/use-toast';
 interface SiteContextType {
   site: SiteData;
   setSite: React.Dispatch<React.SetStateAction<SiteData>>;
-  saveSite: (updatedSite: SiteData) => void;
   isMounted: boolean;
+  hasUnsavedChanges: boolean;
+  setHasUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
@@ -18,21 +19,15 @@ export const SiteContext = createContext<SiteContextType | undefined>(undefined)
 export function SiteProvider({ children }: { children: React.ReactNode }) {
   const [site, setSite] = useState<SiteData>(DEFAULT_SITE_CONTENT);
   const [isMounted, setIsMounted] = useState(false);
-  const { toast } = useToast();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
+    // We start with the default content from the file system.
+    setSite(DEFAULT_SITE_CONTENT);
     setIsMounted(true);
   }, []);
-
-  const saveSite = useCallback((updatedSite: SiteData) => {
-    setSite(updatedSite);
-    toast({
-        title: "¡Cambios guardados!",
-        description: "El contenido de tu sitio ha sido actualizado localmente. Estos cambios se escribirán permanentemente en el código fuente en la siguiente respuesta."
-    });
-  }, [toast]);
   
-  const value = useMemo(() => ({ site, setSite, saveSite, isMounted }), [site, saveSite, isMounted]);
+  const value = useMemo(() => ({ site, setSite, isMounted, hasUnsavedChanges, setHasUnsavedChanges }), [site, isMounted, hasUnsavedChanges]);
 
   if (!isMounted) {
     return null; 

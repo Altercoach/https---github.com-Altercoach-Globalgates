@@ -50,58 +50,71 @@ const labels = {
 };
 
 export default function ServicesEditorPage() {
-  const { site, setSite, saveSite } = useSite();
-  const [draft, setDraft] = useState<SiteData['services']>(() => JSON.parse(JSON.stringify(site.services)));
+  const { site, setSite, setHasUnsavedChanges } = useSite();
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
 
-  const handleUpdate = (updater: (draftServices: Service[]) => Service[]) => {
-    setDraft(updater);
+  const handleUpdate = (updater: (prevSite: SiteData) => SiteData) => {
+    setSite(updater);
+    setHasUnsavedChanges(true);
   };
   
   const handleTextUpdate = (serviceId: string, field: 'title', value: any) => {
-    handleUpdate(services => services.map(s => {
-      if (s.id === serviceId) {
-        const newTitle = { ...s.title, [langCode]: value };
-        return { ...s, title: newTitle };
-      }
-      return s;
+    handleUpdate(prev => ({
+        ...prev,
+        services: prev.services.map(s => {
+          if (s.id === serviceId) {
+            const newTitle = { ...s.title, [langCode]: value };
+            return { ...s, title: newTitle };
+          }
+          return s;
+        })
     }));
   };
   
   const handleVisibilityToggle = (serviceId: string, checked: boolean) => {
-    handleUpdate(services => services.map(s => 
-      s.id === serviceId ? { ...s, visible: checked } : s
-    ));
+    handleUpdate(prev => ({
+        ...prev,
+        services: prev.services.map(s => s.id === serviceId ? { ...s, visible: checked } : s)
+    }));
   };
 
   const handleBulletChange = (serviceId: string, bulletIndex: number, newText: string) => {
-    handleUpdate(services => services.map(s => {
-      if (s.id === serviceId) {
-        const newBullets = [...s.bullets];
-        newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
-        return { ...s, bullets: newBullets };
-      }
-      return s;
+    handleUpdate(prev => ({
+        ...prev,
+        services: prev.services.map(s => {
+            if (s.id === serviceId) {
+                const newBullets = [...s.bullets];
+                newBullets[bulletIndex] = { ...newBullets[bulletIndex], [langCode]: newText };
+                return { ...s, bullets: newBullets };
+            }
+            return s;
+        })
     }));
   };
 
   const addBullet = (serviceId: string) => {
-    handleUpdate(services => services.map(s => {
-      if(s.id === serviceId) {
-        return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New Feature', fr: 'Nouvelle fonctionnalité'}]}
-      }
-      return s;
+    handleUpdate(prev => ({
+        ...prev,
+        services: prev.services.map(s => {
+          if(s.id === serviceId) {
+            return {...s, bullets: [...s.bullets, { es: t.newFeature, en: 'New feature', fr: 'Nouvelle fonctionnalité'}]}
+          }
+          return s;
+        })
     }));
   };
 
   const removeBullet = (serviceId: string, bulletIndex: number) => {
-    handleUpdate(services => services.map(s => {
-      if(s.id === serviceId) {
-        return {...s, bullets: s.bullets.filter((_, i) => i !== bulletIndex)}
-      }
-      return s;
+    handleUpdate(prev => ({
+        ...prev,
+        services: prev.services.map(s => {
+            if(s.id === serviceId) {
+                return {...s, bullets: s.bullets.filter((_, i) => i !== bulletIndex)}
+            }
+            return s;
+        })
     }));
   };
 
@@ -112,17 +125,12 @@ export default function ServicesEditorPage() {
       title: { es: 'Nueva Solución', en: 'New Solution', fr: 'Nouvelle Solution' },
       bullets: [{ es: 'Nueva característica', en: 'New feature', fr: 'Nouvelle fonctionnalité' }]
     };
-    handleUpdate(services => [...services, newService]);
+    handleUpdate(prev => ({ ...prev, services: [...prev.services, newService] }));
   };
 
   const removeService = (serviceId: string) => {
-    handleUpdate(services => services.filter(s => s.id !== serviceId));
+    handleUpdate(prev => ({ ...prev, services: prev.services.filter(s => s.id !== serviceId) }));
   };
-
-  const handleSaveChanges = () => {
-    saveSite({ ...site, services: draft });
-  };
-
 
   return (
     <div className="space-y-6">
@@ -143,7 +151,7 @@ export default function ServicesEditorPage() {
       </Alert>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {draft.map((service) => (
+        {site.services.map((service) => (
           <Card key={service.id}>
             <CardHeader>
                <div className="flex items-start justify-between gap-2">
@@ -188,11 +196,6 @@ export default function ServicesEditorPage() {
           </Card>
         ))}
       </div>
-      <div className="flex justify-end">
-        <Button onClick={handleSaveChanges}>{t.saveChanges}</Button>
-      </div>
     </div>
   );
 }
-
-    

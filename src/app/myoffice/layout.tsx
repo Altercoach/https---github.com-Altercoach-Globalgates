@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -36,7 +36,8 @@ const labels = {
     logout: "Cerrar Sesión",
     viewSite: "Ver Sitio",
     redirecting: "Redirigiendo...",
-    loadingOffice: "Cargando Oficina..."
+    loadingOffice: "Cargando Oficina...",
+    reviewAndSave: "Revisar y Guardar Cambios"
   },
   en: {
     brand: "Brand",
@@ -51,7 +52,8 @@ const labels = {
     logout: "Logout",
     viewSite: "View Site",
     redirecting: "Redirecting...",
-    loadingOffice: "Loading Office..."
+    loadingOffice: "Loading Office...",
+    reviewAndSave: "Review & Save Changes"
   },
   fr: {
     brand: "Marque",
@@ -66,7 +68,8 @@ const labels = {
     logout: "Se déconnecter",
     viewSite: "Voir le site",
     redirecting: "Redirection...",
-    loadingOffice: "Chargement du bureau..."
+    loadingOffice: "Chargement du bureau...",
+    reviewAndSave: "Réviser et Enregistrer"
   }
 };
 
@@ -78,7 +81,7 @@ export default function MyOfficeLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { site } = useSite();
+  const { site, hasUnsavedChanges } = useSite();
   const { auth, logout } = useAuth();
   const { language, translatedSite } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
@@ -166,12 +169,20 @@ export default function MyOfficeLayout({
             </Button>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-muted/20">
+        <main className="relative flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-muted/20">
           {children}
+          {hasUnsavedChanges && (
+            <div className="fixed bottom-6 right-6 z-50 animate-in fade-in-50 slide-in-from-bottom-5">
+              <Button size="lg" asChild>
+                <Link href="/myoffice/review-and-save">
+                  <Save className="mr-2" />
+                  {t.reviewAndSave}
+                </Link>
+              </Button>
+            </div>
+          )}
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
-
-    
