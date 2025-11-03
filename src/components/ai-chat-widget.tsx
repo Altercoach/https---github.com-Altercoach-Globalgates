@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Bot, Send, X, Loader2, User, Sparkles } from 'lucide-react';
+import { Bot, Send, X, Loader2, User, Sparkles, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,7 +24,7 @@ type Message = {
   content: string;
 };
 
-const leadSystemPrompt = `Eres un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y un vendedor experto. Tu nombre es Alex Rider.
+const leadSystemPrompt = `Eres '[Agent Name]', un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y un vendedor experto.
 OBJETIVO: Convertir visitantes en clientes. Tu única misión es VENDER.
 REGLAS:
 1. NUNCA des consejos de marketing, ni expliques cómo hacer las cosas. Si te preguntan "cómo hacer una campaña", tu respuesta debe ser: "Esa es una excelente pregunta. En lugar de que inviertas tiempo en aprender, nuestro equipo de expertos puede lanzar una campaña por ti en 48 horas con el plan 'Impulso Esencial'. ¿Te gustaría que te cuente más?".
@@ -36,7 +36,7 @@ REGLAS:
 7. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.
 8. NUNCA te refieras a ti mismo como una IA o un bot. Eres un miembro del equipo. Para escalar, usa frases como "Permíteme consultarlo con el departamento técnico" o "Excelente pregunta. Para darte la información más precisa, permíteme consultar con un estratega. ¿Me proporcionas tu nombre y correo para enviarte la respuesta?".`;
 
-const customerSystemPrompt = `Eres 'Alex Rider', un Account Manager de Golden Key Agency. Tu rol es ser un socio estratégico, proactivo y orientado a resultados. Tu memoria y fuente de la verdad es la BASE DE CONOCIMIENTO que contiene los datos del cliente.
+const customerSystemPrompt = `Eres '[Agent Name]', un Account Manager de Golden Key Agency. Tu rol es ser un socio estratégico, proactivo y orientado a resultados. Tu memoria y fuente de la verdad es la BASE DE CONOCIMIENTO que contiene los datos del cliente.
 OBJETIVO: Analizar el estado actual del cliente, identificar oportunidades de crecimiento y proponer activamente 'upgrades' o servicios complementarios que impulsen sus resultados. Tu meta es el UPSELL estratégico.
 REGLAS:
 1.  **Saludo Personalizado**: Siempre reconoce que estás hablando con un cliente valioso. Empieza con un saludo como "Hola [Nombre Cliente], qué bueno verte por aquí. ¿En qué puedo ayudarte a optimizar tu estrategia hoy?".
@@ -67,11 +67,8 @@ export function AIChatWidget() {
 
   const isPayingCustomer = auth.user?.email === 'demo@cliente.com';
   
-  // Placeholder for agent persona - in a real app, this would be fetched
-  const agentPersona = {
-    name: 'Alex Rider',
-    avatarUrl: '/avatars/alex-rider.jpg'
-  }
+  const { agentPersona } = site;
+  const agentName = `${agentPersona.firstName} ${agentPersona.lastName}`;
 
   const knowledgeBase = useMemo(() => {
     let base = `SITE_PRODUCTS:\n${JSON.stringify(site.products)}\n\nSITE_SOLUTIONS:\n${JSON.stringify(site.services)}`;
@@ -93,14 +90,16 @@ export function AIChatWidget() {
   
   const systemPrompt = useMemo(() => {
     const isRegisteredButNotPaying = auth.loggedIn && auth.user?.role === 'customer' && !isPayingCustomer;
-    const prompt = isPayingCustomer ? customerSystemPrompt : leadSystemPrompt;
+    let prompt = isPayingCustomer ? customerSystemPrompt : leadSystemPrompt;
     
-    let finalPrompt = prompt.replace(/Golden Key Agency/g, getTranslation(site.brand.name));
+    prompt = prompt.replace(/\[Agent Name\]/g, agentName);
+    prompt = prompt.replace(/Golden Key Agency/g, getTranslation(site.brand.name));
+    
     if(isPayingCustomer && auth.user) {
-        finalPrompt = finalPrompt.replace('[Nombre Cliente]', auth.user.email);
+        prompt = prompt.replace('[Nombre Cliente]', auth.user.email);
     }
-    return finalPrompt;
-  }, [isPayingCustomer, auth.loggedIn, auth.user, site.brand.name, getTranslation]);
+    return prompt;
+  }, [isPayingCustomer, auth.loggedIn, auth.user, site.brand.name, getTranslation, agentName]);
 
   useEffect(() => {
     if (isWidgetOpen && initialMessage) {
@@ -175,10 +174,13 @@ export function AIChatWidget() {
       {/* Chat Bubble */}
       {!isWidgetOpen && (
         <Button
-          className="fixed bottom-4 right-4 h-16 w-16 rounded-full shadow-lg z-[100] flex items-center justify-center"
+          className="fixed bottom-4 right-4 h-16 w-16 rounded-full shadow-lg z-[99] flex items-center justify-center p-0 overflow-hidden"
           onClick={() => setIsWidgetOpen(true)}
         >
-          <Bot className="h-8 w-8" />
+          <Avatar className="h-full w-full">
+            <AvatarImage src={agentPersona.avatar} alt={agentName} />
+            <AvatarFallback>{agentPersona.firstName.charAt(0)}</AvatarFallback>
+          </Avatar>
         </Button>
       )}
 
@@ -188,13 +190,13 @@ export function AIChatWidget() {
           <CardHeader className="flex-row items-center justify-between p-4 border-b">
             <div className='flex items-center gap-3'>
               <Avatar className="h-9 w-9">
-                <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
-                <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={agentPersona.avatar} alt={agentName} />
+                <AvatarFallback>{agentPersona.firstName.charAt(0)}</AvatarFallback>
               </Avatar>
-              <CardTitle className="text-lg">{agentPersona.name}</CardTitle>
+              <CardTitle className="text-lg">{agentName}</CardTitle>
             </div>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsWidgetOpen(false)}>
-              <X className="h-4 w-4" />
+              <ChevronDown className="h-5 w-5" />
             </Button>
           </CardHeader>
           <CardContent className="flex-1 p-0 overflow-hidden">
@@ -209,8 +211,8 @@ export function AIChatWidget() {
                   <div key={index} className={cn('flex items-end gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
                     {msg.role === 'model' && 
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
-                        <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={agentPersona.avatar} alt={agentName} />
+                        <AvatarFallback>{agentPersona.firstName.charAt(0)}</AvatarFallback>
                       </Avatar>
                     }
                     <div className={cn('max-w-[80%] p-3 rounded-lg', msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
@@ -222,8 +224,8 @@ export function AIChatWidget() {
                 {isLoading && (
                     <div className="flex items-end gap-2 justify-start">
                         <Avatar className="h-8 w-8">
-                           <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
-                           <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                           <AvatarImage src={agentPersona.avatar} alt={agentName} />
+                           <AvatarFallback>{agentPersona.firstName.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="max-w-[80%] p-3 rounded-lg bg-muted flex items-center">
                             <Loader2 className="h-5 w-5 animate-spin"/>

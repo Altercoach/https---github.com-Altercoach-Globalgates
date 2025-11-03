@@ -10,6 +10,7 @@ import { Bot, Send, User, AlertTriangle, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/use-language';
 import { Badge } from '@/components/ui/badge';
+import { useSite } from '@/hooks/use-site';
 
 const labels = {
   es: {
@@ -72,13 +73,11 @@ const chatHistory = [
 export default function CrmPage() {
     const [selectedConversation, setSelectedConversation] = useState(conversations[1]);
     const { language } = useLanguage();
+    const { site } = useSite();
     const t = labels[language.code as keyof typeof labels] || labels.en;
     
-    // Placeholder for agent persona - in a real app, this would be fetched
-    const agentPersona = {
-        name: 'Alex Rider',
-        avatarUrl: '/avatars/alex-rider.jpg'
-    }
+    const agentName = `${site.agentPersona.firstName} ${site.agentPersona.lastName}`;
+    const agentAvatar = site.agentPersona.avatar;
 
     return (
         <div className="flex flex-col h-full">
@@ -162,8 +161,8 @@ export default function CrmPage() {
                                         </div>
                                          {!isUser && 
                                             <Avatar className="h-8 w-8">
-                                                <AvatarImage src={agentPersona.avatarUrl} alt={agentPersona.name} />
-                                                <AvatarFallback>{agentPersona.name.charAt(0)}</AvatarFallback>
+                                                <AvatarImage src={agentAvatar} alt={agentName} />
+                                                <AvatarFallback>{site.agentPersona.firstName.charAt(0)}</AvatarFallback>
                                             </Avatar>
                                          }
                                     </div>

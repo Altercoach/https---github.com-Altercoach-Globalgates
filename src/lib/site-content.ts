@@ -31,6 +31,11 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       slate: '#111315',
     },
   },
+  agentPersona: {
+    firstName: 'Alex',
+    lastName: 'Rider',
+    avatar: '/avatars/alex-rider.jpg',
+  },
   services: [
     { 
       id: 'svc-social-media', 
@@ -90,7 +95,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       note: { es: 'Gestión elite para una red social clave. Ideal para arrancar.', en: 'Elite management for one key social network. Ideal to start.', fr: 'Gestion élite pour un réseau social clé. Idéal pour démarrer.'},
       description: { es: 'Servicio de manejo de perfiles en redes sociales, combinando creatividad humana con IA predictiva. Un community manager dedicado crea contenido personalizado, mientras un especialista en campañas optimiza ads para máximo ROI.', en: 'Social media profile management service, combining human creativity with predictive AI. A dedicated community manager creates personalized content, while a campaign specialist optimizes ads for maximum ROI.', fr: 'Service de gestion de profils de réseaux sociaux, alliant créativité humaine et IA prédictive. Un community manager dédié crée du contenu personnalisé, tandis qu\'un spécialiste des campagnes optimise les publicités pour un ROI maximal.' },
       longDescription: { es: 'Este es nuestro servicio estrella para manejar perfiles en redes sociales de manera elite. Reduce tu carga operativa en 80%, permitiendo enfocarte en tu negocio principal, mientras nuestra IA analiza datos históricos para sugerir ajustes automáticos, logrando hasta 30% más crecimiento orgánico que estrategias manuales.', en: 'This is our flagship service for elite social media profile management. It reduces your operational load by 80%, allowing you to focus on your core business, while our AI analyzes historical data to suggest automatic adjustments, achieving up to 30% more organic growth than manual strategies.', fr: 'C\'est notre service phare pour une gestion d\'élite des profils de réseaux sociaux. Il réduit votre charge opérationnelle de 80%, vous permettant de vous concentrer sur votre cœur de métier, tandis que notre IA analyse les données historiques pour suggérer des ajustements automatiques, réalisant jusqu\'à 30% de croissance organique en plus que les stratégies manuelles.'},
-      whatIncludes: {es: '- Parrilla de contenido mensual (15 diseños, hasta 6 videos).\n- Respuestas a mensajes y comentarios (L-V 9-17h, 24/7 con IA básica).\n- 2 propuestas de campañas publicitarias iniciales.\n- Reporte mensual detallado con métricas y recomendaciones IA.', en: '- Monthly content schedule (15 designs, up to 6 videos).\n- Responses to messages and comments (Mon-Fri 9-5, 24/7 with basic AI).\n- 2 initial ad campaign proposals.\n- Detailed monthly report with metrics and AI recommendations.', fr: '- Calendrier de contenu mensuel (15 conceptions, jusqu\'à 6 vidéos).\n- Réponses aux messages et commentaires (Lun-Ven 9-17h, 24/7 avec IA de base).\n- 2 propositions initiales de campagnes publicitaires.\n- Rapport mensuel détaillé avec métriques et recommandations IA.'},
+      whatIncludes: {es: '- Parrilla de contenido mensual (15 diseños, hasta 6 videos).\n- Respuestas a mensajes y comentarios (L-V 9-17h, 24/7 con IA básica).\n- 2 propuestas de campañas publicitaires iniciales.\n- Reporte mensual detallado con métricas y recomendaciones IA.', en: '- Monthly content schedule (15 designs, up to 6 videos).\n- Responses to messages and comments (Mon-Fri 9-5, 24/7 with basic AI).\n- 2 initial ad campaign proposals.\n- Detailed monthly report with metrics and AI recommendations.', fr: '- Calendrier de contenu mensuel (15 conceptions, jusqu\'à 6 vidéos).\n- Réponses aux messages et commentaires (Lun-Ven 9-17h, 24/7 avec IA de base).\n- 2 propositions initiales de campagnes publicitaires.\n- Rapport mensuel détaillé avec métriques et recommandations IA.'},
       whatFor: {es: 'Ideal para negocios que quieren visibilidad constante sin equipo interno, como tiendas online o servicios locales. Aumenta reservas, seguidores y conversión a ventas reales.', en: 'Ideal for businesses that want constant visibility without an in-house team, such as online stores or local services. Increases bookings, followers, and conversion to real sales.', fr: 'Idéal pour les entreprises qui veulent une visibilité constante sans équipe interne, comme les boutiques en ligne ou les services locaux. Augmente les réservations, les abonnés et la conversion en ventes réelles.'}
     },
     { 
@@ -244,5 +249,3 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     },
   ],
 };
-
-    

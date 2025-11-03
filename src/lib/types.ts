@@ -49,10 +49,17 @@ export type SiteBrand = {
   };
 };
 
+export type AgentPersona = {
+  firstName: string;
+  lastName: string;
+  avatar: string; // URL to the avatar image
+};
+
 export type SiteData = {
   brand: SiteBrand;
   services: Service[];
   products: Product[];
+  agentPersona: AgentPersona;
 };
 
 export type CartItem = {

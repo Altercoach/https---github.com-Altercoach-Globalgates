@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon } f
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
+import { useSite } from '@/hooks/use-site';
 
 const labels = {
   es: {
@@ -86,7 +87,7 @@ const labels = {
   }
 };
 
-const defaultSystemPrompt = `Eres 'Alex', un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y muy eficiente.
+const defaultSystemPrompt = `Eres '[Agent Name]', un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y muy eficiente.
 OBJETIVO: Convertir visitantes en leads calificados y resolver dudas de primer nivel.
 REGLAS:
 1. SIEMPRE pide nombre, email y teléfono para registrar un lead.
@@ -105,12 +106,10 @@ Promoción actual: 10% de descuento en el plan 'Portal Maestro Digital' para nue
 export default function AgentConfigPage() {
     const { toast } = useToast();
     const { language } = useLanguage();
+    const { site, setSite, setHasUnsavedChanges } = useSite();
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
     const [isActive, setIsActive] = useState(true);
-    const [agentName, setAgentName] = useState('Alex');
-    const [agentLastName, setAgentLastName] = useState('Rider');
-    const [agentAvatar, setAgentAvatar] = useState('/avatars/alex-rider.jpg');
     const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt);
     const [knowledgeBase, setKnowledgeBase] = useState(defaultKnowledgeBase);
     const [apiKey, setApiKey] = useState('wh_xxxxxxxx');
@@ -126,15 +125,18 @@ export default function AgentConfigPage() {
         const reader = new FileReader();
         reader.onload = (event) => {
             const url = event.target?.result as string;
-            setAgentAvatar(url);
+            setSite(prev => ({ ...prev, agentPersona: { ...prev.agentPersona, avatar: url } }));
+            setHasUnsavedChanges(true);
         };
         reader.readAsDataURL(file);
     };
 
-    const saveChanges = () => {
-        // Here you would save all the state to your backend/local storage
-        // For now, we just show a toast
-        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
+    const handleTextChange = (field: 'firstName' | 'lastName', value: string) => {
+        setSite(prev => ({
+            ...prev,
+            agentPersona: { ...prev.agentPersona, [field]: value }
+        }));
+        setHasUnsavedChanges(true);
     };
 
     return (
@@ -154,7 +156,7 @@ export default function AgentConfigPage() {
                         <Label>{t.agentAvatar}</Label>
                         <div className="relative w-32 h-32">
                            <Image 
-                             src={agentAvatar || `https://i.pravatar.cc/150?u=${agentName}`} 
+                             src={site.agentPersona.avatar || `https://i.pravatar.cc/150?u=${site.agentPersona.firstName}`} 
                              alt="Agent Avatar" 
                              width={128}
                              height={128}
@@ -168,11 +170,11 @@ export default function AgentConfigPage() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="agent-name">{t.agentFirstName}</Label>
-                                <Input id="agent-name" value={agentName} onChange={(e) => setAgentName(e.target.value)} />
+                                <Input id="agent-name" value={site.agentPersona.firstName} onChange={(e) => handleTextChange('firstName', e.target.value)} />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="agent-lastname">{t.agentLastName}</Label>
-                                <Input id="agent-lastname" value={agentLastName} onChange={(e) => setAgentLastName(e.target.value)} />
+                                <Input id="agent-lastname" value={site.agentPersona.lastName} onChange={(e) => handleTextChange('lastName', e.target.value)} />
                             </div>
                         </div>
                         <div className="flex items-center space-x-4 rounded-lg border p-4">
@@ -242,9 +244,7 @@ export default function AgentConfigPage() {
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end">
-                <Button onClick={saveChanges}><Save className="mr-2"/>{t.saveChanges}</Button>
-            </div>
+            {/* The save button is now handled by the floating "Review & Save" button in the layout */}
         </div>
     );
 }

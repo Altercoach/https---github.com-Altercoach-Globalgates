@@ -25,6 +25,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -78,6 +89,13 @@ const labels = {
     viewDetails: "Ver detalles",
     sendMessage: "Enviar mensaje",
     noResults: "No se encontraron resultados.",
+    confirmAction: "Confirmar Acción",
+    confirmDelete: "¿Estás seguro que quieres eliminar a",
+    clientsCount: "clientes?",
+    thisAction: "Esta acción",
+    cannotBeUndone: "no se puede deshacer.",
+    cancel: "Cancelar",
+    confirm: "Confirmar",
   },
   en: {
     pageTitle: "Business Administration",
@@ -115,6 +133,13 @@ const labels = {
     viewDetails: "View details",
     sendMessage: "Send message",
     noResults: "No results found.",
+    confirmAction: "Confirm Action",
+    confirmDelete: "Are you sure you want to delete",
+    clientsCount: "clients?",
+    thisAction: "This action",
+    cannotBeUndone: "cannot be undone.",
+    cancel: "Cancel",
+    confirm: "Confirm",
   },
   fr: {
     pageTitle: "Administration de l'Entreprise",
@@ -152,6 +177,13 @@ const labels = {
     viewDetails: "Voir les détails",
     sendMessage: "Envoyer un message",
     noResults: "Aucun résultat trouvé.",
+    confirmAction: "Confirmer l'action",
+    confirmDelete: "Êtes-vous sûr de vouloir supprimer",
+    clientsCount: "clients?",
+    thisAction: "Cette action",
+    cannotBeUndone: "ne peut pas être annulée.",
+    cancel: "Annuler",
+    confirm: "Confirmer",
   }
 };
 
@@ -240,6 +272,15 @@ export default function AdminDashboardPage() {
               return 'destructive';
       }
   }
+  
+  const BulkActionMenuItem = ({ action, icon, label, isDestructive = false }: { action: 'suspend' | 'activate' | 'delete', icon: React.ReactNode, label: string, isDestructive?: boolean }) => (
+    <AlertDialogTrigger asChild>
+        <DropdownMenuItem onSelect={e => e.preventDefault()} className={isDestructive ? "text-destructive" : ""}>
+            {icon} {label}
+        </DropdownMenuItem>
+    </AlertDialogTrigger>
+  );
+
 
   return (
     <div className="space-y-6">
@@ -320,20 +361,35 @@ export default function AdminDashboardPage() {
                 </SelectContent>
             </Select>
             <div className="ml-auto flex items-center gap-2">
-              <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                      <Button variant="outline" disabled={selectedCustomerIds.length === 0}>
-                          {t.actions} ({selectedCustomerIds.length})
-                      </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                      <DropdownMenuLabel>{t.bulkActions}</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => handleBulkAction('suspend')}><XCircle className="mr-2"/> {t.suspend}</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleBulkAction('activate')}><PlayCircle className="mr-2"/> {t.reactivate}</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive" onClick={() => handleBulkAction('delete')}><Trash2 className="mr-2"/> {t.delete}</DropdownMenuItem>
-                  </DropdownMenuContent>
-              </DropdownMenu>
+              <AlertDialog>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" disabled={selectedCustomerIds.length === 0}>
+                            {t.actions} ({selectedCustomerIds.length})
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuLabel>{t.bulkActions}</DropdownMenuLabel>
+                        <BulkActionMenuItem action="suspend" icon={<XCircle className="mr-2"/>} label={t.suspend} />
+                        <BulkActionMenuItem action="activate" icon={<PlayCircle className="mr-2"/>} label={t.reactivate} />
+                        <DropdownMenuSeparator />
+                        <BulkActionMenuItem action="delete" icon={<Trash2 className="mr-2"/>} label={t.delete} isDestructive />
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t.confirmAction}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t.confirmDelete} {selectedCustomerIds.length} {t.clientsCount} {t.thisAction} <strong>{t.cannotBeUndone}</strong>.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleBulkAction('delete')}>{t.confirm}</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </CardHeader>
