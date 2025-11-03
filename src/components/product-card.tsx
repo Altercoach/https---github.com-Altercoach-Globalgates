@@ -143,6 +143,9 @@ export function ProductCard({ product }: ProductCardProps) {
       <DialogContent className="sm:max-w-xl max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{productName}</DialogTitle>
+           <DialogDescription>
+            {productNote}
+          </DialogDescription>
           {productBadge && (
             <div className="mt-2">
               <Badge variant="outline" className="border-accent text-accent">{productBadge}</Badge>
