@@ -197,7 +197,7 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
       }
     };
     getAnalysis();
-  }, [isCompleted, isAgentTraining, language, currentAnswers, toast, t]);
+  }, [isCompleted, isAgentTraining, language.code, currentAnswers, toast, t]);
 
   const handleVisibilityToggle = (checked: boolean) => {
     setIsClientVisible(checked);
