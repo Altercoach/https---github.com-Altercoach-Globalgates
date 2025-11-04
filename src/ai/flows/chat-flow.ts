@@ -71,7 +71,7 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: 'googleai/gemini-pro' });
+    const { output } = await prompt({ ...input, history: augmentedHistory });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');

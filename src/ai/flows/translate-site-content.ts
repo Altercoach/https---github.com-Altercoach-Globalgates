@@ -51,7 +51,7 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const {output} = await prompt(input, { model: 'googleai/gemini-pro' });
+    const {output} = await prompt(input);
     return output || '{}';
   }
 );
