@@ -35,11 +35,11 @@ export default function ClientInstructionsPage() {
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">2. Crea tu Cuenta</h4>
-                                <p>Después de finalizar tu compra, serás dirigido a crear una cuenta. Este será tu acceso a tu panel de cliente personalizado donde gestionarás tus servicios.</p>
+                                <p>Puedes crear una cuenta de dos formas: 1) Después de finalizar una compra, serás dirigido a la página de registro. 2) Haciendo clic en "Regístrate Gratis" en la página principal. En ambos casos, tu cuenta te dará acceso a tu panel de cliente.</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">3. Usa tu Panel de Cliente</h4>
-                                <p>Una vez creada tu cuenta, accederás a tu Dashboard. Aquí verás acciones pendientes (como llenar cuestionarios), tus KPIs de marketing y los análisis estratégicos que preparamos para ti.</p>
+                                <p>Una vez creada tu cuenta, accederás a tu Dashboard. Si compraste un plan, verás tus KPIs de marketing y análisis. Si te registraste gratis, verás "Acciones Pendientes" (como llenar cuestionarios) para que podamos crear una estrategia para ti.</p>
                             </div>
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">4. Habla con tu Agente IA</h4>
