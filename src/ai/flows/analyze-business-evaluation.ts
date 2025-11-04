@@ -72,7 +72,7 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
     outputSchema: AnalyzeBusinessEvaluationOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: 'gemini-pro' });
+    const { output } = await prompt(input);
     if (!output) {
       throw new Error('The AI failed to generate an analysis.');
     }
