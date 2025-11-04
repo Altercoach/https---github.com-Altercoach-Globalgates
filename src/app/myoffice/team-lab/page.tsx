@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -69,88 +70,87 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                 </p>
             </header>
 
-            <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-3">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
-                        <CardDescription>
-                            Selecciona un cliente, añade instrucciones y genera una parrilla de contenido mensual. La IA usará los datos del cliente y tus notas.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid lg:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="client-select">Seleccionar Cliente</Label>
-                                <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                                    <SelectTrigger id="client-select">
-                                        <SelectValue placeholder="Elige un cliente..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {initialCustomers.map(customer => (
-                                            <SelectItem key={customer.id} value={customer.id}>
-                                                {customer.name} - ({customer.email})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="business-description">Instrucciones Adicionales para la IA</Label>
-                                <Textarea
-                                    id="business-description"
-                                    placeholder="Ej: Enfocarse en un diseño estético, analizar la competencia para el Buen Fin, etc."
-                                    value={additionalInstructions}
-                                    onChange={(e) => setAdditionalInstructions(e.target.value)}
-                                    rows={3}
-                                />
-                            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
+                    <CardDescription>
+                        Selecciona un cliente, añade instrucciones y genera una parrilla de contenido mensual. La IA usará los datos del cliente y tus notas.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid lg:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="client-select">Seleccionar Cliente</Label>
+                            <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                                <SelectTrigger id="client-select">
+                                    <SelectValue placeholder="Elige un cliente..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {initialCustomers.map(customer => (
+                                        <SelectItem key={customer.id} value={customer.id}>
+                                            {customer.name} - ({customer.email})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
-                        <Button onClick={handleGenerateSchedule} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Generando...
-                                </>
-                            ) : (
-                                "Generar Parrilla con IA"
-                            )}
-                        </Button>
+                        <div className="space-y-2">
+                            <Label htmlFor="business-description">Instrucciones Adicionales para la IA</Label>
+                            <Textarea
+                                id="business-description"
+                                placeholder="Ej: Enfocarse en un diseño estético, analizar la competencia para el Buen Fin, etc."
+                                value={additionalInstructions}
+                                onChange={(e) => setAdditionalInstructions(e.target.value)}
+                                rows={3}
+                            />
+                        </div>
+                    </div>
+                    <Button onClick={handleGenerateSchedule} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Generando...
+                            </>
+                        ) : (
+                            "Generar Parrilla con IA"
+                        )}
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {schedule && (
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Parrilla de Contenido Generada</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[50px]">Post</TableHead>
+                                    <TableHead>Formato</TableHead>
+                                    <TableHead>Tópico</TableHead>
+                                    <TableHead>Copy In (Ideas)</TableHead>
+                                    <TableHead>Copy Out (Publicación)</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {schedule.map((post) => (
+                                    <TableRow key={post.postNumber}>
+                                        <TableCell>{post.postNumber}</TableCell>
+                                        <TableCell>{post.format}</TableCell>
+                                        <TableCell>{post.topic}</TableCell>
+                                        <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyIn}</TableCell>
+                                        <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyOut}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
+            )}
 
-                {schedule && (
-                     <Card className="lg:col-span-3">
-                        <CardHeader>
-                            <CardTitle>Parrilla de Contenido Generada</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[50px]">Post</TableHead>
-                                        <TableHead>Formato</TableHead>
-                                        <TableHead>Tópico</TableHead>
-                                        <TableHead>Copy In (Ideas)</TableHead>
-                                        <TableHead>Copy Out (Publicación)</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {schedule.map((post) => (
-                                        <TableRow key={post.postNumber}>
-                                            <TableCell>{post.postNumber}</TableCell>
-                                            <TableCell>{post.format}</TableCell>
-                                            <TableCell>{post.topic}</TableCell>
-                                            <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyIn}</TableCell>
-                                            <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyOut}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                )}
-
-
+            <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="col-span-1 md:col-span-3">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Image /> Generador de Medios por IA</CardTitle>
