@@ -48,24 +48,6 @@ const prompt = ai.definePrompt({
       *   **Si la descripción es muy vaga o insuficiente para tomar una decisión informada:** No selecciones ningún producto (deja 'productIds' como un array vacío). En su lugar, formula una pregunta específica y amigable (en español) en el campo 'reasoning' para ayudar al usuario a proporcionar la información que necesitas. Por ejemplo, si dicen "quiero crecer", podrías preguntar: "¿Excelente! Para darte la mejor recomendación, ¿podrías decirme si tu prioridad es aumentar tus seguidores en redes sociales o capturar directamente datos de clientes potenciales (leads)?".
 
   4.  Devuelve tu respuesta en el formato solicitado.`,
-  safetySettings: [
-    {
-      category: 'HARM_CATEGORY_HATE_SPEECH',
-      threshold: 'BLOCK_ONLY_HIGH',
-    },
-    {
-      category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-      threshold: 'BLOCK_NONE',
-    },
-    {
-      category: 'HARM_CATEGORY_HARASSMENT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-    },
-    {
-      category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-      threshold: 'BLOCK_LOW_AND_ABOVE',
-    },
-  ],
 });
 
 const recommendPlanFlow = ai.defineFlow(
@@ -75,7 +57,7 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input, { model: 'googleai/gemini-pro' });
+    const {output} = await prompt(input, { model: 'gemini-pro' });
     return output!;
   }
 );

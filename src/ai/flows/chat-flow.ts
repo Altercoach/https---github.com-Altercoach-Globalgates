@@ -56,12 +56,6 @@ const prompt = ai.definePrompt({
   {{/each}}
   
   Assistant:`,
-  safetySettings: [
-    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
-    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-  ],
 });
 
 const chatFlow = ai.defineFlow(
@@ -77,7 +71,7 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: 'googleai/gemini-pro' });
+    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: 'gemini-pro' });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');

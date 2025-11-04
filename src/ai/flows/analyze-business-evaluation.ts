@@ -63,24 +63,6 @@ const prompt = ai.definePrompt({
   5.  **Language**: The entire output, including headings and all analysis text, MUST be in the target language: **{{{targetLanguage}}}**.
 
   6.  **Output Format:** Ensure your entire response is in the requested JSON format, with separate fields for the SWOT analysis and the recommendations.`,
-  safetySettings: [
-    {
-      category: 'HARM_CATEGORY_HATE_SPEECH',
-      threshold: 'BLOCK_ONLY_HIGH',
-    },
-    {
-      category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-      threshold: 'BLOCK_NONE',
-    },
-    {
-      category: 'HARM_CATEGORY_HARASSMENT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-    },
-    {
-      category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-      threshold: 'BLOCK_LOW_AND_ABOVE',
-    },
-  ],
 });
 
 const analyzeBusinessEvaluationFlow = ai.defineFlow(
@@ -90,7 +72,7 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
     outputSchema: AnalyzeBusinessEvaluationOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: 'googleai/gemini-pro' });
+    const { output } = await prompt(input, { model: 'gemini-pro' });
     if (!output) {
       throw new Error('The AI failed to generate an analysis.');
     }

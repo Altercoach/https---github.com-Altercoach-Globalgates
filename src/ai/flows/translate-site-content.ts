@@ -37,24 +37,6 @@ Here is the website content to translate from Spanish:
 {{{siteContent}}}
 
 **IMPORTANT**: Respond only with the translated JSON object as a string. Do not add any extra explanations, comments, or markdown formatting. The JSON structure must remain identical to the input.`,
-  safetySettings: [
-    {
-      category: 'HARM_CATEGORY_HATE_SPEECH',
-      threshold: 'BLOCK_ONLY_HIGH',
-    },
-    {
-      category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-      threshold: 'BLOCK_NONE',
-    },
-    {
-      category: 'HARM_CATEGORY_HARASSMENT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-    },
-    {
-      category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-      threshold: 'BLOCK_LOW_AND_ABOVE',
-    },
-  ],
 });
 
 const translateSiteContentFlow = ai.defineFlow(
@@ -69,7 +51,7 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const {output} = await prompt(input, { model: 'googleai/gemini-pro' });
+    const {output} = await prompt(input, { model: 'gemini-pro' });
     return output || '{}';
   }
 );

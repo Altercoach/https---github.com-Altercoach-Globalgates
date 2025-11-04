@@ -88,7 +88,7 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: 'googleai/gemini-pro' });
+    const { output } = await prompt(input, { model: 'gemini-pro' });
     if (!output) {
       throw new Error('The AI failed to generate a content schedule.');
     }
