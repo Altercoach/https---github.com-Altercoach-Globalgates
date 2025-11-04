@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, BookOpen } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, BookOpen, ArrowRight, Settings } from 'lucide-react';
 
 export default function AdminInstructionsPage() {
 
@@ -98,6 +98,60 @@ export default function AdminInstructionsPage() {
                         <p><strong>Crucial:</strong> Cualquier cambio realizado en las secciones de "Marca", "Soluciones" o "Planes" es temporal. Para hacerlos permanentes, debes ir a la página **"Revisar y Guardar"** (botón flotante) y usar el botón **"Guardar Cambios en el Código"**.</p>
                     </CardContent>
                 </Card>
+            </div>
+
+            <div className="mt-12">
+                <div className="text-center space-y-3 mb-12">
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
+                       Mapa Conceptual del Panel de Administración
+                    </h2>
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-8">
+                    {/* Left side: Site Config */}
+                    <Card className="border-primary">
+                        <CardHeader>
+                            <CardTitle>1. Configuración del Sitio (Contenido Público)</CardTitle>
+                            <CardDescription>Lo que editas aquí define lo que ven tus visitantes en la página principal. Los cambios son temporales hasta que los guardas.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className="flex flex-col gap-2 items-center">
+                                    <div className="p-3 bg-muted rounded-lg w-40 text-center"><Store className="mx-auto mb-1"/>Marca</div>
+                                    <div className="p-3 bg-muted rounded-lg w-40 text-center"><LayoutGrid className="mx-auto mb-1"/>Soluciones</div>
+                                    <div className="p-3 bg-muted rounded-lg w-40 text-center"><ShoppingBag className="mx-auto mb-1"/>Planes</div>
+                                </div>
+                                <ArrowRight className="h-8 w-8 text-muted-foreground shrink-0"/>
+                                <div className="p-3 bg-primary/10 border border-dashed border-primary rounded-lg text-center flex-1">
+                                    <p className="font-semibold">Página Principal</p>
+                                    <p className="text-sm text-muted-foreground">(Lo que ve el cliente)</p>
+                                </div>
+                                 <ArrowRight className="h-8 w-8 text-muted-foreground shrink-0"/>
+                                 <div className="p-3 bg-destructive/10 border border-destructive rounded-lg text-center w-40">
+                                    <KeyRound className="mx-auto mb-1 text-destructive"/>
+                                    <p className="font-semibold">Revisar y Guardar</p>
+                                    <p className="text-sm text-muted-foreground">(Paso final para guardar)</p>
+                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    
+                    {/* Right side: Business Management */}
+                     <Card className="border-accent">
+                        <CardHeader>
+                            <CardTitle>2. Gestión del Negocio (Operaciones Internas)</CardTitle>
+                            <CardDescription>Herramientas para administrar clientes, crear cuestionarios y supervisar a tu agente de IA.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                             <div className="p-3 bg-accent/10 rounded-lg text-center mb-2"><ShieldCheck className="mx-auto mb-1 text-accent"/> <span className="font-semibold">Admin:</span> Gestión de Clientes y KPIs</div>
+                             <div className="grid grid-cols-2 gap-4">
+                                <div className="p-3 bg-muted rounded-lg text-center"><MessageSquare className="mx-auto mb-1"/> <span className="font-semibold">CRM:</span> Supervisión de Chats</div>
+                                <div className="p-3 bg-muted rounded-lg text-center"><FileText className="mx-auto mb-1"/> <span className="font-semibold">Cuestionarios:</span> Onboarding de Clientes</div>
+                                <div className="p-3 bg-muted rounded-lg text-center col-span-2"><Puzzle className="mx-auto mb-1"/> <span className="font-semibold">Integraciones:</span> Configuración del Agente IA y Canales</div>
+                             </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     );

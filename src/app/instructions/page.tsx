@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, LifeBuoy } from 'lucide-react';
+import { BookOpen, Zap, LifeBuoy, Home, UserPlus, ShoppingCart, LogIn, LayoutDashboard, FileText, BarChart3, ArrowRight, ArrowDown } from 'lucide-react';
 
 export default function ClientInstructionsPage() {
 
@@ -76,6 +76,80 @@ export default function ClientInstructionsPage() {
                     </Card>
                 </div>
             </section>
+            
+            <section className="container mx-auto py-12 px-4 md:px-6">
+                <div className="text-center space-y-3 mb-12">
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">
+                        Ruta Visual del Cliente
+                    </h2>
+                    <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                       Sigue el flujo para entender cómo navegar desde el inicio hasta la gestión de tu cuenta.
+                    </p>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                    {/* Step 1: Homepage */}
+                    <Card className="w-fit max-w-sm text-center shadow-md">
+                        <CardHeader>
+                            <CardTitle className="flex flex-col items-center gap-2"><Home /> Página Principal</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                           <p className="text-sm">Explora soluciones y planes.</p>
+                        </CardContent>
+                    </Card>
+                    
+                    <ArrowDown className="h-8 w-8 text-muted-foreground my-4" />
+
+                    {/* Step 2: Two Paths */}
+                    <div className="flex flex-col md:flex-row gap-8 items-stretch">
+                        
+                        {/* Path A: Free Signup */}
+                        <div className="flex flex-col items-center">
+                           <Card className="w-64 text-center border-accent bg-accent/5">
+                               <CardHeader>
+                                   <CardTitle className="flex flex-col items-center gap-2 text-accent"><UserPlus/> Registro Gratis</CardTitle>
+                               </CardHeader>
+                               <CardContent>
+                                  <p className="text-sm">Crea una cuenta sin costo para una consulta.</p>
+                               </CardContent>
+                           </Card>
+                           <ArrowDown className="h-8 w-8 text-muted-foreground my-4" />
+                           <Card className="w-64 text-center">
+                               <CardHeader>
+                                   <CardTitle className="flex flex-col items-center gap-2"><FileText/> Panel con Tareas</CardTitle>
+                               </CardHeader>
+                               <CardContent>
+                                  <p className="text-sm">Recibes "Acciones Pendientes" para definir tu estrategia.</p>
+                               </CardContent>
+                           </Card>
+                        </div>
+                        
+                         {/* Path B: Purchase Plan */}
+                         <div className="flex flex-col items-center">
+                           <Card className="w-64 text-center border-primary bg-primary/5">
+                               <CardHeader>
+                                   <CardTitle className="flex flex-col items-center gap-2 text-primary"><ShoppingCart/> Compra de Plan</CardTitle>
+                               </CardHeader>
+                               <CardContent>
+                                  <p className="text-sm">Añade servicios al carrito y finaliza la compra.</p>
+                               </CardContent>
+                           </Card>
+                           <ArrowDown className="h-8 w-8 text-muted-foreground my-4" />
+                           <Card className="w-64 text-center">
+                               <CardHeader>
+                                   <CardTitle className="flex flex-col items-center gap-2"><BarChart3/> Panel con KPIs</CardTitle>
+                               </CardHeader>
+                               <CardContent>
+                                  <p className="text-sm">Desbloqueas tu dashboard con métricas y análisis de negocio.</p>
+                               </CardContent>
+                           </Card>
+                        </div>
+
+                    </div>
+                    
+                </div>
+            </section>
         </div>
     );
 }
+
