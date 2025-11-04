@@ -13,19 +13,22 @@ const labels = {
     rightsReserved: "Todos los derechos reservados.",
     home: "Página Principal",
     myOffice: "Mi Oficina",
-    login: "Iniciar Sesión"
+    login: "Iniciar Sesión",
+    instructions: "Instrucciones",
   },
   en: {
     rightsReserved: "All rights reserved.",
     home: "Home",
     myOffice: "My Office",
-    login: "Login"
+    login: "Login",
+    instructions: "Instructions",
   },
   fr: {
     rightsReserved: "Tous droits réservés.",
     home: "Accueil",
     myOffice: "Mon Bureau",
-    login: "Connexion"
+    login: "Connexion",
+    instructions: "Instructions",
   }
 };
 
@@ -48,6 +51,7 @@ export function Footer() {
         </div>
         <div className="flex items-center gap-2">
             <Button variant="ghost" asChild><Link href="/">{t.home}</Link></Button>
+            <Button variant="ghost" asChild><Link href="/instructions">{t.instructions}</Link></Button>
             {auth.user?.role === 'admin' ? (
                <Button variant="ghost" asChild><Link href="/myoffice">{t.myOffice}</Link></Button>
             ) : (

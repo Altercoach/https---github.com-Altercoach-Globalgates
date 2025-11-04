@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, Save } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, Save, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -28,9 +28,10 @@ const labels = {
     solutions: "Soluciones",
     plans: "Planes y Servicios",
     questionnaires: "Cuestionarios",
-    integrations: "Integraciones y Agente",
+    integrations: "Integraciones",
     admin: "Admin",
     crm: "CRM",
+    instructions: "Instrucciones",
     customerView: "Vista Cliente",
     loggedInAs: "Conectado como:",
     logout: "Cerrar Sesión",
@@ -44,9 +45,10 @@ const labels = {
     solutions: "Solutions",
     plans: "Plans & Services",
     questionnaires: "Questionnaires",
-    integrations: "Integrations & Agent",
+    integrations: "Integrations",
     admin: "Admin",
     crm: "CRM",
+    instructions: "Instructions",
     customerView: "Customer View",
     loggedInAs: "Logged in as:",
     logout: "Logout",
@@ -60,9 +62,10 @@ const labels = {
     solutions: "Solutions",
     plans: "Forfaits et Services",
     questionnaires: "Questionnaires",
-    integrations: "Intégrations et Agent",
+    integrations: "Intégrations",
     admin: "Admin",
     crm: "CRM",
+    instructions: "Instructions",
     customerView: "Vue Client",
     loggedInAs: "Connecté en tant que:",
     logout: "Se déconnecter",
@@ -101,6 +104,7 @@ export default function MyOfficeLayout({
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle />},
     { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck />},
     { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
+    { href: '/myoffice/instructions', label: t.instructions, icon: <BookOpen /> },
   ];
 
   if (auth.user?.role !== 'admin') {
