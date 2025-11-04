@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateContentScheduleInputSchema = z.object({
-  clientBusiness: z.string().describe("A brief description of the client's business, their target audience, and marketing goals."),
+  clientBusiness: z.string().describe("A description of the client's business, their purchased plan, and any specific instructions from the marketing team."),
 });
 export type GenerateContentScheduleInput = z.infer<typeof GenerateContentScheduleInputSchema>;
 
@@ -39,13 +39,13 @@ const prompt = ai.definePrompt({
   name: 'generateContentSchedulePrompt',
   input: { schema: GenerateContentScheduleInputSchema },
   output: { schema: GenerateContentScheduleOutputSchema },
-  prompt: `You are a world-class social media content strategist. Your task is to create a monthly content schedule (a "parrilla de contenido") for an Instagram account. You will generate a list of 10-12 post ideas.
+  prompt: `You are a world-class social media content strategist. Your task is to create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and specific instructions from the marketing team.
 
-  **Client's Business Description:**
+  **Client Information & Team Instructions:**
   {{{clientBusiness}}}
 
   **Your Task:**
-  Based on the client's business, create a diverse and engaging content schedule. For each post, you must define the following:
+  Based on the provided information, create a diverse and engaging content schedule. For each post, you must define the following:
   1.  **postNumber**: The sequential number of the post (e.g., "1", "2", "3-4").
   2.  **format**: The type of post. Choose from: 'Post fijo', 'Historia', 'Carrusel', 'Video'.
   3.  **topic**: The strategic theme. Choose from: 'Venta' (Sales), 'Branding', 'Dato curioso' (Fun Fact), 'Recomendación' (Recommendation), 'Interacción' (Interaction).
@@ -53,6 +53,7 @@ const prompt = ai.definePrompt({
   5.  **copyOut**: The final, ready-to-publish text for the post's caption. This should be engaging, well-written, and MUST include 3-4 relevant, popular hashtags.
 
   **Instructions & Tone:**
+  - Analyze the client's business and the team's instructions to tailor the content perfectly.
   - Create a balanced mix of formats and topics. Don't just make sales posts. Include branding, educational, and interactive content to build a community.
   - The 'copyIn' should be a clear instruction for a designer or video editor.
   - The 'copyOut' should be creative, persuasive, and reflect the brand's voice.

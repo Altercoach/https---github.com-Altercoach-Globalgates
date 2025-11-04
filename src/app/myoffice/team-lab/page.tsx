@@ -10,26 +10,40 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { initialCustomers } from '@/lib/constants';
 
 export default function TeamLabPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [schedule, setSchedule] = useState<ContentPost[] | null>(null);
-    const [businessDescription, setBusinessDescription] = useState('Gimnasio y centro de bienestar enfocado en un estilo de vida saludable, equilibrio mente-cuerpo y constancia. Público objetivo: personas de 25-45 años que buscan más que solo ejercicio.');
+    const [selectedClientId, setSelectedClientId] = useState<string | undefined>();
+    const [additionalInstructions, setAdditionalInstructions] = useState('Enfócate en un estilo de vida saludable, equilibrio mente-cuerpo y constancia. Público objetivo: personas de 25-45 años que buscan más que solo ejercicio.');
     const { toast } = useToast();
 
     const handleGenerateSchedule = async () => {
-        if (!businessDescription) {
+        if (!selectedClientId) {
             toast({
-                title: "Descripción requerida",
-                description: "Por favor, introduce una descripción del negocio del cliente.",
+                title: "Cliente no seleccionado",
+                description: "Por favor, selecciona un cliente para generar su parrilla de contenido.",
                 variant: "destructive"
             });
             return;
         }
+        
+        const selectedCustomer = initialCustomers.find(c => c.id === selectedClientId);
+        if (!selectedCustomer) {
+            toast({ title: "Error", description: "Cliente no encontrado.", variant: "destructive" });
+            return;
+        }
+
+        const clientBusinessDescription = `Cliente: ${selectedCustomer.name} (${selectedCustomer.email}). 
+Plan contratado: ${selectedCustomer.plan}.
+Instrucciones adicionales del equipo: ${additionalInstructions}`;
+
         setIsLoading(true);
         setSchedule(null);
         try {
-            const result = await generateContentSchedule({ clientBusiness: businessDescription });
+            const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
             setSchedule(result.posts);
         } catch (error) {
             console.error("Failed to generate schedule", error);
@@ -60,19 +74,36 @@ export default function TeamLabPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
                         <CardDescription>
-                            Genera una parrilla de contenido mensual para un cliente. La IA creará los temas, formatos y copys.
+                            Selecciona un cliente, añade instrucciones y genera una parrilla de contenido mensual. La IA usará los datos del cliente y tus notas.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="business-description">Describe el negocio y objetivos del cliente</Label>
-                            <Textarea
-                                id="business-description"
-                                placeholder="Ej: Gimnasio enfocado en bienestar, comunidad de yoga, etc."
-                                value={businessDescription}
-                                onChange={(e) => setBusinessDescription(e.target.value)}
-                                rows={3}
-                            />
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="client-select">Seleccionar Cliente</Label>
+                                <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                                    <SelectTrigger id="client-select">
+                                        <SelectValue placeholder="Elige un cliente..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {initialCustomers.map(customer => (
+                                            <SelectItem key={customer.id} value={customer.id}>
+                                                {customer.name} - ({customer.email})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="business-description">Instrucciones Adicionales para la IA</Label>
+                                <Textarea
+                                    id="business-description"
+                                    placeholder="Ej: Enfocarse en un diseño estético, analizar la competencia para el Buen Fin, etc."
+                                    value={additionalInstructions}
+                                    onChange={(e) => setAdditionalInstructions(e.target.value)}
+                                    rows={3}
+                                />
+                            </div>
                         </div>
                         <Button onClick={handleGenerateSchedule} disabled={isLoading}>
                             {isLoading ? (
