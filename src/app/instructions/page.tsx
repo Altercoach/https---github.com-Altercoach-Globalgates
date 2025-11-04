@@ -2,13 +2,25 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, LifeBuoy, Home, UserPlus, ShoppingCart, LogIn, LayoutDashboard, FileText, BarChart3, ArrowRight, ArrowDown } from 'lucide-react';
+import { BookOpen, Zap, LifeBuoy, Home, UserPlus, ShoppingCart, LogIn, LayoutDashboard, FileText, BarChart3, ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function ClientInstructionsPage() {
+    const { auth } = useAuth();
+
+    const returnHref = auth.loggedIn ? '/dashboard' : '/';
+    const returnLabel = auth.loggedIn ? 'Volver al Panel' : 'Volver a la Página Principal';
 
     return (
         <div className="bg-background min-h-screen">
             <section className="container mx-auto py-12 px-4 md:px-6">
+                <div className="mb-8">
+                     <Button variant="outline" size="sm" asChild>
+                        <Link href={returnHref}><ArrowLeft className="mr-2"/> {returnLabel}</Link>
+                    </Button>
+                </div>
                 <div className="text-center space-y-3 mb-12">
                     <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Guía del Usuario</div>
                     <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
@@ -152,4 +164,3 @@ export default function ClientInstructionsPage() {
         </div>
     );
 }
-
