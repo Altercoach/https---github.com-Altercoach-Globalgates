@@ -78,7 +78,7 @@ const generateAgentPromptFlow = ai.defineFlow(
     outputSchema: GenerateAgentPromptOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    const { output } = await prompt(input, { model: 'gemini-pro' });
     if (!output) {
       throw new Error('The AI failed to generate an agent prompt.');
     }
