@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CalendarDays, Bot, Image as ImageIcon, Video, Users, Loader2, Download, Mail, Copy } from 'lucide-react';
+import { Beaker, CalendarDays, Bot, Image as ImageIcon, Video, Users, Loader2, Download, Mail, Copy, File } from 'lucide-react';
 import { generateContentSchedule } from '@/ai/flows/generate-content-schedule-flow';
 import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { initialCustomers } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 export default function TeamLabPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +78,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
         const csvContent = [
             headers.join(','),
             ...schedule.map(post => 
-                headers.map(header => `"${(post as any)[header].replace(/"/g, '""')}"`).join(',')
+                headers.map(header => `"${((post as any)[header] || '').replace(/"/g, '""')}"`).join(',')
             )
         ].join('\n');
 
@@ -93,9 +95,38 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
         }
     };
     
+    const downloadPDF = () => {
+        if (!schedule) return;
+        const doc = new jsPDF();
+        const customer = initialCustomers.find(c => c.id === selectedClientId);
+
+        doc.text(`Parrilla de Contenido para: ${customer?.name || selectedClientId}`, 14, 15);
+
+        (doc as any).autoTable({
+            startY: 25,
+            head: [['Post', 'Formato', 'Tópico', 'Copy In', 'Copy Out']],
+            body: schedule.map(post => [
+                post.postNumber,
+                post.format,
+                post.topic,
+                post.copyIn,
+                post.copyOut
+            ]),
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [34, 49, 63] },
+            columnStyles: {
+              3: { cellWidth: 50 },
+              4: { cellWidth: 50 },
+            }
+        });
+
+        doc.save(`parrilla_contenido_${selectedClientId}.pdf`);
+    };
+
     const sendByEmail = () => {
         if (!schedule) return;
-
+        const customer = initialCustomers.find(c => c.id === selectedClientId);
+        const subject = `Parrilla de Contenido para ${customer?.name || selectedClientId}`;
         const tableRows = schedule.map(post => `
             <tr>
                 <td style="border: 1px solid #ddd; padding: 8px;">${post.postNumber}</td>
@@ -124,7 +155,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
             </table>
         `;
         
-        const mailtoLink = `mailto:?subject=Parrilla de Contenido para ${selectedClientId}&body=${encodeURIComponent(emailBody)}`;
+        const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
         window.location.href = mailtoLink;
     };
 
@@ -234,6 +265,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                         </Table>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2 pt-4">
+                        <Button variant="outline" onClick={downloadPDF}><File className="mr-2"/> Descargar PDF</Button>
                         <Button variant="outline" onClick={downloadCSV}><Download className="mr-2"/> Descargar CSV</Button>
                         <Button variant="outline" onClick={sendByEmail}><Mail className="mr-2"/> Enviar por Email</Button>
                     </CardFooter>
