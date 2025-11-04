@@ -193,6 +193,18 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
             setIsGeneratingImage(false);
         }
     };
+    
+    const handleAutomateDelivery = () => {
+        toast({
+            title: "Automatización Iniciada",
+            description: "La generación en lote de todos los recursos ha comenzado. (Funcionalidad futura)",
+        });
+        // Future logic:
+        // for (const post of schedule) {
+        //   await generateImageFromPrompt({ creativeBrief: post.copyIn });
+        //   // Handle saving/displaying the batch of images
+        // }
+    }
 
 
     return (
@@ -243,16 +255,22 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                                 />
                             </div>
                         </div>
-                        <Button onClick={handleGenerateSchedule} disabled={isLoading}>
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Generando...
-                                </>
-                            ) : (
-                                "Generar Parrilla con IA"
-                            )}
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button onClick={handleGenerateSchedule} disabled={isLoading}>
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Generando...
+                                    </>
+                                ) : (
+                                    "Generar Parrilla con IA"
+                                )}
+                            </Button>
+                            <Button onClick={handleAutomateDelivery} disabled={!schedule}>
+                                <Sparkles className="mr-2 h-4 w-4"/>
+                                Automatizar Entrega
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
 
