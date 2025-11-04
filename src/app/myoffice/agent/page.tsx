@@ -1,15 +1,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
@@ -30,14 +29,18 @@ const labels = {
     agentStatus: "Estado del Agente",
     agentActive: "Activo",
     agentInactive: "Inactivo",
-    systemPrompt: "Prompt del Sistema (Órdenes Ejecutivas)",
-    systemPromptDesc: "Este es el cerebro del agente. Define su rol, reglas y cómo debe comportarse. La IA lo usará como su instrucción principal.",
+    systemPrompt: "Prompt del Sistema (Cerebro y Reglas)",
+    systemPromptDesc: "Define el rol, reglas y cómo debe comportarse. La IA lo usará como su instrucción principal.",
     knowledgeBase: "Base de Conocimiento (Entrenamiento)",
-    knowledgeBaseDesc: "Pega aquí URLs, FAQs, detalles de productos o cualquier información que el agente deba conocer. Usará esto como su 'memoria' para responder preguntas.",
-    integrations: "Integraciones de API",
-    integrationsDesc: "Conecta tu agente a las APIs de mensajería. (Campos de ejemplo)",
+    knowledgeBaseDesc: "Pega aquí URLs, FAQs, o cualquier información que el agente deba conocer como su 'memoria'.",
+    integrations: "Integraciones y Claves de API",
+    integrationsDesc: "Conecta tu agente a las APIs de mensajería y define los correos de tu equipo.",
     whatsappApiKey: "WhatsApp API Key",
-    comingSoon: "Más integraciones próximamente."
+    instagramApiKey: "Instagram API Key",
+    messengerApiKey: "Facebook Messenger API Key",
+    supportEmail: "Email de Soporte/Ventas",
+    exclusionTitle: "Reglas de Exclusión",
+    exclusionDesc: "Añade emails o teléfonos (uno por línea) de contactos que el agente NUNCA debe atender (ej. proveedores, familia).",
   },
   en: {
     pageTitle: "AI Agent Configuration",
@@ -53,14 +56,18 @@ const labels = {
     agentStatus: "Agent Status",
     agentActive: "Active",
     agentInactive: "Inactive",
-    systemPrompt: "System Prompt (Executive Orders)",
-    systemPromptDesc: "This is the agent's brain. It defines its role, rules, and how it should behave. The AI will use this as its main instruction.",
+    systemPrompt: "System Prompt (Brain & Rules)",
+    systemPromptDesc: "It defines its role, rules, and how it should behave. The AI will use this as its main instruction.",
     knowledgeBase: "Knowledge Base (Training)",
-    knowledgeBaseDesc: "Paste URLs, FAQs, product details, or any information the agent should know here. It will use this as its 'memory' to answer questions.",
-    integrations: "API Integrations",
-    integrationsDesc: "Connect your agent to messaging APIs. (Example fields)",
+    knowledgeBaseDesc: "Paste URLs, FAQs, or any information the agent should know as its 'memory'.",
+    integrations: "Integrations & API Keys",
+    integrationsDesc: "Connect your agent to messaging APIs and define your team's emails.",
     whatsappApiKey: "WhatsApp API Key",
-    comingSoon: "More integrations coming soon."
+    instagramApiKey: "Instagram API Key",
+    messengerApiKey: "Facebook Messenger API Key",
+    supportEmail: "Support/Sales Email",
+    exclusionTitle: "Exclusion Rules",
+    exclusionDesc: "Add emails or phone numbers (one per line) of contacts the agent should NEVER attend to (e.g., suppliers, family).",
   },
   fr: {
     pageTitle: "Configuration de l'Agent IA",
@@ -76,14 +83,18 @@ const labels = {
     agentStatus: "Statut de l'Agent",
     agentActive: "Actif",
     agentInactive: "Inactif",
-    systemPrompt: "Prompt Système (Ordres Exécutifs)",
-    systemPromptDesc: "C'est le cerveau de l'agent. Il définit son rôle, ses règles et son comportement. L'IA l'utilisera comme instruction principale.",
+    systemPrompt: "Prompt Système (Cerveau et Règles)",
+    systemPromptDesc: "Définit son rôle, ses règles et son comportement. L'IA l'utilisera comme instruction principale.",
     knowledgeBase: "Base de Connaissances (Formation)",
-    knowledgeBaseDesc: "Collez ici les URL, FAQ, détails de produits ou toute information que l'agent doit connaître. Il l'utilisera comme sa 'mémoire' pour répondre aux questions.",
-    integrations: "Intégrations d'API",
-    integrationsDesc: "Connectez votre agent aux API de messagerie. (Champs d'exemple)",
+    knowledgeBaseDesc: "Collez ici les URL, FAQ ou toute information que l'agent doit connaître comme sa 'mémoire'.",
+    integrations: "Intégrations & Clés API",
+    integrationsDesc: "Connectez votre agent aux API de messagerie et définissez les e-mails de votre équipe.",
     whatsappApiKey: "Clé API WhatsApp",
-    comingSoon: "Plus d'intégrations à venir."
+    instagramApiKey: "Clé API Instagram",
+    messengerApiKey: "Clé API Facebook Messenger",
+    supportEmail: "Email de Support/Ventes",
+    exclusionTitle: "Règles d'Exclusion",
+    exclusionDesc: "Ajoutez les e-mails ou numéros de téléphone (un par ligne) des contacts que l'agent ne doit JAMAIS prendre en charge (ex: fournisseurs, famille).",
   }
 };
 
@@ -92,9 +103,10 @@ OBJETIVO: Convertir visitantes en leads calificados y resolver dudas de primer n
 REGLAS:
 1. SIEMPRE pide nombre, email y teléfono para registrar un lead.
 2. NUNCA ofrezcas descuentos a menos que se indique en la BASE DE CONOCIMIENTO.
-3. Si no sabes una respuesta, di: "Excelente pregunta. Permíteme consultarlo con un especialista para darte la información precisa. ¿Me das tu correo para contactarte?". Y registra el lead.
-4. NUNCA te refieras a ti mismo como una IA. Eres un miembro del equipo. Para escalar, usa frases como "consultaré con el departamento técnico" o "lo revisaré con un estratega senior".
-5. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.`;
+3. Si no sabes una respuesta, di: "Excelente pregunta. Permíteme consultarlo con un especialista para darte la información precisa. ¿Me das tu correo para contactarte?". Y registra el lead. Para escalar, usa el correo: [Support Email].
+4. NUNCA te refieras a ti mismo como una IA. Eres un miembro del equipo. Para escalar, usa frases como "consultaré con el departamento técnico".
+5. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.
+6. NUNCA atiendas a los contactos en la LISTA DE EXCLUSIÓN. Si te contactan, responde: "¡Hola! En un momento te atiende un miembro del equipo." y no continúes la conversación.`;
 
 const defaultKnowledgeBase = `https://goldenkey.agency/products
 https://goldenkey.agency/contact
@@ -104,7 +116,6 @@ Promoción actual: 10% de descuento en el plan 'Portal Maestro Digital' para nue
 
 
 export default function AgentConfigPage() {
-    const { toast } = useToast();
     const { language } = useLanguage();
     const { site, setSite, setHasUnsavedChanges } = useSite();
     const t = labels[language.code as keyof typeof labels] || labels.en;
@@ -112,7 +123,14 @@ export default function AgentConfigPage() {
     const [isActive, setIsActive] = useState(true);
     const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt);
     const [knowledgeBase, setKnowledgeBase] = useState(defaultKnowledgeBase);
-    const [apiKey, setApiKey] = useState('wh_xxxxxxxx');
+    
+    // States for the new fields
+    const [whatsappKey, setWhatsappKey] = useState('wh_xxxxxxxx');
+    const [instagramKey, setInstagramKey] = useState('ig_xxxxxxxx');
+    const [messengerKey, setMessengerKey] = useState('ms_xxxxxxxx');
+    const [supportEmail, setSupportEmail] = useState('atencion@goldenkey.website');
+    const [exclusionList, setExclusionList] = useState('proveedor@email.com\n+1234567890');
+
     
     const triggerFilePicker = () => {
         document.getElementById('avatarPicker')?.click();
@@ -222,29 +240,51 @@ export default function AgentConfigPage() {
                 </Card>
             </div>
             
-            <Card>
+             <Card>
                 <CardHeader>
-                    <CardTitle>{t.integrations}</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><KeyRound /> {t.integrations}</CardTitle>
                     <CardDescription>{t.integrationsDesc}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="whatsapp-api">{t.whatsappApiKey}</Label>
-                        <Input 
-                            id="whatsapp-api" 
-                            type="password"
-                            value={apiKey}
-                            onChange={(e) => setApiKey(e.target.value)}
-                        />
+                    <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="whatsapp-api">{t.whatsappApiKey}</Label>
+                            <Input id="whatsapp-api" type="password" value={whatsappKey} onChange={(e) => setWhatsappKey(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="instagram-api">{t.instagramApiKey}</Label>
+                            <Input id="instagram-api" type="password" value={instagramKey} onChange={(e) => setInstagramKey(e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="messenger-api">{t.messengerApiKey}</Label>
+                            <Input id="messenger-api" type="password" value={messengerKey} onChange={(e) => setMessengerKey(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="support-email">{t.supportEmail}</Label>
+                            <Input id="support-email" type="email" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} />
+                        </div>
                     </div>
-                    <Alert variant="default">
-                        <Bot className="h-4 w-4" />
-                        <AlertTitle>{t.comingSoon}</AlertTitle>
-                    </Alert>
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><ShieldOff /> {t.exclusionTitle}</CardTitle>
+                    <CardDescription>{t.exclusionDesc}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Textarea 
+                        value={exclusionList}
+                        onChange={(e) => setExclusionList(e.target.value)}
+                        rows={5}
+                        placeholder="proveedor@email.com
++1234567890"
+                    />
                 </CardContent>
             </Card>
 
-            {/* The save button is now handled by the floating "Review & Save" button in the layout */}
         </div>
     );
 }
+
+    

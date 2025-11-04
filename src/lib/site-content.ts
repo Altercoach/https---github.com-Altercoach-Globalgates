@@ -178,7 +178,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Boost Essentiel (1 Réseau)"
       },
       "type": "sub",
-      "price": 500,
+      "price": 600,
       "badge": {
         "es": "Social Media",
         "en": "Social Media",
@@ -190,7 +190,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Gestion élite pour un réseau social clé. Idéal pour démarrer."
       },
       "description": {
-        "es": "Servicio de manejo de perfiles en redes sociales, combinando creatividad humana con IA predictiva. Un community manager dedicado crea contenido personalizado, mientras un especialista en campañas optimiza ads para máximo ROI.",
+        "es": "Servicio de manejo de perfiles en redes sociales, combinando creatividad humana con IA predictiva. Un community manager dedicado crea contenido personalizado, mientras un especialista en campañas optimiza ads para máximo ROI, se incluyen imágenes de stock libre.",
         "en": "Social media profile management service, combining human creativity with predictive AI. A dedicated community manager creates personalized content, while a campaign specialist optimizes ads for maximum ROI.",
         "fr": "Service de gestion de profils de réseaux sociaux, alliant créativité humaine et IA prédictive. Un community manager dédié crée du contenu personnalisé, tandis qu'un spécialiste des campagnes optimise les publicités pour un ROI maximal."
       },
@@ -240,24 +240,24 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       "id": "prod_sm_3",
       "visible": true,
       "name": {
-        "es": "Tridente Digital (3 Redes)",
+        "es": "3D Digital (3 Redes)",
         "en": "Digital Trident (3 Networks)",
         "fr": "Trident Numérique (3 Réseaux)"
       },
       "type": "sub",
-      "price": 1000,
+      "price": 1200,
       "badge": {
         "es": "Social Media",
         "en": "Social Media",
         "fr": "Réseaux Sociaux"
       },
       "note": {
-        "es": "Cobertura amplia para marcas en expansión (ej. +TikTok).",
+        "es": "Cobertura amplia para marcas en expansión (ej. FB,IG+TikTok).",
         "en": "Broad coverage for expanding brands (e.g., +TikTok).",
         "fr": "Large couverture pour les marques en expansion (par ex. +TikTok)."
       },
       "description": {
-        "es": "Domina tres plataformas clave para una cobertura de audiencia más amplia. Ideal para marcas que buscan expandirse a nuevos demográficos, como TikTok.",
+        "es": "Domina tres plataformas clave para una cobertura de audiencia más amplia. Ideal para marcas que buscan expandirse a nuevos demográficos, como Instagram, Facebook y X (antes twitter).",
         "en": "Master three key platforms for broader audience coverage. Ideal for brands looking to expand into new demographics, such as TikTok.",
         "fr": "Maîtrisez trois plateformes clés pour une couverture d'audience plus large. Idéal pour les marques cherchant à s'étendre à de nouveaux groupes démographiques, comme TikTok."
       }
@@ -323,7 +323,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Boost Essentiel VIP (1 Réseau)"
       },
       "type": "sub",
-      "price": 600,
+      "price": 800,
       "badge": {
         "es": "Gestión VIP",
         "en": "VIP Management",
@@ -370,7 +370,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       "id": "prod_sm_vip_3",
       "visible": true,
       "name": {
-        "es": "Tridente Digital VIP (3 Redes)",
+        "es": "3D Digital VIP (3 Redes)",
         "en": "Digital Trident VIP (3 Networks)",
         "fr": "Trident Numérique VIP (3 Réseaux)"
       },

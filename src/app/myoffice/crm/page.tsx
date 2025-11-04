@@ -6,17 +6,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, User, AlertTriangle, Search } from 'lucide-react';
+import { Bot, Send, User, AlertTriangle, Search, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/use-language';
 import { Badge } from '@/components/ui/badge';
 import { useSite } from '@/hooks/use-site';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const labels = {
   es: {
     pageTitle: "Centro de Supervisión (CRM)",
     pageSubtitle: "Supervisa las conversaciones del equipo e interviene cuando sea necesario.",
     searchPlaceholder: "Buscar conversaciones...",
+    filterByChannel: "Filtrar por canal",
+    allChannels: "Todos los Canales",
     noConversation: "Selecciona una conversación para empezar.",
     messagePlaceholder: "Escribe tu respuesta...",
     agent: "Alex Rider",
@@ -29,6 +32,8 @@ const labels = {
     pageTitle: "Supervision Center (CRM)",
     pageSubtitle: "Supervise team conversations and intervene when necessary.",
     searchPlaceholder: "Search conversations...",
+    filterByChannel: "Filter by channel",
+    allChannels: "All Channels",
     noConversation: "Select a conversation to start.",
     messagePlaceholder: "Type your response...",
     agent: "Alex Rider",
@@ -41,6 +46,8 @@ const labels = {
     pageTitle: "Centre de Supervision (CRM)",
     pageSubtitle: "Supervisez les conversations de l'équipe et intervenez si nécessaire.",
     searchPlaceholder: "Rechercher des conversations...",
+    filterByChannel: "Filtrer par canal",
+    allChannels: "Tous les Canaux",
     noConversation: "Sélectionnez une conversation pour commencer.",
     messagePlaceholder: "Écrivez votre réponse...",
     agent: "Alex Rider",
@@ -52,9 +59,9 @@ const labels = {
 };
 
 const conversations = [
-    { id: 1, name: 'Ana García', lastMessage: 'Sí, me interesa el paquete VIP...', time: '10:42 AM', unread: 2, avatar: 'https://i.pravatar.cc/150?u=ana', needsAttention: false },
-    { id: 2, name: 'Carlos Mendoza', lastMessage: 'No funciona el código de descuento.', time: '9:15 AM', unread: 0, avatar: 'https://i.pravatar.cc/150?u=carlos', needsAttention: true },
-    { id: 3, name: 'Laura Petrova', lastMessage: 'Ok, gracias!', time: 'Ayer', unread: 0, avatar: 'https://i.pravatar.cc/150?u=laura', needsAttention: false },
+    { id: 1, name: 'Ana García', lastMessage: 'Sí, me interesa el paquete VIP...', time: '10:42 AM', unread: 2, avatar: 'https://i.pravatar.cc/150?u=ana', needsAttention: false, channel: 'whatsapp' },
+    { id: 2, name: 'Carlos Mendoza', lastMessage: 'No funciona el código de descuento.', time: '9:15 AM', unread: 0, avatar: 'https://i.pravatar.cc/150?u=carlos', needsAttention: true, channel: 'messenger' },
+    { id: 3, name: 'Laura Petrova', lastMessage: 'Ok, gracias!', time: 'Ayer', unread: 0, avatar: 'https://i.pravatar.cc/150?u=laura', needsAttention: false, channel: 'instagram' },
 ];
 
 const chatHistory = [
@@ -72,12 +79,15 @@ const chatHistory = [
 
 export default function CrmPage() {
     const [selectedConversation, setSelectedConversation] = useState(conversations[1]);
+    const [channelFilter, setChannelFilter] = useState('all');
     const { language } = useLanguage();
     const { site } = useSite();
     const t = labels[language.code as keyof typeof labels] || labels.en;
     
     const agentName = `${site.agentPersona.firstName} ${site.agentPersona.lastName}`;
     const agentAvatar = site.agentPersona.avatar;
+
+    const filteredConversations = conversations.filter(c => channelFilter === 'all' || c.channel === channelFilter);
 
     return (
         <div className="flex flex-col h-full">
@@ -89,14 +99,25 @@ export default function CrmPage() {
             <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr] gap-4 flex-1 overflow-hidden">
                 {/* Conversation List */}
                 <div className="flex flex-col border rounded-lg overflow-hidden">
-                    <div className="p-4 border-b">
+                    <div className="p-4 border-b space-y-4">
                         <div className="relative">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input placeholder={t.searchPlaceholder} className="pl-8" />
                         </div>
+                        <Select value={channelFilter} onValueChange={setChannelFilter}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder={t.filterByChannel} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">{t.allChannels}</SelectItem>
+                                <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                                <SelectItem value="messenger">Messenger</SelectItem>
+                                <SelectItem value="instagram">Instagram DM</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                     <ScrollArea className="flex-1">
-                        {conversations.map(convo => (
+                        {filteredConversations.map(convo => (
                             <button
                                 key={convo.id}
                                 className={cn(
@@ -188,3 +209,5 @@ export default function CrmPage() {
         </div>
     );
 }
+
+    
