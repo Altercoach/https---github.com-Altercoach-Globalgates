@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BarChart, LogOut, Settings, User, Menu, Home } from 'lucide-react';
+import { BarChart, LogOut, Settings, User, Menu, Home, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ const labels = {
     home: "Página Principal",
     dashboard: "Dashboard",
     settings: "Configuración",
+    instructions: "Instrucciones",
     logout: "Cerrar Sesión",
     redirecting: "Redirigiendo...",
     backToSite: "Volver al Sitio"
@@ -25,6 +26,7 @@ const labels = {
     home: "Main Page",
     dashboard: "Dashboard",
     settings: "Settings",
+    instructions: "Instructions",
     logout: "Logout",
     redirecting: "Redirecting...",
     backToSite: "Back to Site"
@@ -34,6 +36,7 @@ const labels = {
     home: "Page d'accueil",
     dashboard: "Tableau de bord",
     settings: "Paramètres",
+    instructions: "Instructions",
     logout: "Se déconnecter",
     redirecting: "Redirection...",
     backToSite: "Retour au site"
@@ -62,6 +65,7 @@ export default function DashboardLayout({
     { href: '/', label: t.home, icon: Home },
     { href: '/dashboard', label: t.dashboard, icon: BarChart },
     { href: '/dashboard/settings', label: t.settings, icon: Settings },
+    { href: '/instructions', label: t.instructions, icon: BookOpen },
   ];
 
   if (!auth.user) {
