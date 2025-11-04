@@ -81,8 +81,11 @@ const generateImageFlow = ai.defineFlow(
 
     // Step 2: Use the final prompt to generate the image.
     const { media } = await ai.generate({
-      model: googleAI.model('imagen-4.0-fast-generate-001'),
+      model: googleAI.model('gemini-1.5-flash'),
       prompt: finalPrompt,
+      config: {
+        responseModalities: ['IMAGE'],
+      },
     });
 
     const imageUrl = media?.url;
