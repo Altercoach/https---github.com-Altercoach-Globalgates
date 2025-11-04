@@ -4,9 +4,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CalendarDays, Bot, Image as ImageIcon, Video, Users, Loader2, Download, Mail, Copy, File } from 'lucide-react';
+import { Beaker, CalendarDays, Bot, Image as ImageIcon, Video, Users, Loader2, Download, Mail, Copy, File, Sparkles } from 'lucide-react';
 import { generateContentSchedule } from '@/ai/flows/generate-content-schedule-flow';
 import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
+import { generateImageFromPrompt } from '@/ai/flows/generate-image-flow';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +15,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { initialCustomers } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Image from 'next/image';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -23,6 +26,13 @@ export default function TeamLabPage() {
     const [selectedClientId, setSelectedClientId] = useState<string | undefined>();
     const [additionalInstructions, setAdditionalInstructions] = useState('Enfócate en un estilo de vida saludable, equilibrio mente-cuerpo y constancia. Público objetivo: personas de 25-45 años que buscan más que solo ejercicio.');
     const { toast } = useToast();
+    
+    // State for image generation dialog
+    const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+    const [currentPost, setCurrentPost] = useState<ContentPost | null>(null);
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+    const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+
 
     const handleGenerateSchedule = async () => {
         if (!selectedClientId) {
@@ -159,177 +169,249 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
         window.location.href = mailtoLink;
     };
 
+    const openImageDialog = (post: ContentPost) => {
+        setCurrentPost(post);
+        setGeneratedImageUrl(null);
+        setIsImageDialogOpen(true);
+    };
+
+    const handleGenerateImage = async () => {
+        if (!currentPost) return;
+        setIsGeneratingImage(true);
+        setGeneratedImageUrl(null);
+        try {
+            const result = await generateImageFromPrompt({ creativeBrief: currentPost.copyIn });
+            setGeneratedImageUrl(result.imageUrl);
+        } catch (error) {
+            console.error("Failed to generate image", error);
+            toast({
+                title: "Error al generar imagen",
+                description: "La IA no pudo crear la imagen. Inténtalo de nuevo.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsGeneratingImage(false);
+        }
+    };
+
 
     return (
-        <div className="space-y-6">
-            <header>
-                <div className="flex items-center gap-3 mb-2">
-                    <Beaker className="h-8 w-8 text-primary" />
-                    <h1 className="text-3xl font-bold font-headline">Team Lab Marketing</h1>
-                </div>
-                <p className="text-muted-foreground">
-                    Centro de operaciones para la creación, gestión y producción de entregables para clientes.
-                </p>
-            </header>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
-                    <CardDescription>
-                        Selecciona un cliente, añade instrucciones y genera una parrilla de contenido mensual. La IA usará los datos del cliente y tus notas.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid lg:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="client-select">Seleccionar Cliente</Label>
-                            <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                                <SelectTrigger id="client-select">
-                                    <SelectValue placeholder="Elige un cliente..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {initialCustomers.map(customer => (
-                                        <SelectItem key={customer.id} value={customer.id}>
-                                            {customer.name} - ({customer.email})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="business-description">Instrucciones Adicionales para la IA</Label>
-                            <Textarea
-                                id="business-description"
-                                placeholder="Ej: Enfocarse en un diseño estético, analizar la competencia para el Buen Fin, etc."
-                                value={additionalInstructions}
-                                onChange={(e) => setAdditionalInstructions(e.target.value)}
-                                rows={3}
-                            />
-                        </div>
+        <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+            <div className="space-y-6">
+                <header>
+                    <div className="flex items-center gap-3 mb-2">
+                        <Beaker className="h-8 w-8 text-primary" />
+                        <h1 className="text-3xl font-bold font-headline">Team Lab Marketing</h1>
                     </div>
-                    <Button onClick={handleGenerateSchedule} disabled={isLoading}>
-                        {isLoading ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Generando...
-                            </>
-                        ) : (
-                            "Generar Parrilla con IA"
-                        )}
-                    </Button>
-                </CardContent>
-            </Card>
+                    <p className="text-muted-foreground">
+                        Centro de operaciones para la creación, gestión y producción de entregables para clientes.
+                    </p>
+                </header>
 
-            {schedule && (
-                 <Card>
+                <Card>
                     <CardHeader>
-                        <CardTitle>Parrilla de Contenido Editable</CardTitle>
-                        <CardDescription>Ajusta el contenido generado por la IA y luego expórtalo o compártelo.</CardDescription>
+                        <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
+                        <CardDescription>
+                            Selecciona un cliente, añade instrucciones y genera una parrilla de contenido mensual. La IA usará los datos del cliente y tus notas.
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[80px]">Post</TableHead>
-                                    <TableHead className="w-[120px]">Formato</TableHead>
-                                    <TableHead className="w-[150px]">Tópico</TableHead>
-                                    <TableHead className="min-w-[250px]">Copy In (Ideas)</TableHead>
-                                    <TableHead className="min-w-[250px]">Copy Out (Publicación)</TableHead>
-                                    <TableHead className="w-[120px]">Acción</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {schedule.map((post, index) => (
-                                    <TableRow key={post.postNumber}>
-                                        <TableCell>
-                                            <Input value={post.postNumber} onChange={e => handleScheduleChange(index, 'postNumber', e.target.value)} className="text-center font-bold"/>
-                                        </TableCell>
-                                        <TableCell>
-                                             <Input value={post.format} onChange={e => handleScheduleChange(index, 'format', e.target.value)} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input value={post.topic} onChange={e => handleScheduleChange(index, 'topic', e.target.value)} />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Textarea value={post.copyIn} onChange={e => handleScheduleChange(index, 'copyIn', e.target.value)} rows={4} className="text-xs" />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Textarea value={post.copyOut} onChange={e => handleScheduleChange(index, 'copyOut', e.target.value)} rows={4} className="text-xs"/>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button variant="outline" size="sm">Crear Recurso</Button>
-                                        </TableCell>
+                    <CardContent className="space-y-4">
+                        <div className="grid lg:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="client-select">Seleccionar Cliente</Label>
+                                <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                                    <SelectTrigger id="client-select">
+                                        <SelectValue placeholder="Elige un cliente..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {initialCustomers.map(customer => (
+                                            <SelectItem key={customer.id} value={customer.id}>
+                                                {customer.name} - ({customer.email})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="business-description">Instrucciones Adicionales para la IA</Label>
+                                <Textarea
+                                    id="business-description"
+                                    placeholder="Ej: Enfocarse en un diseño estético, analizar la competencia para el Buen Fin, etc."
+                                    value={additionalInstructions}
+                                    onChange={(e) => setAdditionalInstructions(e.target.value)}
+                                    rows={3}
+                                />
+                            </div>
+                        </div>
+                        <Button onClick={handleGenerateSchedule} disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Generando...
+                                </>
+                            ) : (
+                                "Generar Parrilla con IA"
+                            )}
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                {schedule && (
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Parrilla de Contenido Editable</CardTitle>
+                            <CardDescription>Ajusta el contenido generado por la IA y luego expórtalo o compártelo.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[80px]">Post</TableHead>
+                                        <TableHead className="w-[120px]">Formato</TableHead>
+                                        <TableHead className="w-[150px]">Tópico</TableHead>
+                                        <TableHead className="min-w-[250px]">Copy In (Ideas)</TableHead>
+                                        <TableHead className="min-w-[250px]">Copy Out (Publicación)</TableHead>
+                                        <TableHead className="w-[120px]">Acción</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                    <CardFooter className="flex justify-end gap-2 pt-4">
-                        <Button variant="outline" onClick={downloadPDF}><File className="mr-2"/> Descargar PDF</Button>
-                        <Button variant="outline" onClick={downloadCSV}><Download className="mr-2"/> Descargar CSV</Button>
-                        <Button variant="outline" onClick={sendByEmail}><Mail className="mr-2"/> Enviar por Email</Button>
-                    </CardFooter>
-                </Card>
-            )}
+                                </TableHeader>
+                                <TableBody>
+                                    {schedule.map((post, index) => (
+                                        <TableRow key={post.postNumber}>
+                                            <TableCell>
+                                                <Input value={post.postNumber} onChange={e => handleScheduleChange(index, 'postNumber', e.target.value)} className="text-center font-bold"/>
+                                            </TableCell>
+                                            <TableCell>
+                                                 <Input value={post.format} onChange={e => handleScheduleChange(index, 'format', e.target.value)} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input value={post.topic} onChange={e => handleScheduleChange(index, 'topic', e.target.value)} />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Textarea value={post.copyIn} onChange={e => handleScheduleChange(index, 'copyIn', e.target.value)} rows={4} className="text-xs" />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Textarea value={post.copyOut} onChange={e => handleScheduleChange(index, 'copyOut', e.target.value)} rows={4} className="text-xs"/>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button variant="outline" size="sm" onClick={() => openImageDialog(post)}>Crear Recurso</Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2 pt-4">
+                            <Button variant="outline" onClick={downloadPDF}><File className="mr-2"/> Descargar PDF</Button>
+                            <Button variant="outline" onClick={downloadCSV}><Download className="mr-2"/> Descargar CSV</Button>
+                            <Button variant="outline" onClick={sendByEmail}><Mail className="mr-2"/> Enviar por Email</Button>
+                        </CardFooter>
+                    </Card>
+                )}
 
-            <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="col-span-1 md:col-span-3">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><ImageIcon /> Generador de Medios por IA</CardTitle>
-                        <CardDescription>
-                            Herramientas de IA para crear los recursos visuales de las campañas. Utiliza texto, imágenes o videos de referencia.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-4 border rounded-lg text-center bg-muted/50">
-                            <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                            <h3 className="font-semibold">Texto a Imagen</h3>
-                            <p className="text-xs text-muted-foreground mt-1">Genera imágenes a partir de descripciones detalladas.</p>
-                        </div>
-                        <div className="p-4 border rounded-lg text-center bg-muted/50">
-                             <Video className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                            <h3 className="font-semibold">Texto a Video</h3>
-                            <p className="text-xs text-muted-foreground mt-1">Crea clips de video cortos a partir de un guion o idea.</p>
-                        </div>
-                        <div className="p-4 border rounded-lg text-center bg-muted/50">
-                             <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                            <h3 className="font-semibold">Imagen a Imagen</h3>
-                            <p className="text-xs text-muted-foreground mt-1">Modifica o mejora una imagen existente usando IA.</p>
-                        </div>
-                        <div className="p-4 border rounded-lg text-center bg-muted/50">
-                            <Video className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                            <h3 className="font-semibold">Video a Video</h3>
-                            <p className="text-xs text-muted-foreground mt-1">Aplica nuevos estilos o efectos a un video de referencia.</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Users /> Gestión de Equipo</CardTitle>
-                        <CardDescription>
-                            Administra el acceso de tus colaboradores a las herramientas del laboratorio.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                         <p className="text-sm text-muted-foreground">Próximamente: Interfaz para invitar y asignar roles (diseñador, copywriter, community manager) a los miembros de tu equipo.</p>
-                         <Button className="mt-4" disabled>Administrar Colaboradores</Button>
-                    </CardContent>
-                </Card>
+                <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+                    <Card className="col-span-1 md:col-span-3">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><ImageIcon /> Generador de Medios por IA</CardTitle>
+                            <CardDescription>
+                                Herramientas de IA para crear los recursos visuales de las campañas. Utiliza texto, imágenes o videos de referencia.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="p-4 border rounded-lg text-center bg-muted/50">
+                                <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                                <h3 className="font-semibold">Texto a Imagen</h3>
+                                <p className="text-xs text-muted-foreground mt-1">Genera imágenes a partir de descripciones detalladas.</p>
+                            </div>
+                            <div className="p-4 border rounded-lg text-center bg-muted/50">
+                                 <Video className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                                <h3 className="font-semibold">Texto a Video</h3>
+                                <p className="text-xs text-muted-foreground mt-1">Crea clips de video cortos a partir de un guion o idea.</p>
+                            </div>
+                            <div className="p-4 border rounded-lg text-center bg-muted/50">
+                                 <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                                <h3 className="font-semibold">Imagen a Imagen</h3>
+                                <p className="text-xs text-muted-foreground mt-1">Modifica o mejora una imagen existente usando IA.</p>
+                            </div>
+                            <div className="p-4 border rounded-lg text-center bg-muted/50">
+                                <Video className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                                <h3 className="font-semibold">Video a Video</h3>
+                                <p className="text-xs text-muted-foreground mt-1">Aplica nuevos estilos o efectos a un video de referencia.</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Users /> Gestión de Equipo</CardTitle>
+                            <CardDescription>
+                                Administra el acceso de tus colaboradores a las herramientas del laboratorio.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             <p className="text-sm text-muted-foreground">Próximamente: Interfaz para invitar y asignar roles (diseñador, copywriter, community manager) a los miembros de tu equipo.</p>
+                             <Button className="mt-4" disabled>Administrar Colaboradores</Button>
+                        </CardContent>
+                    </Card>
 
-                 <Card className="col-span-1 md:col-span-2">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Bot /> Activación de Agentes de IA para Clientes</CardTitle>
-                        <CardDescription>
-                            Una vez que un cliente completa sus formularios de entrenamiento, activa y despliega su agente de IA personalizado.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Próximamente: Lista de clientes pendientes de activación. Un clic aquí procesará sus respuestas, generará el 'system prompt' final y habilitará el agente en el panel del cliente correspondiente.</p>
-                         <Button className="mt-4" disabled>Ver Clientes Pendientes</Button>
-                    </CardContent>
-                </Card>
+                     <Card className="col-span-1 md:col-span-2">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Bot /> Activación de Agentes de IA para Clientes</CardTitle>
+                            <CardDescription>
+                                Una vez que un cliente completa sus formularios de entrenamiento, activa y despliega su agente de IA personalizado.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">Próximamente: Lista de clientes pendientes de activación. Un clic aquí procesará sus respuestas, generará el 'system prompt' final y habilitará el agente en el panel del cliente correspondiente.</p>
+                             <Button className="mt-4" disabled>Ver Clientes Pendientes</Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </div>
+            <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Generador de Imagen con IA</DialogTitle>
+                    <DialogDescription>
+                        Usa la idea del post para generar un recurso visual. Puedes refinar el prompt antes de generar.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 space-y-4">
+                    <div>
+                        <Label htmlFor="creative-brief" className="font-semibold">Brief Creativo (Prompt)</Label>
+                        <Textarea 
+                            id="creative-brief"
+                            value={currentPost?.copyIn || ''} 
+                            onChange={(e) => setCurrentPost(prev => prev ? {...prev, copyIn: e.target.value} : null)}
+                            rows={5}
+                            className="mt-2"
+                        />
+                    </div>
+                     <Button onClick={handleGenerateImage} disabled={isGeneratingImage} className="w-full">
+                        {isGeneratingImage ? <Loader2 className="mr-2 animate-spin" /> : <Sparkles className="mr-2" />}
+                        {isGeneratingImage ? 'Generando imagen...' : 'Generar Imagen con IA'}
+                    </Button>
+
+                    {isGeneratingImage && (
+                        <div className="flex justify-center items-center h-64 bg-muted rounded-lg">
+                           <Loader2 className="h-12 w-12 text-primary animate-spin"/>
+                        </div>
+                    )}
+
+                    {generatedImageUrl && (
+                        <div className="space-y-4">
+                            <div className="aspect-square relative w-full bg-muted rounded-lg overflow-hidden">
+                                <Image src={generatedImageUrl} alt="Imagen generada por IA" layout="fill" objectFit="contain" />
+                            </div>
+                            <a href={generatedImageUrl} download={`post_image_${currentPost?.postNumber}.png`}>
+                                <Button variant="secondary" className="w-full">
+                                    <Download className="mr-2" />
+                                    Descargar Imagen
+                                </Button>
+                            </a>
+                        </div>
+                    )}
+
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }
