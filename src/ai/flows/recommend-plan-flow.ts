@@ -30,7 +30,6 @@ export async function recommendPlan(input: RecommendPlanInput): Promise<Recommen
 
 const prompt = ai.definePrompt({
   name: 'recommendPlanPrompt',
-  model: 'googleai/gemini-pro',
   input: {schema: RecommendPlanInputSchema},
   output: {schema: RecommendPlanOutputSchema},
   prompt: `Eres un consultor de negocios experto especializado en marketing digital y crecimiento. Tu tarea es analizar la descripción de un negocio y recomendar el mejor plan o combinación de planes de los productos disponibles.
@@ -58,7 +57,7 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await prompt(input, { model: 'googleai/gemini-pro' });
     return output!;
   }
 );

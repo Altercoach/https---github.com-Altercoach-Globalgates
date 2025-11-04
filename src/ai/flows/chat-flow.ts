@@ -35,7 +35,6 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
 
 const prompt = ai.definePrompt({
   name: 'chatPrompt',
-  model: 'googleai/gemini-pro',
   input: { schema: ChatInputSchema },
   output: { schema: ChatOutputSchema },
   prompt: `You MUST respond in the following language: {{{language}}}
@@ -72,7 +71,7 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const { output } = await prompt({ ...input, history: augmentedHistory });
+    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: 'googleai/gemini-pro' });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');

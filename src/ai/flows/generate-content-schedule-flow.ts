@@ -38,7 +38,6 @@ export async function generateContentSchedule(input: GenerateContentScheduleInpu
 
 const prompt = ai.definePrompt({
   name: 'generateContentSchedulePrompt',
-  model: 'googleai/gemini-pro',
   input: { schema: GenerateContentScheduleInputSchema },
   output: { schema: GenerateContentScheduleOutputSchema },
   prompt: `You are a world-class social media content strategist. Your task is to create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and specific instructions from the marketing team.
@@ -89,7 +88,7 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    const { output } = await prompt(input, { model: 'googleai/gemini-pro' });
     if (!output) {
       throw new Error('The AI failed to generate a content schedule.');
     }
