@@ -10,6 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 
 const AnalyzeBusinessEvaluationInputSchema = z.object({
@@ -72,7 +73,7 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
     outputSchema: AnalyzeBusinessEvaluationOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: 'gemini-1.5-flash' });
+    const { output } = await prompt(input, { model: googleAI.model('gemini-1.5-flash') });
     if (!output) {
       throw new Error('The AI failed to generate an analysis.');
     }

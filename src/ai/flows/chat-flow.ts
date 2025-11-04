@@ -9,6 +9,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 
 const ChatHistorySchema = z.object({
@@ -71,7 +72,7 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: 'gemini-1.5-flash' });
+    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: googleAI.model('gemini-1.5-flash') });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');
