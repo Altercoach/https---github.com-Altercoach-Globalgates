@@ -31,7 +31,7 @@ export async function generateImageFromPrompt(input: GenerateImageInput): Promis
 const imagePromptRefiner = ai.definePrompt({
     name: 'imagePromptRefiner',
     input: { schema: GenerateImageInputSchema },
-    output: { schema: z.string() },
+    output: { schema: z.string().nullable() },
     prompt: `You are an expert prompt engineer for text-to-image models. Your task is to convert a simple creative brief into a rich, detailed, and effective prompt.
 
     **Creative Brief:**
