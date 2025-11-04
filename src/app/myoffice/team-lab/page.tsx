@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CalendarDays, Bot, Image, Video, Users, Loader2 } from 'lucide-react';
+import { Beaker, CalendarDays, Bot, Image as ImageIcon, Video, Users, Loader2, Download, Mail, Copy } from 'lucide-react';
 import { generateContentSchedule } from '@/ai/flows/generate-content-schedule-flow';
 import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { initialCustomers } from '@/lib/constants';
+import { Input } from '@/components/ui/input';
 
 export default function TeamLabPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +47,10 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
         try {
             const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
             setSchedule(result.posts);
+            toast({
+                title: "¡Parrilla Generada!",
+                description: "La IA ha creado una nueva parrilla de contenido."
+            })
         } catch (error) {
             console.error("Failed to generate schedule", error);
             toast({
@@ -57,6 +62,72 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
             setIsLoading(false);
         }
     };
+    
+    const handleScheduleChange = (index: number, field: keyof ContentPost, value: string) => {
+        if (!schedule) return;
+        const newSchedule = [...schedule];
+        (newSchedule[index] as any)[field] = value;
+        setSchedule(newSchedule);
+    };
+
+    const downloadCSV = () => {
+        if (!schedule) return;
+        const headers = ['postNumber', 'format', 'topic', 'copyIn', 'copyOut'];
+        const csvContent = [
+            headers.join(','),
+            ...schedule.map(post => 
+                headers.map(header => `"${(post as any)[header].replace(/"/g, '""')}"`).join(',')
+            )
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `parrilla_contenido_${selectedClientId}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+    
+    const sendByEmail = () => {
+        if (!schedule) return;
+
+        const tableRows = schedule.map(post => `
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">${post.postNumber}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${post.format}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${post.topic}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${post.copyIn.replace(/\n/g, '<br>')}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${post.copyOut.replace(/\n/g, '<br>')}</td>
+            </tr>
+        `).join('');
+
+        const emailBody = `
+            <h2>Parrilla de Contenido</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Post</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Formato</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Tópico</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Copy In</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Copy Out</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        `;
+        
+        const mailtoLink = `mailto:?subject=Parrilla de Contenido para ${selectedClientId}&body=${encodeURIComponent(emailBody)}`;
+        window.location.href = mailtoLink;
+    };
+
 
     return (
         <div className="space-y-6">
@@ -121,46 +192,65 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
             {schedule && (
                  <Card>
                     <CardHeader>
-                        <CardTitle>Parrilla de Contenido Generada</CardTitle>
+                        <CardTitle>Parrilla de Contenido Editable</CardTitle>
+                        <CardDescription>Ajusta el contenido generado por la IA y luego expórtalo o compártelo.</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="overflow-x-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[50px]">Post</TableHead>
-                                    <TableHead>Formato</TableHead>
-                                    <TableHead>Tópico</TableHead>
-                                    <TableHead>Copy In (Ideas)</TableHead>
-                                    <TableHead>Copy Out (Publicación)</TableHead>
+                                    <TableHead className="w-[80px]">Post</TableHead>
+                                    <TableHead className="w-[120px]">Formato</TableHead>
+                                    <TableHead className="w-[150px]">Tópico</TableHead>
+                                    <TableHead className="min-w-[250px]">Copy In (Ideas)</TableHead>
+                                    <TableHead className="min-w-[250px]">Copy Out (Publicación)</TableHead>
+                                    <TableHead className="w-[120px]">Acción</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {schedule.map((post) => (
+                                {schedule.map((post, index) => (
                                     <TableRow key={post.postNumber}>
-                                        <TableCell>{post.postNumber}</TableCell>
-                                        <TableCell>{post.format}</TableCell>
-                                        <TableCell>{post.topic}</TableCell>
-                                        <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyIn}</TableCell>
-                                        <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyOut}</TableCell>
+                                        <TableCell>
+                                            <Input value={post.postNumber} onChange={e => handleScheduleChange(index, 'postNumber', e.target.value)} className="text-center font-bold"/>
+                                        </TableCell>
+                                        <TableCell>
+                                             <Input value={post.format} onChange={e => handleScheduleChange(index, 'format', e.target.value)} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input value={post.topic} onChange={e => handleScheduleChange(index, 'topic', e.target.value)} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Textarea value={post.copyIn} onChange={e => handleScheduleChange(index, 'copyIn', e.target.value)} rows={4} className="text-xs" />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Textarea value={post.copyOut} onChange={e => handleScheduleChange(index, 'copyOut', e.target.value)} rows={4} className="text-xs"/>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button variant="outline" size="sm">Crear Recurso</Button>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
                     </CardContent>
+                    <CardFooter className="flex justify-end gap-2 pt-4">
+                        <Button variant="outline" onClick={downloadCSV}><Download className="mr-2"/> Descargar CSV</Button>
+                        <Button variant="outline" onClick={sendByEmail}><Mail className="mr-2"/> Enviar por Email</Button>
+                    </CardFooter>
                 </Card>
             )}
 
             <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="col-span-1 md:col-span-3">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Image /> Generador de Medios por IA</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><ImageIcon /> Generador de Medios por IA</CardTitle>
                         <CardDescription>
                             Herramientas de IA para crear los recursos visuales de las campañas. Utiliza texto, imágenes o videos de referencia.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="p-4 border rounded-lg text-center bg-muted/50">
-                            <Image className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                            <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
                             <h3 className="font-semibold">Texto a Imagen</h3>
                             <p className="text-xs text-muted-foreground mt-1">Genera imágenes a partir de descripciones detalladas.</p>
                         </div>
@@ -170,7 +260,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                             <p className="text-xs text-muted-foreground mt-1">Crea clips de video cortos a partir de un guion o idea.</p>
                         </div>
                         <div className="p-4 border rounded-lg text-center bg-muted/50">
-                             <Image className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                             <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
                             <h3 className="font-semibold">Imagen a Imagen</h3>
                             <p className="text-xs text-muted-foreground mt-1">Modifica o mejora una imagen existente usando IA.</p>
                         </div>
