@@ -1,12 +1,48 @@
-
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CalendarDays, Bot, Image, Video, Users } from 'lucide-react';
-import Link from 'next/link';
+import { Beaker, CalendarDays, Bot, Image, Video, Users, Loader2 } from 'lucide-react';
+import { generateContentSchedule } from '@/ai/flows/generate-content-schedule-flow';
+import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function TeamLabPage() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [schedule, setSchedule] = useState<ContentPost[] | null>(null);
+    const [businessDescription, setBusinessDescription] = useState('Gimnasio y centro de bienestar enfocado en un estilo de vida saludable, equilibrio mente-cuerpo y constancia. Público objetivo: personas de 25-45 años que buscan más que solo ejercicio.');
+    const { toast } = useToast();
+
+    const handleGenerateSchedule = async () => {
+        if (!businessDescription) {
+            toast({
+                title: "Descripción requerida",
+                description: "Por favor, introduce una descripción del negocio del cliente.",
+                variant: "destructive"
+            });
+            return;
+        }
+        setIsLoading(true);
+        setSchedule(null);
+        try {
+            const result = await generateContentSchedule({ clientBusiness: businessDescription });
+            setSchedule(result.posts);
+        } catch (error) {
+            console.error("Failed to generate schedule", error);
+            toast({
+                title: "Error al generar",
+                description: "La IA no pudo generar la parrilla. Inténtalo de nuevo.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <header>
@@ -19,34 +55,71 @@ export default function TeamLabPage() {
                 </p>
             </header>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                <Card className="col-span-1 md:col-span-2">
+            <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="lg:col-span-3">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
                         <CardDescription>
-                            Genera, edita y aprueba parrillas de contenido mensuales para los clientes. Asigna tareas al equipo de community management.
+                            Genera una parrilla de contenido mensual para un cliente. La IA creará los temas, formatos y copys.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">Próximamente: Se mostrará una lista de clientes con planes activos. Al seleccionar uno, se podrá generar o visualizar su parrilla de contenido mensual, con propuestas de copy y creatividades sugeridas por IA.</p>
-                         <Button className="mt-4" disabled>Generar Parrilla para Cliente</Button>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="business-description">Describe el negocio y objetivos del cliente</Label>
+                            <Textarea
+                                id="business-description"
+                                placeholder="Ej: Gimnasio enfocado en bienestar, comunidad de yoga, etc."
+                                value={businessDescription}
+                                onChange={(e) => setBusinessDescription(e.target.value)}
+                                rows={3}
+                            />
+                        </div>
+                        <Button onClick={handleGenerateSchedule} disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Generando...
+                                </>
+                            ) : (
+                                "Generar Parrilla con IA"
+                            )}
+                        </Button>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Users /> Gestión de Equipo</CardTitle>
-                        <CardDescription>
-                            Administra el acceso de tus colaboradores a las herramientas del laboratorio.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                         <p className="text-sm text-muted-foreground">Próximamente: Interfaz para invitar y asignar roles (diseñador, copywriter, community manager) a los miembros de tu equipo.</p>
-                         <Button className="mt-4" disabled>Administrar Colaboradores</Button>
-                    </CardContent>
-                </Card>
-                
+                {schedule && (
+                     <Card className="lg:col-span-3">
+                        <CardHeader>
+                            <CardTitle>Parrilla de Contenido Generada</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[50px]">Post</TableHead>
+                                        <TableHead>Formato</TableHead>
+                                        <TableHead>Tópico</TableHead>
+                                        <TableHead>Copy In (Ideas)</TableHead>
+                                        <TableHead>Copy Out (Publicación)</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {schedule.map((post) => (
+                                        <TableRow key={post.postNumber}>
+                                            <TableCell>{post.postNumber}</TableCell>
+                                            <TableCell>{post.format}</TableCell>
+                                            <TableCell>{post.topic}</TableCell>
+                                            <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyIn}</TableCell>
+                                            <TableCell className="text-xs whitespace-pre-wrap font-sans">{post.copyOut}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                )}
+
+
                 <Card className="col-span-1 md:col-span-3">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Image /> Generador de Medios por IA</CardTitle>
@@ -77,8 +150,21 @@ export default function TeamLabPage() {
                         </div>
                     </CardContent>
                 </Card>
+                
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Users /> Gestión de Equipo</CardTitle>
+                        <CardDescription>
+                            Administra el acceso de tus colaboradores a las herramientas del laboratorio.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         <p className="text-sm text-muted-foreground">Próximamente: Interfaz para invitar y asignar roles (diseñador, copywriter, community manager) a los miembros de tu equipo.</p>
+                         <Button className="mt-4" disabled>Administrar Colaboradores</Button>
+                    </CardContent>
+                </Card>
 
-                 <Card className="col-span-1 md:col-span-3">
+                 <Card className="col-span-1 md:col-span-2">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Bot /> Activación de Agentes de IA para Clientes</CardTitle>
                         <CardDescription>
@@ -90,7 +176,6 @@ export default function TeamLabPage() {
                          <Button className="mt-4" disabled>Ver Clientes Pendientes</Button>
                     </CardContent>
                 </Card>
-
             </div>
         </div>
     );
