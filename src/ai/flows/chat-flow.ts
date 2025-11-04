@@ -35,6 +35,7 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
 
 const prompt = ai.definePrompt({
   name: 'chatPrompt',
+  model: 'googleai/gemini-pro',
   input: { schema: ChatInputSchema },
   output: { schema: ChatOutputSchema },
   prompt: `You MUST respond in the following language: {{{language}}}
