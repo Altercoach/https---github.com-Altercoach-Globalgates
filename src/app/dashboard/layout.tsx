@@ -52,10 +52,11 @@ export default function DashboardLayout({
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
   useEffect(() => {
-    if (auth.user?.role !== 'customer') {
-      router.push('/login');
+    // Only redirect if auth is loaded and user is not a customer.
+    if (auth.isMounted && !auth.user) {
+        router.push('/login');
     }
-  }, [auth, router]);
+  }, [auth.isMounted, auth.user, router]);
 
   const navItems = [
     { href: '/', label: t.home, icon: Home },
@@ -63,7 +64,7 @@ export default function DashboardLayout({
     { href: '/dashboard/settings', label: t.settings, icon: Settings },
   ];
 
-  if (auth.user?.role !== 'customer') {
+  if (!auth.user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p>{t.redirecting}</p>
@@ -163,3 +164,4 @@ export default function DashboardLayout({
     </div>
   );
 }
+    
