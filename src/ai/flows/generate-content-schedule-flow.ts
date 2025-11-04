@@ -39,6 +39,7 @@ const prompt = ai.definePrompt({
   name: 'generateContentSchedulePrompt',
   input: { schema: GenerateContentScheduleInputSchema },
   output: { schema: GenerateContentScheduleOutputSchema },
+  model: 'googleai/gemini-pro',
   prompt: `You are a world-class social media content strategist. Your task is to create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and specific instructions from the marketing team.
 
   **Client Information & Team Instructions:**
