@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, BookOpen, ArrowRight, Settings } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, BookOpen, ArrowRight, Settings, Beaker } from 'lucide-react';
 
 export default function AdminInstructionsPage() {
 
@@ -57,6 +57,16 @@ export default function AdminInstructionsPage() {
                     <CardContent className="text-sm text-muted-foreground space-y-2">
                         <p><strong>Función:</strong> Crear y revisar los cuestionarios de onboarding para clientes.</p>
                         <p><strong>Uso:</strong> Usa "Nuevo Cuestionario" para crear un formulario personalizado pegando una lista de preguntas. Revisa las respuestas de los clientes y el análisis de la IA en los envíos completados.</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Beaker/> Team Lab</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-muted-foreground space-y-2">
+                        <p><strong>Función:</strong> Es el centro de producción. Aquí, tu equipo crea y gestiona los entregables para los clientes.</p>
+                        <p><strong>Uso:</strong> Próximamente: Genera parrillas de contenido con IA, crea imágenes y videos, y gestiona las órdenes de trabajo para los community managers.</p>
                     </CardContent>
                 </Card>
 
@@ -147,7 +157,8 @@ export default function AdminInstructionsPage() {
                              <div className="grid grid-cols-2 gap-4">
                                 <div className="p-3 bg-muted rounded-lg text-center"><MessageSquare className="mx-auto mb-1"/> <span className="font-semibold">CRM:</span> Supervisión de Chats</div>
                                 <div className="p-3 bg-muted rounded-lg text-center"><FileText className="mx-auto mb-1"/> <span className="font-semibold">Cuestionarios:</span> Onboarding de Clientes</div>
-                                <div className="p-3 bg-muted rounded-lg text-center col-span-2"><Puzzle className="mx-auto mb-1"/> <span className="font-semibold">Integraciones:</span> Configuración del Agente IA y Canales</div>
+                                <div className="p-3 bg-muted rounded-lg text-center"><Beaker className="mx-auto mb-1"/> <span className="font-semibold">Team Lab:</span> Producción de Contenido</div>
+                                <div className="p-3 bg-muted rounded-lg text-center"><Puzzle className="mx-auto mb-1"/> <span className="font-semibold">Integraciones:</span> Configuración del Agente IA</div>
                              </div>
                         </CardContent>
                     </Card>

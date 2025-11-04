@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, Save, BookOpen } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, Save, BookOpen, Beaker } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -38,7 +38,8 @@ const labels = {
     viewSite: "Ver Sitio",
     redirecting: "Redirigiendo...",
     loadingOffice: "Cargando Oficina...",
-    reviewAndSave: "Revisar y Guardar Cambios"
+    reviewAndSave: "Revisar y Guardar Cambios",
+    teamLab: "Team Lab"
   },
   en: {
     brand: "Brand",
@@ -55,7 +56,8 @@ const labels = {
     viewSite: "View Site",
     redirecting: "Redirecting...",
     loadingOffice: "Loading Office...",
-    reviewAndSave: "Review & Save Changes"
+    reviewAndSave: "Review & Save Changes",
+    teamLab: "Team Lab"
   },
   fr: {
     brand: "Marque",
@@ -72,7 +74,8 @@ const labels = {
     viewSite: "Voir le site",
     redirecting: "Redirection...",
     loadingOffice: "Chargement du bureau...",
-    reviewAndSave: "Réviser et Enregistrer"
+    reviewAndSave: "Réviser et Enregistrer",
+    teamLab: "Labo d'Équipe"
   }
 };
 
@@ -101,6 +104,7 @@ export default function MyOfficeLayout({
     { href: '/myoffice/services', label: t.solutions, icon: <LayoutGrid /> },
     { href: '/myoffice/products', label: t.plans, icon: <ShoppingBag /> },
     { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
+    { href: '/myoffice/team-lab', label: t.teamLab, icon: <Beaker /> },
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle />},
     { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck />},
     { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
