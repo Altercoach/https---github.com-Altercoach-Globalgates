@@ -65,7 +65,7 @@ const generateImageFlow = ai.defineFlow(
     // Use the refined prompt if available, otherwise fall back to the original brief.
     const finalPrompt = refinedPrompt ?? input.creativeBrief;
 
-    if (!finalPrompt) {
+    if (!finalPrompt || finalPrompt.trim() === '') {
         throw new Error('Creative brief is empty, cannot generate an image.');
     }
 

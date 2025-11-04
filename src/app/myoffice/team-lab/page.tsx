@@ -182,11 +182,11 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
         try {
             const result = await generateImageFromPrompt({ creativeBrief: currentPost.copyIn });
             setGeneratedImageUrl(result.imageUrl);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to generate image", error);
             toast({
                 title: "Error al generar imagen",
-                description: "La IA no pudo crear la imagen. Inténtalo de nuevo.",
+                description: error.message || "La IA no pudo crear la imagen. Inténtalo de nuevo.",
                 variant: "destructive"
             });
         } finally {
