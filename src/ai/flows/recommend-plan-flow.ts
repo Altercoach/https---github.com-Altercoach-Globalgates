@@ -75,7 +75,7 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const {output} = await prompt(input, { model: 'googleai/gemini-pro' });
     return output!;
   }
 );

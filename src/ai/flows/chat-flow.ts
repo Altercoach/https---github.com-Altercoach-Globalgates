@@ -56,9 +56,6 @@ const prompt = ai.definePrompt({
   {{/each}}
   
   Assistant:`,
-  config: {
-    // Convert Zod schema to a more basic format if needed by the model
-  },
   safetySettings: [
     { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
@@ -80,7 +77,7 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const { output } = await prompt({ ...input, history: augmentedHistory });
+    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: 'googleai/gemini-pro' });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');
