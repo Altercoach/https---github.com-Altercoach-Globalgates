@@ -204,3 +204,4 @@ export function ProductCard({ product }: ProductCardProps) {
     </Dialog>
   );
 }
+
