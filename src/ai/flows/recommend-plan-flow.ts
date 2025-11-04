@@ -57,7 +57,7 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input, { model: 'gemini-1.5-flash-latest' });
+    const {output} = await prompt(input, { model: 'gemini-1.5-flash' });
     return output!;
   }
 );
