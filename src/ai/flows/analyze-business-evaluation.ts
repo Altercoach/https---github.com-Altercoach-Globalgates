@@ -36,7 +36,6 @@ export async function analyzeBusinessEvaluation(input: AnalyzeBusinessEvaluation
 
 const prompt = ai.definePrompt({
   name: 'analyzeBusinessEvaluationPrompt',
-  model: 'googleai/gemini-pro',
   input: { schema: AnalyzeBusinessEvaluationInputSchema },
   output: { schema: AnalyzeBusinessEvaluationOutputSchema },
   prompt: `You are an expert business consultant and marketing strategist named "Business Doctor RX". Your task is to analyze a client's answers from a business evaluation questionnaire and provide a comprehensive, insightful analysis in the specified language.

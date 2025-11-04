@@ -27,7 +27,6 @@ export async function translateSiteContent(input: TranslateSiteContentInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'translateSiteContentPrompt',
-  model: 'googleai/gemini-pro',
   input: {schema: TranslateSiteContentInputSchema},
   output: {schema: z.string().nullable()},
   prompt: `You are a professional translator specializing in website and marketing content. You will be provided with website content in JSON format, which is originally in Spanish. Your task is to translate it into the target language, preserving the JSON structure and keys perfectly. Pay special attention to marketing and business terminology to ensure it is accurate and culturally relevant in the translated language.

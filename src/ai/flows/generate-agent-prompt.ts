@@ -37,7 +37,6 @@ export async function generateAgentPrompt(input: GenerateAgentPromptInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'generateAgentPrompt',
-  model: 'googleai/gemini-pro',
   input: { schema: GenerateAgentPromptInputSchema },
   output: { schema: GenerateAgentPromptOutputSchema },
   prompt: `Eres un experto en psicología organizacional, branding y diseño de personalidades para asistentes de inteligencia artificial. Tu tarea es analizar las respuestas de un cliente a un cuestionario de entrenamiento y, a partir de ellas, crear un perfil completo y un system prompt detallado para su nuevo Agente de IA.
