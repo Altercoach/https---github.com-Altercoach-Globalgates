@@ -9,8 +9,7 @@
  * - TranslateSiteContentOutput - The return type for the translateSiteContent function.
  */
 
-import {ai} from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import {ai, getModelForTask} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const TranslateSiteContentInputSchema = z.object({
@@ -52,7 +51,7 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const {output} = await prompt(input, { model: googleAI.model('gemini-1.5-flash') });
+    const {output} = await prompt(input, { model: getModelForTask('translation') });
     return output || '{}';
   }
 );

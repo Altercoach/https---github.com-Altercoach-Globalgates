@@ -9,8 +9,7 @@
  * - AnalyzeBusinessEvaluationOutput - The return type for the function.
  */
 
-import { ai } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import { ai, getModelForTask } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const AnalyzeBusinessEvaluationInputSchema = z.object({
@@ -73,7 +72,7 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
     outputSchema: AnalyzeBusinessEvaluationOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: googleAI.model('gemini-1.5-flash') });
+    const { output } = await prompt(input, { model: getModelForTask('businessAnalysis') });
     if (!output) {
       throw new Error('The AI failed to generate an analysis.');
     }

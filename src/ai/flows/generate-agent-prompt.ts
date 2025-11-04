@@ -9,8 +9,7 @@
  * - GenerateAgentPromptOutput - The return type for the function.
  */
 
-import { ai } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import { ai, getModelForTask } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateAgentPromptInputSchema = z.object({
@@ -79,7 +78,7 @@ const generateAgentPromptFlow = ai.defineFlow(
     outputSchema: GenerateAgentPromptOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: googleAI.model('gemini-1.5-flash') });
+    const { output } = await prompt(input, { model: getModelForTask('promptGeneration') });
     if (!output) {
       throw new Error('The AI failed to generate an agent prompt.');
     }

@@ -9,8 +9,7 @@
  * - RecommendPlanOutput - El tipo de retorno para la función recommendPlan.
  */
 
-import {ai} from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import {ai, getModelForTask} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const RecommendPlanInputSchema = z.object({
@@ -58,7 +57,7 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input, { model: googleAI.model('gemini-1.5-flash') });
+    const {output} = await prompt(input, { model: getModelForTask('chat') });
     return output!;
   }
 );
