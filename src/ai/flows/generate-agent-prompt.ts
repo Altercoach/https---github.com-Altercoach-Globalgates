@@ -78,7 +78,7 @@ const generateAgentPromptFlow = ai.defineFlow(
     outputSchema: GenerateAgentPromptOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: 'gemini-1.5-flash' });
+    const { output } = await prompt(input, { model: 'googleai/gemini-1.5-flash' });
     if (!output) {
       throw new Error('The AI failed to generate an agent prompt.');
     }
