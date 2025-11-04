@@ -272,15 +272,6 @@ export default function AdminDashboardPage() {
               return 'destructive';
       }
   }
-  
-  const BulkActionMenuItem = ({ action, icon, label, isDestructive = false }: { action: 'suspend' | 'activate' | 'delete', icon: React.ReactNode, label: string, isDestructive?: boolean }) => (
-    <AlertDialogTrigger asChild>
-        <DropdownMenuItem onSelect={e => e.preventDefault()} className={isDestructive ? "text-destructive" : ""}>
-            {icon} {label}
-        </DropdownMenuItem>
-    </AlertDialogTrigger>
-  );
-
 
   return (
     <div className="space-y-6">
@@ -343,6 +334,8 @@ export default function AdminDashboardPage() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
+                id="search-customer"
+                name="search-customer"
                 placeholder={t.searchPlaceholder}
                 className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
                 value={searchTerm}
@@ -370,10 +363,16 @@ export default function AdminDashboardPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuLabel>{t.bulkActions}</DropdownMenuLabel>
-                        <BulkActionMenuItem action="suspend" icon={<XCircle className="mr-2"/>} label={t.suspend} />
-                        <BulkActionMenuItem action="activate" icon={<PlayCircle className="mr-2"/>} label={t.reactivate} />
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem onSelect={e => e.preventDefault()}><XCircle className="mr-2"/>{t.suspend}</DropdownMenuItem>
+                        </AlertDialogTrigger>
+                         <AlertDialogTrigger asChild>
+                           <DropdownMenuItem onSelect={e => e.preventDefault()}><PlayCircle className="mr-2"/>{t.reactivate}</DropdownMenuItem>
+                         </AlertDialogTrigger>
                         <DropdownMenuSeparator />
-                        <BulkActionMenuItem action="delete" icon={<Trash2 className="mr-2"/>} label={t.delete} isDestructive />
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem onSelect={e => e.preventDefault()} className="text-destructive"><Trash2 className="mr-2"/>{t.delete}</DropdownMenuItem>
+                        </AlertDialogTrigger>
                     </DropdownMenuContent>
                 </DropdownMenu>
 

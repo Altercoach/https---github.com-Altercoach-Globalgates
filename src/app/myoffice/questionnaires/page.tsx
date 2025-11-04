@@ -15,27 +15,33 @@ const sampleQuestionnaires = [
   {
     id: 'brief-001',
     clientEmail: 'cliente.a@example.com',
-    type: 'Evaluación de Negocio',
-    type_en: 'Business Evaluation',
-    type_fr: 'Évaluation d\'Entreprise',
+    type: {
+      es: 'Evaluación de Negocio',
+      en: 'Business Evaluation',
+      fr: 'Évaluation d\'Entreprise',
+    },
     status: 'Completado',
     date: new Date('2024-05-10'),
   },
   {
     id: 'brief-marketing-002',
     clientEmail: 'cliente.b@example.com',
-    type: 'Brief de Marketing Profesional',
-    type_en: 'Professional Marketing Brief',
-    type_fr: 'Brief de Marketing Professionnel',
+    type: {
+        es: 'Brief de Marketing Profesional',
+        en: 'Professional Marketing Brief',
+        fr: 'Brief de Marketing Professionnel',
+    },
     status: 'Pendiente',
     date: new Date('2024-05-15'),
   },
   {
     id: 'agent-training-001',
     clientEmail: 'cliente.c@example.com',
-    type: 'Entrenamiento de Agente IA',
-    type_en: 'AI Agent Training',
-    type_fr: 'Formation d\'Agent IA',
+    type: {
+        es: 'Entrenamiento de Agente IA',
+        en: 'AI Agent Training',
+        fr: 'Formation d\'Agent IA',
+    },
     status: 'Completado',
     date: new Date('2024-05-18'),
   }
@@ -94,7 +100,7 @@ const labels = {
 
 
 export default function QuestionnairesPage() {
-  const { language } = useLanguage();
+  const { language, getTranslation } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
   const locale = { es, en: enUS, fr }[language.code] || enUS;
 
@@ -132,13 +138,10 @@ export default function QuestionnairesPage() {
             <TableBody>
               {sampleQuestionnaires.map((q) => {
                 const isCompleted = q.status === 'Completado';
-                const typeKey = `type_${language.code}` as keyof typeof q;
-                const questionnaireType = q[typeKey] || q.type;
-
                 return (
                   <TableRow key={q.id}>
                     <TableCell className="font-medium">{q.clientEmail}</TableCell>
-                    <TableCell>{questionnaireType}</TableCell>
+                    <TableCell>{getTranslation(q.type)}</TableCell>
                     <TableCell>{format(q.date, "dd MMM, yyyy", { locale })}</TableCell>
                     <TableCell>
                       <Badge variant={isCompleted ? 'default' : 'secondary'} className={isCompleted ? 'bg-accent text-accent-foreground' : ''}>

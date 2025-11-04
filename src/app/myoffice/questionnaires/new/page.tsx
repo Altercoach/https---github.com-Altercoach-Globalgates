@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -15,10 +16,10 @@ import { Textarea } from '@/components/ui/textarea';
 const labels = {
   es: {
     back: "Volver a Cuestionarios",
-    pageTitle: "Generador de Cuestionario con IA",
+    pageTitle: "Generador de Cuestionario",
     pageSubtitle: "Crea y asigna un nuevo cuestionario a un cliente.",
     configTitle: "Configuración y Contenido",
-    configDesc: "Define el título, el cliente y pega las preguntas que la IA debe usar.",
+    configDesc: "Define el título, el cliente y pega las preguntas para generar un enlace.",
     questionnaireTitle: "Título del Cuestionario",
     questionnaireTitlePlaceholder: "Ej: Brief de Marketing Avanzado",
     clientEmail: "Email del Cliente",
@@ -31,14 +32,15 @@ const labels = {
     linkCopiedDesc: "Puedes compartirlo directamente con tu cliente.",
     emailRequired: "Por favor, introduce un email.",
     sentToast: "¡Cuestionario \"enviado\"!",
-    sentToastDesc: "Se ha generado un enlace para tu cliente."
+    sentToastDesc: "Se ha generado un enlace para tu cliente.",
+    createAnother: "Crear otro cuestionario"
   },
   en: {
     back: "Back to Questionnaires",
-    pageTitle: "AI Questionnaire Generator",
+    pageTitle: "Questionnaire Generator",
     pageSubtitle: "Create and assign a new questionnaire to a client.",
     configTitle: "Configuration & Content",
-    configDesc: "Set the title, client, and paste the questions the AI should use.",
+    configDesc: "Set the title, client, and paste the questions to generate a link.",
     questionnaireTitle: "Questionnaire Title",
     questionnaireTitlePlaceholder: "e.g., Advanced Marketing Brief",
     clientEmail: "Client's Email",
@@ -51,14 +53,15 @@ const labels = {
     linkCopiedDesc: "You can share it directly with your client.",
     emailRequired: "Please enter an email.",
     sentToast: "Questionnaire \"sent\"!",
-    sentToastDesc: "A link has been generated for your client."
+    sentToastDesc: "A link has been generated for your client.",
+    createAnother: "Create another questionnaire"
   },
   fr: {
     back: "Retour aux Questionnaires",
-    pageTitle: "Générateur de Questionnaire IA",
+    pageTitle: "Générateur de Questionnaire",
     pageSubtitle: "Créez et assignez un nouveau questionnaire à un client.",
     configTitle: "Configuration et Contenu",
-    configDesc: "Définissez le titre, le client et collez les questions que l'IA doit utiliser.",
+    configDesc: "Définissez le titre, le client et collez les questions pour générer un lien.",
     questionnaireTitle: "Titre du Questionnaire",
     questionnaireTitlePlaceholder: "Ex: Brief Marketing Avancé",
     clientEmail: "E-mail du Client",
@@ -71,7 +74,8 @@ const labels = {
     linkCopiedDesc: "Vous pouvez le partager directement avec votre client.",
     emailRequired: "Veuillez saisir un e-mail.",
     sentToast: "Questionnaire \"envoyé\" !",
-    sentToastDesc: "Un lien a été généré pour votre client."
+    sentToastDesc: "Un lien a été généré pour votre client.",
+    createAnother: "Créer un autre questionnaire"
   }
 };
 
@@ -85,7 +89,11 @@ export default function NewQuestionnairePage() {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!clientEmail) {
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const email = formData.get('client-email');
+
+    if (!email) {
       toast({ title: t.emailRequired, variant: 'destructive' });
       return;
     }
@@ -105,7 +113,7 @@ export default function NewQuestionnairePage() {
       toast({ title: t.linkCopied, description: t.linkCopiedDesc });
     } catch (err) {
       console.error('Failed to copy: ', err);
-      toast({ title: "Error al copiar", description: "No se pudo copiar el enlace al portapapeles.", variant: 'destructive'});
+      toast({ title: "Error copying", description: "Could not copy link to clipboard.", variant: 'destructive'});
     }
   };
 
@@ -139,22 +147,21 @@ export default function NewQuestionnairePage() {
                       </Button>
                     </AlertDescription>
                 </Alert>
-                 <Button onClick={() => setIsSent(false)} className="w-full">Crear otro cuestionario</Button>
+                 <Button onClick={() => setIsSent(false)} className="w-full">{t.createAnother}</Button>
             </div>
           ) : (
              <form onSubmit={handleSend} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="questionnaire-title">{t.questionnaireTitle}</Label>
-                    <Input id="questionnaire-title" placeholder={t.questionnaireTitlePlaceholder} required />
+                    <Input id="questionnaire-title" name="questionnaire-title" placeholder={t.questionnaireTitlePlaceholder} required />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="client-email">{t.clientEmail}</Label>
                     <Input
                         id="client-email"
+                        name="client-email"
                         type="email"
                         placeholder={t.clientEmailPlaceholder}
-                        value={clientEmail}
-                        onChange={(e) => setClientEmail(e.target.value)}
                         required
                     />
                 </div>
@@ -162,6 +169,7 @@ export default function NewQuestionnairePage() {
                     <Label htmlFor="questions">{t.questionsLabel}</Label>
                     <Textarea
                         id="questions"
+                        name="questions"
                         placeholder={t.questionsPlaceholder}
                         rows={10}
                         required
