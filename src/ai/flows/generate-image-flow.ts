@@ -9,7 +9,7 @@
  * - GenerateImageOutput - The return type for the function.
  */
 
-import { ai, getModelForTask } from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 
@@ -60,16 +60,19 @@ const generateImageFlow = ai.defineFlow(
   },
   async (input) => {
     // Step 1: Refine the user's brief into a better prompt.
-    const { output: refinedPrompt } = await imagePromptRefiner(input, { model: getModelForTask('copywriting') });
+    const { output: refinedPrompt } = await imagePromptRefiner(input, { model: 'googleai/gemini-1.5-flash' });
     
-    if (!refinedPrompt) {
-        throw new Error('Failed to refine the image prompt.');
+    // Use the refined prompt if available, otherwise fall back to the original brief.
+    const finalPrompt = refinedPrompt ?? input.creativeBrief;
+
+    if (!finalPrompt) {
+        throw new Error('Creative brief is empty, cannot generate an image.');
     }
 
-    // Step 2: Use the refined prompt to generate the image.
+    // Step 2: Use the final prompt to generate the image.
     const { media } = await ai.generate({
       model: googleAI.model('imagen-4.0-fast-generate-001'),
-      prompt: refinedPrompt,
+      prompt: finalPrompt,
     });
 
     const imageUrl = media?.url;
