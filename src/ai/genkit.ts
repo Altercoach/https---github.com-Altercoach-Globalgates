@@ -111,14 +111,22 @@ export const MODEL_BY_TASK = {
  * Obtener modelo recomendado para una tarea específica
  */
 export function getModelForTask(task: keyof typeof MODEL_BY_TASK) {
-  const modelId = MODEL_BY_TASK[task];
-  if (modelId === REPLICATE_IMAGE_MODEL) {
+  const modelOrId = MODEL_BY_TASK[task];
+  
+  if (modelOrId === REPLICATE_IMAGE_MODEL) {
     // Replicate es un servicio externo, no un modelo de googleAI.
     // El flujo `generate-image-flow` se encargará de llamar a este servicio.
     // Retornamos un modelo de texto rápido como placeholder.
     return getFastModel(); 
   }
-  return googleAI.model(modelId);
+
+  // Si ya es un objeto de modelo, lo retornamos directamente.
+  // Si es un ID, creamos la instancia del modelo.
+  if (typeof modelOrId === 'object') {
+    return modelOrId;
+  }
+  
+  return googleAI.model(modelOrId);
 }
 
 // ============================================
