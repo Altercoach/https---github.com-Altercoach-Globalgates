@@ -365,8 +365,8 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
 
                         {generatedImageUrl && (
                             <div className="space-y-4">
-                                <div className="aspect-square relative w-full bg-muted rounded-lg overflow-hidden">
-                                    <Image src={generatedImageUrl} alt="Imagen generada por IA" fill className="object-contain" />
+                                <div className="relative w-full overflow-hidden bg-muted rounded-lg">
+                                    <Image src={generatedImageUrl} alt="Imagen generada por IA" width={1024} height={1024} className="object-contain w-full h-auto" />
                                 </div>
                                 <a href={generatedImageUrl} download={`post_image_${currentPost?.postNumber}.png`}>
                                     <Button variant="secondary" className="w-full">
