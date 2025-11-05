@@ -176,7 +176,14 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
     };
 
     const handleGenerateImage = async () => {
-        if (!currentPost) return;
+        if (!currentPost || !currentPost.copyIn) {
+            toast({
+                title: "Brief Creativo Vacío",
+                description: "El campo 'Copy In' no puede estar vacío para generar una imagen.",
+                variant: "destructive"
+            });
+            return;
+        }
         setIsGeneratingImage(true);
         setGeneratedImageUrl(null);
         try {
