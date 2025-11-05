@@ -16,8 +16,8 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-// Cambiamos a un modelo más rápido y gratuito para la demostración
-const REPLICATE_MODEL_ID = 'black-forest-labs/flux-schnell:399f6d3176d7c6e69956d04341c6404050e64f114a2c0746939933510443b624';
+// Usaremos un modelo estable y conocido como Stable Diffusion XL.
+const REPLICATE_MODEL_ID = 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b';
 
 const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }> = {
   '1:1': { width: 1024, height: 1024 },
@@ -43,7 +43,7 @@ const generateImageFlow = ai.defineFlow(
     }),
   },
   async (input) => {
-    console.log('🎨 Iniciando generación de imagen con nuevo flujo...');
+    console.log('🎨 Iniciando generación de imagen con flujo simplificado...');
     
     if (!process.env.REPLICATE_API_TOKEN) {
       throw new Error('REPLICATE_API_TOKEN no está configurado en el archivo .env');
@@ -56,7 +56,7 @@ const generateImageFlow = ai.defineFlow(
     const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio] || ASPECT_RATIO_DIMENSIONS['1:1'];
 
     try {
-      console.log(`🖼️  Enviando prompt a Replicate: "${input.creativeBrief.substring(0, 50)}..."`);
+      console.log(`🖼️  Enviando prompt a Replicate con SDXL: "${input.creativeBrief.substring(0, 80)}..."`);
       
       const output = await replicate.run(
         REPLICATE_MODEL_ID as `${string}/${string}:${string}`,
@@ -66,8 +66,6 @@ const generateImageFlow = ai.defineFlow(
             width: dimensions.width,
             height: dimensions.height,
             num_outputs: 1,
-            guidance_scale: 7.5,
-            num_inference_steps: 25,
           },
         }
       );
@@ -83,7 +81,7 @@ const generateImageFlow = ai.defineFlow(
       return {
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief, // Usamos el prompt directo
-        cost: 0.00, // Este modelo es gratuito
+        cost: 0.00, // El costo puede variar, pero lo mantenemos simple.
         model: REPLICATE_MODEL_ID,
       };
 
