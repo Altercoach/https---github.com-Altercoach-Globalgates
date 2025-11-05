@@ -9,100 +9,6 @@ import { GenerateImageInputSchema } from '@/lib/types';
 
 
 // ============================================
-// PROMPT DE REFINAMIENTO CREATIVO
-// ============================================
-
-const imagePromptRefiner = ai.definePrompt(
-  {
-    name: 'imagePromptRefiner',
-    input: {
-      schema: z.object({
-        creativeBrief: z.string(),
-        style: z.string().optional(),
-      }),
-    },
-    output: {
-      schema: z.string().describe('Prompt visual optimizado'),
-    },
-  },
-  `
-Eres un DIRECTOR CREATIVO experto nivel mundial con profundo conocimiento en:
-
-📚 EXPERTOS DE REFERENCIA:
-- Simon Sinek (propósito y storytelling)
-- Seth Godin (ideas virales y tribus)
-- Jürgen Klarić (neuromarketing)
-- Gary Vaynerchuk (contenido social)
-- Neil Patel (marketing digital)
-
-🎨 DISCIPLINAS MAESTRAS:
-- Marketing estratégico y psicología del consumidor
-- Diseño visual y teoría del color
-- Neuromarketing y triggers emocionales
-- Arquetipos de marca y storytelling
-- Composición fotográfica y dirección de arte
-
-🎯 TU MISIÓN:
-Transformar el brief creativo en un PROMPT VISUAL PROFESIONAL para generación de imagen.
-
-BRIEF CREATIVO:
-{{{creativeBrief}}}
-
-{{#if style}}
-ESTILO SOLICITADO:
-{{style}}
-{{/if}}
-
-📐 PROCESO DE DIRECCIÓN CREATIVA:
-
-1. ANÁLISIS DEL CONCEPTO:
-   - Identifica el mensaje core y objetivo de marketing
-   - Determina la emoción o reacción que debe provocar
-   - Define el arquetipo visual más efectivo
-
-2. SELECCIÓN DE ESTILO:
-   Considera estos enfoques según el objetivo:
-   - Realismo fotográfico (credibilidad, producto)
-   - Ilustración conceptual (ideas abstractas)
-   - Minimalismo (elegancia, premium)
-   - Bold & colorido (energía, juventud)
-   - Storytelling visual (conexión emocional)
-   - Arte abstracto (innovación, creatividad)
-
-3. ELEMENTOS DE DISEÑO:
-   - Composición (regla de tercios, punto focal)
-   - Paleta de colores (psicología del color)
-   - Iluminación (mood y atmósfera)
-   - Tipografía visual (si aplica)
-   - Espacios negativos (jerarquía visual)
-
-4. CONSTRUCCIÓN DEL PROMPT:
-   Estructura tu prompt así:
-
-   [SUJETO PRINCIPAL] + [ACCIÓN/EMOCIÓN] + [ESTILO VISUAL] + [COMPOSICIÓN] + [ILUMINACIÓN] + [PALETA] + [DETALLES TÉCNICOS]
-
-   Ejemplo:
-   "Professional female entrepreneur, confident pose, modern minimalist style, centered composition with negative space, natural window lighting, soft blues and whites, high quality photography, 8K, sharp focus, bokeh background"
-
-🎨 INSTRUCCIONES CRÍTICAS:
-
-- NO traduzcas literalmente el copy
-- USA el brief como CONCEPTO, no como texto
-- Sé ESPECÍFICO en detalles visuales
-- Incluye triggers emocionales sutiles
-- Considera el contexto de marketing (¿venta? ¿educación? ¿inspiración?)
-- Optimiza para generación por IA (sé descriptivo pero conciso)
-- EVITA: texto, logos, marcas específicas (a menos que sea esencial)
-
-💡 ENTREGA:
-Un prompt de máximo 200 palabras, profesional, detallado y optimizado para Stable Diffusion/FLUX.
-Enfócate en la IDEA VISUAL, no en describir el copy.
-
-PROMPT VISUAL OPTIMIZADO:
-`
-);
-
-// ============================================
 // DIMENSIONES SEGÚN ASPECT RATIO
 // ============================================
 
@@ -135,27 +41,10 @@ const generateImageFlow = ai.defineFlow(
     if (!input.creativeBrief || input.creativeBrief.trim().length === 0) {
       throw new Error('El brief creativo está vacío, no se puede generar una imagen.');
     }
-
-    console.log('🧠 Refinando brief creativo con IA...');
     
-    let refinedPrompt: string;
-    try {
-      const { output } = await imagePromptRefiner(
-        {
-          creativeBrief: input.creativeBrief,
-          style: input.style,
-        },
-        {
-          model: getModelForTask('copywriting'), 
-        }
-      );
-      
-      refinedPrompt = output || input.creativeBrief;
-      console.log('✅ Prompt refinado:', refinedPrompt.substring(0, 100) + '...');
-    } catch (error) {
-      console.warn('⚠️ No se pudo refinar el prompt, usando brief original');
-      refinedPrompt = input.creativeBrief;
-    }
+    // Usamos el brief directamente como prompt para mayor robustez
+    const refinedPrompt = input.creativeBrief;
+    console.log('🖼️  Usando prompt directo:', refinedPrompt.substring(0, 100) + '...');
 
     const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio] || ASPECT_RATIO_DIMENSIONS['1:1'];
 
