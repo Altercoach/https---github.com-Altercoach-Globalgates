@@ -81,11 +81,8 @@ const generateImageFlow = ai.defineFlow(
 
     // Step 2: Use the final prompt to generate the image.
     const { media } = await ai.generate({
-      model: googleAI.model('gemini-1.5-flash'), // Corrected to a compatible and accessible model
+      model: getModelForTask('contentGeneration'), // Use the same model as content generation for compatibility
       prompt: finalPrompt,
-      config: {
-        responseModalities: ['IMAGE'],
-      },
     });
 
     const imageUrl = media?.url;
