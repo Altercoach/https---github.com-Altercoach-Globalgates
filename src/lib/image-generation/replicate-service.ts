@@ -98,7 +98,7 @@ class ReplicateImageService {
   private initialize() {
     const apiToken = process.env.REPLICATE_API_TOKEN;
     
-    if (!apiToken || apiToken === 'r8_tu_token_aqui' || apiToken.length < 10) {
+    if (!apiToken) {
       console.warn('⚠️ REPLICATE_API_TOKEN no configurado. Usando modo placeholder.');
       this.isConfigured = false;
       return;
@@ -140,7 +140,7 @@ class ReplicateImageService {
           input: {
             prompt: options.prompt,
             negative_prompt: options.negativePrompt || 
-              'low quality, blurry, distorted, watermark, text, logo',
+              'low quality, blurry, distorted, watermark, text, logo, brand name, ugly, deformed',
             width: options.width || 1024,
             height: options.height || 1024,
             num_outputs: options.numOutputs || 1,
