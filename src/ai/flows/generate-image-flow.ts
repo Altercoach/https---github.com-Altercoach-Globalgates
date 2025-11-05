@@ -8,19 +8,10 @@ import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput,
 import { GenerateImageInputSchema } from '@/lib/types';
 
 // ============================================
-// CONFIGURACIÓN DE REPLICATE
+// MODELO Y FALLBACK
 // ============================================
 
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
-
-// Modelo gratuito y actualizado recomendado (FLUX.1.1 Pro)
-const REPLICATE_MODEL_ID = 'black-forest-labs/flux-1.1-pro:1c59f6236b3f5a8398b1b7029519c636f332208a9947843194a2b220377461e1';
-
-// ============================================
-// FUNCIÓN DE FALLBACK (PLACEHOLDER)
-// ============================================
+const REPLICATE_MODEL_ID = 'black-forest-labs/flux-schnell';
 
 function generatePlaceholder(brief: string): GenerateImageOutput {
     console.warn('⚠️  Replicate falló (puede ser por falta de créditos o error de API). Usando placeholder de picsum.photos.');
@@ -32,7 +23,6 @@ function generatePlaceholder(brief: string): GenerateImageOutput {
         model: 'placeholder',
     };
 }
-
 
 // ============================================
 // FLUJO PRINCIPAL DE GENERACIÓN
@@ -61,15 +51,24 @@ const generateImageFlow = ai.defineFlow(
     }
     
     try {
-      console.log(`🎨  Enviando prompt a Replicate con FLUX.1.1 Pro: "${input.creativeBrief.substring(0, 80)}..."`);
+      const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
       
-      const replicateInput = {
-        prompt: input.creativeBrief,
-        aspect_ratio: input.aspectRatio,
-        num_outputs: 1,
-      };
+      console.log(`🎨 Generando imagen con FLUX Schnell (GRATIS)`);
+      console.log('📝 Prompt:', input.creativeBrief.substring(0, 100));
 
-      const output = await replicate.run(REPLICATE_MODEL_ID as `${string}/${string}:${string}`, { input: replicateInput });
+      const output = await replicate.run(
+        REPLICATE_MODEL_ID as `${string}/${string}:${string}`,
+        {
+          input: {
+            prompt: input.creativeBrief,
+            go_fast: true,
+            num_outputs: 1,
+            aspect_ratio: input.aspectRatio,
+            output_format: "webp",
+            output_quality: 80,
+          }
+        }
+      );
       
       const imageUrl = Array.isArray(output) ? output[0] : String(output);
 
@@ -78,17 +77,17 @@ const generateImageFlow = ai.defineFlow(
       }
 
       console.log('✅ Imagen generada exitosamente por IA.');
+      console.log('🔗 URL:', imageUrl);
 
       return {
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief,
-        cost: 0, // El modelo FLUX es gratuito
-        model: REPLICATE_MODEL_ID,
+        cost: 0, 
+        model: 'flux-schnell',
       };
 
     } catch (error: any) {
       console.error('❌ Error al generar imagen con Replicate:', error.message);
-      // Si falla (por crédito u otra razón), devolvemos un placeholder.
       return generatePlaceholder(input.creativeBrief);
     }
   }
@@ -111,7 +110,6 @@ export async function generateImageFromPrompt(input: GenerateImageInput): Promis
  */
 export async function generateBatchImages(input: GenerateBatchImagesInput): Promise<GenerateBatchImagesOutput> {
     console.warn("La generación en lote aún no está implementada en este flujo simplificado.");
-    // Devolvemos una respuesta vacía para no romper la interfaz
     return {
         results: [],
         totalCost: 0,
