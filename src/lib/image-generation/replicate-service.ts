@@ -98,7 +98,7 @@ class ReplicateImageService {
   private initialize() {
     const apiToken = process.env.REPLICATE_API_TOKEN;
     
-    if (!apiToken || apiToken === 'r8_tu_token_aqui') {
+    if (!apiToken || apiToken === 'r8_tu_token_aqui' || apiToken.length < 10) {
       console.warn('⚠️ REPLICATE_API_TOKEN no configurado. Usando modo placeholder.');
       this.isConfigured = false;
       return;
@@ -109,7 +109,9 @@ class ReplicateImageService {
         auth: apiToken,
       });
       this.isConfigured = true;
-      console.log('✅ Replicate configurado correctamente');
+      console.log('✅ Replicate configurado correctamente.');
+      console.log(`   -> Modelo Activo: ${this.getActiveModelInfo().description}`);
+
     } catch (error) {
       console.error('❌ Error al inicializar Replicate:', error);
       this.isConfigured = false;
