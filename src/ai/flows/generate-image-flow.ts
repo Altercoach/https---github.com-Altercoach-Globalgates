@@ -16,7 +16,8 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-const REPLICATE_MODEL_ID = 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b';
+// Cambiamos a un modelo más rápido y gratuito para la demostración
+const REPLICATE_MODEL_ID = 'black-forest-labs/flux-schnell:399f6d3176d7c6e69956d04341c6404050e64f114a2c0746939933510443b624';
 
 const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }> = {
   '1:1': { width: 1024, height: 1024 },
@@ -67,7 +68,6 @@ const generateImageFlow = ai.defineFlow(
             num_outputs: 1,
             guidance_scale: 7.5,
             num_inference_steps: 25,
-            negative_prompt: 'low quality, blurry, distorted, watermark, text, logo'
           },
         }
       );
@@ -83,7 +83,7 @@ const generateImageFlow = ai.defineFlow(
       return {
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief, // Usamos el prompt directo
-        cost: 0.003, // Costo estimado para SDXL
+        cost: 0.00, // Este modelo es gratuito
         model: REPLICATE_MODEL_ID,
       };
 
