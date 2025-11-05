@@ -81,8 +81,11 @@ const generateImageFlow = ai.defineFlow(
 
     // Step 2: Use the final prompt to generate the image.
     const { media } = await ai.generate({
-      model: getModelForTask('contentGeneration'), // Use the same model as content generation for compatibility
+      model: getModelForTask('contentGeneration'), // Use a compatible model for image generation
       prompt: finalPrompt,
+      config: {
+        responseModalities: ['IMAGE'], // Explicitly request an image
+      },
     });
 
     const imageUrl = media?.url;
