@@ -31,13 +31,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    // This allows Next.js to accept requests from the Cloud Workstations preview URL.
-    allowedDevOrigins: [
-        "*.cloudworkstations.dev",
-        "*.cloud.goog"
-    ],
-  },
 };
 
 export default nextConfig;
