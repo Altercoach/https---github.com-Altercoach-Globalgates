@@ -4,14 +4,7 @@
 import { z } from 'zod';
 import { ai, getModelForTask } from '@/ai/genkit';
 import { replicateImageService } from '@/lib/image-generation/replicate-service';
-import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
-
-
-// ============================================
-// SCHEMAS (ahora importados desde types.ts para consistencia)
-// ============================================
-
-export { GenerateImageInputSchema, GenerateImageOutputSchema, GenerateBatchImagesInputSchema, GenerateBatchImagesOutputSchema } from '@/lib/types';
+import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput, GenerateImageInputSchema, GenerateImageOutputSchema } from '@/lib/types';
 
 
 // ============================================
