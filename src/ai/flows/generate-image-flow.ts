@@ -1,35 +1,17 @@
 
 'use server';
 
-/**
- * @fileOverview Generates an image from a creative brief using AI.
- * This flow refines a creative concept into a professional visual prompt using Genkit,
- * then calls a dedicated image generation service (Replicate) to create the image.
- */
-
 import { z } from 'zod';
 import { ai, getModelForTask } from '@/ai/genkit';
 import { replicateImageService } from '@/lib/image-generation/replicate-service';
-import type { ImageGenerationOptions } from '@/lib/image-generation/replicate-service';
+import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
+
 
 // ============================================
-// SCHEMAS
+// SCHEMAS (ahora importados desde types.ts para consistencia)
 // ============================================
 
-export const GenerateImageInputSchema = z.object({
-  creativeBrief: z.string().describe("The creative brief or idea for the image."),
-  aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1').optional(),
-  style: z.string().optional().describe('Estilo visual deseado (ej. "cinematic", "minimalist")'),
-});
-export type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
-
-export const GenerateImageOutputSchema = z.object({
-  imageUrl: z.string().describe("The data URI of the generated image."),
-  refinedPrompt: z.string().describe('The refined prompt used to generate the image.'),
-  cost: z.number().describe('The cost of the generation in USD.'),
-  model: z.string().describe('The model used for generation.'),
-});
-export type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
+export { GenerateImageInputSchema, GenerateImageOutputSchema, GenerateBatchImagesInputSchema, GenerateBatchImagesOutputSchema } from '@/lib/types';
 
 
 // ============================================
@@ -39,46 +21,91 @@ export type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
 const imagePromptRefiner = ai.definePrompt(
   {
     name: 'imagePromptRefiner',
-    input: { schema: GenerateImageInputSchema.pick({ creativeBrief: true, style: true }) },
-    output: { schema: z.string().nullable().describe('Prompt visual optimizado para IA') },
+    input: {
+      schema: z.object({
+        creativeBrief: z.string(),
+        style: z.string().optional(),
+      }),
+    },
+    output: {
+      schema: z.string().describe('Prompt visual optimizado'),
+    },
   },
-  `Eres un DIRECTOR CREATIVO de clase mundial en una agencia de publicidad, un híbrido entre Simon Sinek, Seth Godin y un diseñador visual de élite. Tu especialidad es traducir conceptos de marketing en arte visual impactante.
+  `
+Eres un DIRECTOR CREATIVO experto nivel mundial con profundo conocimiento en:
 
-    **Tu Misión:**
-    Transformar un "Brief Creativo" (un eje conceptual) en un PROMPT VISUAL PROFESIONAL y detallado, optimizado para un modelo de IA de texto a imagen (como Stable Diffusion o FLUX).
+📚 EXPERTOS DE REFERENCIA:
+- Simon Sinek (propósito y storytelling)
+- Seth Godin (ideas virales y tribus)
+- Jürgen Klarić (neuromarketing)
+- Gary Vaynerchuk (contenido social)
+- Neil Patel (marketing digital)
 
-    **Brief Creativo (Eje Conceptual):**
-    {{{creativeBrief}}}
-    
-    {{#if style}}
-    **Estilo Solicitado:**
-    {{style}}
-    {{/if}}
+🎨 DISCIPLINAS MAESTRAS:
+- Marketing estratégico y psicología del consumidor
+- Diseño visual y teoría del color
+- Neuromarketing y triggers emocionales
+- Arquetipos de marca y storytelling
+- Composición fotográfica y dirección de arte
 
-    **Tu Proceso Mental (Paso a Paso):**
+🎯 TU MISIÓN:
+Transformar el brief creativo en un PROMPT VISUAL PROFESIONAL para generación de imagen.
 
-    1.  **Deconstruir el Objetivo:** ¿Qué se quiere lograr? (generar deseo, construir confianza, crear urgencia, comunicar simplicidad).
-    2.  **Elegir un Arquetipo Visual:** No seas literal. Decide si el concepto se expresa mejor a través de:
-        *   **Realismo Fotográfico:** para credibilidad (ej. producto en uso).
-        *   **Abstracción/Conceptual:** para ideas complejas (ej. seguridad de datos).
-        *   **Surrealismo/Metáfora:** para impacto emocional (ej. "libertad financiera").
-        *   **Estilo Minimalista:** para elegancia o premium.
-    3.  **Sintetizar tu Expertise:** Infunde principios de marketing y psicología. Si el brief es sobre "seguridad", usa elementos que evocan confianza (estructuras sólidas, colores calmados, posturas abiertas).
-    4.  **Construir el Prompt Maestro (Tu Instrucción de Director):**
-        *   **Core Concept:** Una frase evocadora que captura la idea principal.
-        *   **Estilo Visual:** (e.g., photorealistic, cinematic lighting, 3D render, minimalist digital art, moody, vibrant, epic).
-        *   **Sujeto y Composición:** Describe la escena, el foco, el ángulo (e.g., close-up on a character's determined expression, wide shot of a serene landscape).
-        *   **Iluminación y Color:** Especifica el ambiente (e.g., dramatic Rembrandt lighting, soft morning light, a palette of cool blues and greys).
-        *   **Emoción Clave a Evocar:** (e.g., confianza, curiosidad, alivio, ambición).
-        *   **Negative Prompts (Crucial):** Lo que NO debe aparecer (e.g., -no text, -no blurry elements, -no generic stock-photo feel, -no logos).
+BRIEF CREATIVO:
+{{{creativeBrief}}}
 
-    **Ejemplo de Transformación:**
-    -   **Brief Creativo (Malo):** "Flyer para un café que da energía."
-    -   **Tu Prompt (EXCELENTE):** "Cinematic shot of a young entrepreneur at dawn in a modern, minimalist office. Golden sunlight streams through the window, illuminating a single, elegant cup of black coffee on their desk. The focus is on their determined, focused eyes, reflecting the glow of a computer screen. The overall mood is one of quiet ambition and potential. Style: Photorealistic, moody, high-contrast. -no cliché imagery, -no text."
+{{#if style}}
+ESTILO SOLICITADO:
+{{style}}
+{{/if}}
 
-    **Tu Tarea:**
-    Ahora, transforma el brief del usuario. Responde **ÚNICAMENTE** con el prompt final y detallado, listo para ser usado por la IA generadora de imágenes. No añadas explicaciones.
-    `
+📐 PROCESO DE DIRECCIÓN CREATIVA:
+
+1. ANÁLISIS DEL CONCEPTO:
+   - Identifica el mensaje core y objetivo de marketing
+   - Determina la emoción o reacción que debe provocar
+   - Define el arquetipo visual más efectivo
+
+2. SELECCIÓN DE ESTILO:
+   Considera estos enfoques según el objetivo:
+   - Realismo fotográfico (credibilidad, producto)
+   - Ilustración conceptual (ideas abstractas)
+   - Minimalismo (elegancia, premium)
+   - Bold & colorido (energía, juventud)
+   - Storytelling visual (conexión emocional)
+   - Arte abstracto (innovación, creatividad)
+
+3. ELEMENTOS DE DISEÑO:
+   - Composición (regla de tercios, punto focal)
+   - Paleta de colores (psicología del color)
+   - Iluminación (mood y atmósfera)
+   - Tipografía visual (si aplica)
+   - Espacios negativos (jerarquía visual)
+
+4. CONSTRUCCIÓN DEL PROMPT:
+   Estructura tu prompt así:
+
+   [SUJETO PRINCIPAL] + [ACCIÓN/EMOCIÓN] + [ESTILO VISUAL] + [COMPOSICIÓN] + [ILUMINACIÓN] + [PALETA] + [DETALLES TÉCNICOS]
+
+   Ejemplo:
+   "Professional female entrepreneur, confident pose, modern minimalist style, centered composition with negative space, natural window lighting, soft blues and whites, high quality photography, 8K, sharp focus, bokeh background"
+
+🎨 INSTRUCCIONES CRÍTICAS:
+
+- NO traduzcas literalmente el copy
+- USA el brief como CONCEPTO, no como texto
+- Sé ESPECÍFICO en detalles visuales
+- Incluye triggers emocionales sutiles
+- Considera el contexto de marketing (¿venta? ¿educación? ¿inspiración?)
+- Optimiza para generación por IA (sé descriptivo pero conciso)
+- EVITA: texto, logos, marcas específicas (a menos que sea esencial)
+
+💡 ENTREGA:
+Un prompt de máximo 200 palabras, profesional, detallado y optimizado para Stable Diffusion/FLUX.
+Enfócate en la IDEA VISUAL, no en describir el copy.
+
+PROMPT VISUAL OPTIMIZADO:
+`
 );
 
 // ============================================
@@ -86,36 +113,39 @@ const imagePromptRefiner = ai.definePrompt(
 // ============================================
 
 const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }> = {
-    '1:1': { width: 1024, height: 1024 },   // Instagram/Facebook posts
-    '4:5': { width: 1024, height: 1280 },   // Instagram feed optimizado
-    '9:16': { width: 720, height: 1280 },   // Stories/Reels
-    '16:9': { width: 1920, height: 1080 },  // YouTube/LinkedIn
+  '1:1': { width: 1024, height: 1024 },   // Instagram/Facebook posts
+  '4:5': { width: 1024, height: 1280 },   // Instagram feed optimizado
+  '9:16': { width: 720, height: 1280 },   // Stories/Reels
+  '16:9': { width: 1920, height: 1080 },  // YouTube/LinkedIn
 };
 
 
 // ============================================
-// FLUJO PRINCIPAL
+// FLUJO PRINCIPAL (NO EXPORTAR DIRECTAMENTE)
 // ============================================
-
-export async function generateImageFromPrompt(input: GenerateImageInput): Promise<GenerateImageOutput> {
-  return generateImageFlow(input);
-}
 
 const generateImageFlow = ai.defineFlow(
   {
-    name: 'generateImageFlow',
-    inputSchema: GenerateImageInputSchema,
-    outputSchema: GenerateImageOutputSchema,
+    name: 'generateImage',
+    inputSchema: z.object({
+      creativeBrief: z.string().describe('Brief creativo o concepto del post'),
+      style: z.string().optional().describe('Estilo visual deseado'),
+      aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1'),
+    }),
+    outputSchema: z.object({
+      imageUrl: z.string().describe('URL de la imagen generada'),
+      refinedPrompt: z.string().describe('Prompt refinado usado para generar la imagen'),
+      cost: z.number().describe('Costo de la generación en USD'),
+      model: z.string().describe('Modelo usado para la generación'),
+    }),
   },
   async (input) => {
     console.log('🎨 Iniciando generación de imagen...');
     
-    // PASO 1: Validar que hay un brief
     if (!input.creativeBrief || input.creativeBrief.trim().length === 0) {
       throw new Error('El brief creativo está vacío, no se puede generar una imagen.');
     }
 
-    // PASO 2: Refinar el brief con IA para convertirlo en prompt visual profesional
     console.log('🧠 Refinando brief creativo con IA...');
     
     let refinedPrompt: string;
@@ -126,7 +156,7 @@ const generateImageFlow = ai.defineFlow(
           style: input.style,
         },
         {
-          model: getModelForTask('copywriting'), // Usa modelo de texto rápido
+          model: getModelForTask('copywriting'), 
         }
       );
       
@@ -137,11 +167,9 @@ const generateImageFlow = ai.defineFlow(
       refinedPrompt = input.creativeBrief;
     }
 
-    // PASO 3: Obtener dimensiones según aspect ratio
-    const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio || '1:1'] || ASPECT_RATIO_DIMENSIONS['1:1'];
+    const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio] || ASPECT_RATIO_DIMENSIONS['1:1'];
 
-    // PASO 4: Generar imagen con el servicio de Replicate
-    console.log(`🖼️ Generando imagen con Replicate (${dimensions.width}x${dimensions.height})...`);
+    console.log('🖼️ Generando imagen con Replicate...');
     
     try {
       const result = await replicateImageService.generateImage({
@@ -165,3 +193,103 @@ const generateImageFlow = ai.defineFlow(
     }
   }
 );
+
+
+// ============================================
+// FLUJO EN LOTE (NO EXPORTAR DIRECTAMENTE)
+// ============================================
+
+const generateBatchImagesFlow = ai.defineFlow(
+  {
+    name: 'generateBatchImages',
+    inputSchema: z.object({
+      posts: z.array(z.object({
+        copyIn: z.string(),
+        aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1'),
+      })),
+    }),
+    outputSchema: z.object({
+      results: z.array(z.object({
+        imageUrl: z.string(),
+        refinedPrompt: z.string(),
+        cost: z.number(),
+        success: z.boolean(),
+        error: z.string().optional(),
+      })),
+      totalCost: z.number(),
+      successCount: z.number(),
+      failureCount: z.number(),
+    }),
+  },
+  async (input) => {
+    console.log(`🎨 Generando ${input.posts.length} imágenes en lote...`);
+    
+    const results = [];
+    let totalCost = 0;
+    let successCount = 0;
+    let failureCount = 0;
+
+    for (const post of input.posts) {
+      try {
+        const result = await generateImageFlow({
+          creativeBrief: post.copyIn,
+          aspectRatio: post.aspectRatio,
+        });
+
+        results.push({
+          imageUrl: result.imageUrl,
+          refinedPrompt: result.refinedPrompt,
+          cost: result.cost,
+          success: true,
+        });
+
+        totalCost += result.cost;
+        successCount++;
+      } catch (error: any) {
+        console.error(`❌ Error en post:`, error);
+        
+        results.push({
+          imageUrl: '',
+          refinedPrompt: '',
+          cost: 0,
+          success: false,
+          error: error.message,
+        });
+
+        failureCount++;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    console.log(`✅ Lote completado: ${successCount} exitosas, ${failureCount} fallidas`);
+    console.log(`💰 Costo total: $${totalCost.toFixed(3)}`);
+
+    return {
+      results,
+      totalCost,
+      successCount,
+      failureCount,
+    };
+  }
+);
+
+// ============================================
+// FUNCIONES WRAPPER ASÍNCRONAS (EXPORTABLES)
+// ============================================
+
+/**
+ * Genera una sola imagen a partir de un brief creativo.
+ * Esta función es segura para ser llamada desde un Server Action.
+ */
+export async function generateImageFromPrompt(input: GenerateImageInput): Promise<GenerateImageOutput> {
+  return await generateImageFlow(input);
+}
+
+/**
+ * Genera un lote de imágenes en paralelo.
+ * Esta función es segura para ser llamada desde un Server Action.
+ */
+export async function generateBatchImages(input: GenerateBatchImagesInput): Promise<GenerateBatchImagesOutput> {
+  return await generateBatchImagesFlow(input);
+}

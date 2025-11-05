@@ -1,4 +1,5 @@
 
+import { z } from 'zod';
 
 export type MultilingualString = {
   es: string;
@@ -102,3 +103,41 @@ export type Customer = {
   signupDate: Date;
   revenue: number;
 };
+
+// AI Flow Schemas
+export const GenerateImageInputSchema = z.object({
+  creativeBrief: z.string().describe('Brief creativo o concepto del post'),
+  style: z.string().optional().describe('Estilo visual deseado'),
+  aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1'),
+});
+export type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
+
+export const GenerateImageOutputSchema = z.object({
+  imageUrl: z.string().describe('URL de la imagen generada'),
+  refinedPrompt: z.string().describe('Prompt refinado usado para generar la imagen'),
+  cost: z.number().describe('Costo de la generación en USD'),
+  model: z.string().describe('Modelo usado para la generación'),
+});
+export type GenerateImageOutput = z.infer<typeof GenerateImageOutputSchema>;
+
+export const GenerateBatchImagesInputSchema = z.object({
+  posts: z.array(z.object({
+    copyIn: z.string(),
+    aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1'),
+  })),
+});
+export type GenerateBatchImagesInput = z.infer<typeof GenerateBatchImagesInputSchema>;
+
+export const GenerateBatchImagesOutputSchema = z.object({
+  results: z.array(z.object({
+    imageUrl: z.string(),
+    refinedPrompt: z.string(),
+    cost: z.number(),
+    success: z.boolean(),
+    error: z.string().optional(),
+  })),
+  totalCost: z.number(),
+  successCount: z.number(),
+  failureCount: z.number(),
+});
+export type GenerateBatchImagesOutput = z.infer<typeof GenerateBatchImagesOutputSchema>;

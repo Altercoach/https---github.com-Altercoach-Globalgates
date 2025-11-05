@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import Image from 'next/image';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import type { GenerateImageInput } from '@/lib/types';
 
 export default function TeamLabPage() {
     const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +28,6 @@ export default function TeamLabPage() {
     const [additionalInstructions, setAdditionalInstructions] = useState('Enfócate en un estilo de vida saludable, equilibrio mente-cuerpo y constancia. Público objetivo: personas de 25-45 años que buscan más que solo ejercicio.');
     const { toast } = useToast();
     
-    // State for image generation dialog
     const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
     const [currentPost, setCurrentPost] = useState<ContentPost | null>(null);
     const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -176,7 +176,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
     };
 
     const handleGenerateImage = async () => {
-        if (!currentPost || !currentPost.copyIn) {
+        if (!currentPost?.copyIn) {
             toast({
                 title: "Brief Creativo Vacío",
                 description: "El campo 'Copy In' no puede estar vacío para generar una imagen.",
@@ -187,7 +187,11 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
         setIsGeneratingImage(true);
         setGeneratedImageUrl(null);
         try {
-            const result = await generateImageFromPrompt({ creativeBrief: currentPost.copyIn });
+            const input: GenerateImageInput = {
+                creativeBrief: currentPost.copyIn,
+                aspectRatio: '1:1', // O puedes hacerlo configurable
+            };
+            const result = await generateImageFromPrompt(input);
             setGeneratedImageUrl(result.imageUrl);
         } catch (error: any) {
             console.error("Failed to generate image", error);
@@ -206,11 +210,6 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
             title: "Automatización Iniciada",
             description: "La generación en lote de todos los recursos ha comenzado. (Funcionalidad futura)",
         });
-        // Future logic:
-        // for (const post of schedule) {
-        //   await generateImageFromPrompt({ creativeBrief: post.copyIn });
-        //   // Handle saving/displaying the batch of images
-        // }
     }
 
 
@@ -332,65 +331,6 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                         </CardFooter>
                     </Card>
                 )}
-
-                <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
-                    <Card className="col-span-1 md:col-span-3">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><ImageIcon /> Generador de Medios por IA</CardTitle>
-                            <CardDescription>
-                                Herramientas de IA para crear los recursos visuales de las campañas. Utiliza texto, imágenes o videos de referencia.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="p-4 border rounded-lg text-center bg-muted/50">
-                                <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                                <h3 className="font-semibold">Texto a Imagen</h3>
-                                <p className="text-xs text-muted-foreground mt-1">Genera imágenes a partir de descripciones detalladas.</p>
-                            </div>
-                            <div className="p-4 border rounded-lg text-center bg-muted/50">
-                                 <Video className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                                <h3 className="font-semibold">Texto a Video</h3>
-                                <p className="text-xs text-muted-foreground mt-1">Crea clips de video cortos a partir de un guion o idea.</p>
-                            </div>
-                            <div className="p-4 border rounded-lg text-center bg-muted/50">
-                                 <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                                <h3 className="font-semibold">Imagen a Imagen</h3>
-                                <p className="text-xs text-muted-foreground mt-1">Modifica o mejora una imagen existente usando IA.</p>
-                            </div>
-                            <div className="p-4 border rounded-lg text-center bg-muted/50">
-                                <Video className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-                                <h3 className="font-semibold">Video a Video</h3>
-                                <p className="text-xs text-muted-foreground mt-1">Aplica nuevos estilos o efectos a un video de referencia.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Users /> Gestión de Equipo</CardTitle>
-                            <CardDescription>
-                                Administra el acceso de tus colaboradores a las herramientas del laboratorio.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                             <p className="text-sm text-muted-foreground">Próximamente: Interfaz para invitar y asignar roles (diseñador, copywriter, community manager) a los miembros de tu equipo.</p>
-                             <Button className="mt-4" disabled>Administrar Colaboradores</Button>
-                        </CardContent>
-                    </Card>
-
-                     <Card className="col-span-1 md:col-span-2">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Bot /> Activación de Agentes de IA para Clientes</CardTitle>
-                            <CardDescription>
-                                Una vez que un cliente completa sus formularios de entrenamiento, activa y despliega su agente de IA personalizado.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">Próximamente: Lista de clientes pendientes de activación. Un clic aquí procesará sus respuestas, generará el 'system prompt' final y habilitará el agente en el panel del cliente correspondiente.</p>
-                             <Button className="mt-4" disabled>Ver Clientes Pendientes</Button>
-                        </CardContent>
-                    </Card>
-                </div>
             </div>
             <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
@@ -434,7 +374,6 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                             </a>
                         </div>
                     )}
-
                 </div>
             </DialogContent>
         </Dialog>
