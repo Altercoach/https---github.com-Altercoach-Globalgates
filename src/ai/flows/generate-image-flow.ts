@@ -18,23 +18,15 @@ const replicate = new Replicate({
 // Modelo gratuito y actualizado recomendado (FLUX.1.1 Pro)
 const REPLICATE_MODEL_ID = 'black-forest-labs/flux-1.1-pro:1c59f6236b3f5a8398b1b7029519c636f332208a9947843194a2b220377461e1';
 
-const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }> = {
-  '1:1': { width: 1024, height: 1024 },
-  '4:5': { width: 1024, height: 1280 },
-  '9:16': { width: 720, height: 1280 },
-  '16:9': { width: 1920, height: 1080 },
-};
-
-
 // ============================================
 // FUNCIÓN DE FALLBACK (PLACEHOLDER)
 // ============================================
 
-function generatePlaceholder(brief: string, aspectRatio: keyof typeof ASPECT_RATIO_DIMENSIONS): GenerateImageOutput {
-    const dimensions = ASPECT_RATIO_DIMENSIONS[aspectRatio];
+function generatePlaceholder(brief: string): GenerateImageOutput {
     console.warn('⚠️  Replicate falló (puede ser por falta de créditos o error de API). Usando placeholder de picsum.photos.');
+    const seed = brief.slice(0, 10).replace(/[^a-zA-Z0-9]/g, '');
     return {
-        imageUrl: `https://picsum.photos/seed/${encodeURIComponent(brief.slice(0,10))}/${dimensions.width}/${dimensions.height}`,
+        imageUrl: `https://picsum.photos/seed/${seed}/1024/1024`,
         refinedPrompt: brief,
         cost: 0,
         model: 'placeholder',
@@ -61,7 +53,7 @@ const generateImageFlow = ai.defineFlow(
     
     if (!process.env.REPLICATE_API_TOKEN) {
       console.warn('REPLICATE_API_TOKEN no está configurado. Usando modo placeholder.');
-      return generatePlaceholder(input.creativeBrief, input.aspectRatio);
+      return generatePlaceholder(input.creativeBrief);
     }
     
     if (!input.creativeBrief || input.creativeBrief.trim().length === 0) {
@@ -71,16 +63,13 @@ const generateImageFlow = ai.defineFlow(
     try {
       console.log(`🎨  Enviando prompt a Replicate con FLUX.1.1 Pro: "${input.creativeBrief.substring(0, 80)}..."`);
       
-      const output = await replicate.run(
-        REPLICATE_MODEL_ID as `${string}/${string}:${string}`,
-        {
-          input: {
-            prompt: input.creativeBrief,
-            aspect_ratio: input.aspectRatio, // <-- CORRECCIÓN CLAVE AQUÍ
-            num_outputs: 1,
-          },
-        }
-      );
+      const replicateInput = {
+        prompt: input.creativeBrief,
+        aspect_ratio: input.aspectRatio,
+        num_outputs: 1,
+      };
+
+      const output = await replicate.run(REPLICATE_MODEL_ID as `${string}/${string}:${string}`, { input: replicateInput });
       
       const imageUrl = Array.isArray(output) ? output[0] : String(output);
 
@@ -99,8 +88,8 @@ const generateImageFlow = ai.defineFlow(
 
     } catch (error: any) {
       console.error('❌ Error al generar imagen con Replicate:', error.message);
-      // Si falla (por crédito u otra razón), devolvemos un placeholder de alta calidad.
-      return generatePlaceholder(input.creativeBrief, input.aspectRatio);
+      // Si falla (por crédito u otra razón), devolvemos un placeholder.
+      return generatePlaceholder(input.creativeBrief);
     }
   }
 );
