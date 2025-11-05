@@ -7,7 +7,6 @@ import Replicate from 'replicate';
 import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
 import { GenerateImageInputSchema } from '@/lib/types';
 
-
 // ============================================
 // CONFIGURACIÓN DE REPLICATE
 // ============================================
@@ -17,6 +16,7 @@ const replicate = new Replicate({
 });
 
 // Usaremos un modelo estable y conocido como Stable Diffusion XL.
+// Este modelo requiere créditos en la cuenta de Replicate.
 const REPLICATE_MODEL_ID = 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b';
 
 const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }> = {
@@ -28,7 +28,23 @@ const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }>
 
 
 // ============================================
-// FLUJO PRINCIPAL (GENERACIÓN ÚNICA)
+// FUNCIÓN DE FALLBACK (PLACEHOLDER)
+// ============================================
+
+function generatePlaceholder(brief: string, aspectRatio: keyof typeof ASPECT_RATIO_DIMENSIONS): GenerateImageOutput {
+    const dimensions = ASPECT_RATIO_DIMENSIONS[aspectRatio];
+    console.warn('⚠️  Replicate falló (puede ser por falta de créditos). Usando placeholder de picsum.photos.');
+    return {
+        imageUrl: `https://picsum.photos/seed/${encodeURIComponent(brief.slice(0,10))}/${dimensions.width}/${dimensions.height}`,
+        refinedPrompt: brief,
+        cost: 0,
+        model: 'placeholder',
+    };
+}
+
+
+// ============================================
+// FLUJO PRINCIPAL DE GENERACIÓN
 // ============================================
 
 const generateImageFlow = ai.defineFlow(
@@ -43,10 +59,10 @@ const generateImageFlow = ai.defineFlow(
     }),
   },
   async (input) => {
-    console.log('🎨 Iniciando generación de imagen con flujo simplificado...');
     
     if (!process.env.REPLICATE_API_TOKEN) {
-      throw new Error('REPLICATE_API_TOKEN no está configurado en el archivo .env');
+      console.warn('REPLICATE_API_TOKEN no está configurado. Usando modo placeholder.');
+      return generatePlaceholder(input.creativeBrief, input.aspectRatio);
     }
     
     if (!input.creativeBrief || input.creativeBrief.trim().length === 0) {
@@ -56,7 +72,7 @@ const generateImageFlow = ai.defineFlow(
     const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio] || ASPECT_RATIO_DIMENSIONS['1:1'];
 
     try {
-      console.log(`🖼️  Enviando prompt a Replicate con SDXL: "${input.creativeBrief.substring(0, 80)}..."`);
+      console.log(`🎨  Enviando prompt a Replicate con SDXL: "${input.creativeBrief.substring(0, 80)}..."`);
       
       const output = await replicate.run(
         REPLICATE_MODEL_ID as `${string}/${string}:${string}`,
@@ -80,14 +96,15 @@ const generateImageFlow = ai.defineFlow(
 
       return {
         imageUrl: imageUrl,
-        refinedPrompt: input.creativeBrief, // Usamos el prompt directo
-        cost: 0.00, // El costo puede variar, pero lo mantenemos simple.
+        refinedPrompt: input.creativeBrief,
+        cost: 0.003, // Costo aproximado de SDXL
         model: REPLICATE_MODEL_ID,
       };
 
     } catch (error: any) {
-      console.error('❌ Error fatal al generar imagen con Replicate:', error);
-      throw new Error(`Error en la API de Replicate: ${error.message}`);
+      console.error('❌ Error al generar imagen con Replicate:', error.message);
+      // Si falla (por crédito u otra razón), devolvemos un placeholder de alta calidad.
+      return generatePlaceholder(input.creativeBrief, input.aspectRatio);
     }
   }
 );
