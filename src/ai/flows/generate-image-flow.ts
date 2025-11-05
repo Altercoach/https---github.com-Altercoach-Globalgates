@@ -68,8 +68,6 @@ const generateImageFlow = ai.defineFlow(
       throw new Error('El brief creativo está vacío, no se puede generar una imagen.');
     }
     
-    const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio] || ASPECT_RATIO_DIMENSIONS['1:1'];
-
     try {
       console.log(`🎨  Enviando prompt a Replicate con FLUX.1.1 Pro: "${input.creativeBrief.substring(0, 80)}..."`);
       
@@ -78,8 +76,7 @@ const generateImageFlow = ai.defineFlow(
         {
           input: {
             prompt: input.creativeBrief,
-            width: dimensions.width,
-            height: dimensions.height,
+            aspect_ratio: input.aspectRatio, // <-- CORRECCIÓN CLAVE AQUÍ
             num_outputs: 1,
           },
         }
