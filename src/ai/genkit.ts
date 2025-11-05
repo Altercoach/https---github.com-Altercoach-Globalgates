@@ -24,6 +24,14 @@ export const GEMINI_2_FLASH = 'gemini-2.0-flash-exp';
  */
 export const GEMINI_15_PRO = 'gemini-1.5-pro';
 
+
+/**
+ * OPCIÓN 3: Imagen 4 - PARA GENERACIÓN DE IMÁGENES
+ * - Mejor para: Creación de recursos visuales a partir de texto.
+ */
+export const IMAGEN_4 = 'imagen-4.0-fast-generate-001';
+
+
 // ============================================
 // MODELO ACTIVO - CAMBIA AQUÍ PARA ALTERNAR
 // ============================================
@@ -79,7 +87,7 @@ export function getFastModel() {
  */
 export const MODEL_BY_TASK = {
   // Tareas creativas y de contenido
-  contentGeneration: getFastModel(),
+  contentGeneration: googleAI.model(IMAGEN_4), // Corrected to use the image model
   copywriting: getFastModel(),
   socialMedia: getFastModel(),
   
