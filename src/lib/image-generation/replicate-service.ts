@@ -179,11 +179,9 @@ class ReplicateImageService {
   private generatePlaceholder(options: ImageGenerationOptions): GeneratedImage {
     const width = options.width || 1024;
     const height = options.height || 1024;
-    const text = encodeURIComponent(
-      options.prompt.substring(0, 100).replace(/\s+/g, '+')
-    );
+    const seed = Math.floor(Math.random() * 1000); // Random seed
     
-    const placeholderUrl = `https://placehold.co/${width}x${height}/4F46E5/white?text=${text}&font=montserrat`;
+    const placeholderUrl = `https://picsum.photos/seed/${seed}/${width}/${height}`;
 
     console.log('📦 Usando placeholder (Replicate no configurado o falló).');
 

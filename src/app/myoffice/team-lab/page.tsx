@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { initialCustomers } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Image from 'next/image';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -364,7 +364,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                     {generatedImageUrl && (
                         <div className="space-y-4">
                             <div className="aspect-square relative w-full bg-muted rounded-lg overflow-hidden">
-                                <Image src={generatedImageUrl} alt="Imagen generada por IA" layout="fill" objectFit="contain" />
+                                <Image src={generatedImageUrl} alt="Imagen generada por IA" fill className="object-contain" />
                             </div>
                             <a href={generatedImageUrl} download={`post_image_${currentPost?.postNumber}.png`}>
                                 <Button variant="secondary" className="w-full">
