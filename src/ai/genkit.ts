@@ -26,10 +26,10 @@ export const GEMINI_15_PRO = 'gemini-1.5-pro';
 
 
 /**
- * OPCIÓN 3: Gemini 1.5 Flash - PARA GENERACIÓN DE IMÁGENES
- * - Mejor para: Creación de recursos visuales a partir de texto en este entorno.
+ * OPCIÓN 3: Replicate - PARA GENERACIÓN DE IMÁGENES
+ * - Se configura en src/lib/image-generation/replicate-service.ts
  */
-export const GEMINI_15_FLASH_FOR_IMAGES = 'gemini-1.5-flash';
+export const REPLICATE_IMAGE_MODEL = 'replicate';
 
 
 // ============================================
@@ -87,7 +87,7 @@ export function getFastModel() {
  */
 export const MODEL_BY_TASK = {
   // Tareas creativas y de contenido
-  imageGeneration: googleAI.model(GEMINI_15_FLASH_FOR_IMAGES), 
+  imageGeneration: REPLICATE_IMAGE_MODEL, 
   copywriting: getFastModel(),
   socialMedia: getFastModel(),
   
@@ -111,7 +111,14 @@ export const MODEL_BY_TASK = {
  * Obtener modelo recomendado para una tarea específica
  */
 export function getModelForTask(task: keyof typeof MODEL_BY_TASK) {
-  return MODEL_BY_TASK[task];
+  const modelId = MODEL_BY_TASK[task];
+  if (modelId === REPLICATE_IMAGE_MODEL) {
+    // Replicate es un servicio externo, no un modelo de googleAI.
+    // El flujo `generate-image-flow` se encargará de llamar a este servicio.
+    // Retornamos un modelo de texto rápido como placeholder.
+    return getFastModel(); 
+  }
+  return googleAI.model(modelId);
 }
 
 // ============================================
@@ -121,7 +128,7 @@ export function getModelForTask(task: keyof typeof MODEL_BY_TASK) {
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
   console.log('🤖 Genkit AI Configuration:');
   console.log(`   Active Text Model: ${ACTIVE_TEXT_MODEL_ID}`);
-  console.log(`   Active Image Model: ${GEMINI_15_FLASH_FOR_IMAGES}`);
+  console.log(`   Active Image Model: ${REPLICATE_IMAGE_MODEL}`);
   console.log(`   Fast Model: ${GEMINI_2_FLASH}`);
   console.log(`   Heavy Model: ${GEMINI_15_PRO}`);
 }

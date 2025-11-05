@@ -4,7 +4,8 @@
 import { z } from 'zod';
 import { ai, getModelForTask } from '@/ai/genkit';
 import { replicateImageService } from '@/lib/image-generation/replicate-service';
-import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput, GenerateImageInputSchema, GenerateImageOutputSchema } from '@/lib/types';
+import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
+import { GenerateImageInputSchema } from '@/lib/types';
 
 
 // ============================================
@@ -120,11 +121,7 @@ const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }>
 const generateImageFlow = ai.defineFlow(
   {
     name: 'generateImage',
-    inputSchema: z.object({
-      creativeBrief: z.string().describe('Brief creativo o concepto del post'),
-      style: z.string().optional().describe('Estilo visual deseado'),
-      aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1'),
-    }),
+    inputSchema: GenerateImageInputSchema,
     outputSchema: z.object({
       imageUrl: z.string().describe('URL de la imagen generada'),
       refinedPrompt: z.string().describe('Prompt refinado usado para generar la imagen'),
