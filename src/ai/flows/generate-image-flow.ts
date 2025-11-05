@@ -15,9 +15,8 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-// Usaremos un modelo estable y conocido como Stable Diffusion XL.
-// Este modelo requiere créditos en la cuenta de Replicate.
-const REPLICATE_MODEL_ID = 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b';
+// Modelo gratuito y actualizado recomendado (FLUX.1.1 Pro)
+const REPLICATE_MODEL_ID = 'black-forest-labs/flux-1.1-pro:1c59f6236b3f5a8398b1b7029519c636f332208a9947843194a2b220377461e1';
 
 const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }> = {
   '1:1': { width: 1024, height: 1024 },
@@ -33,7 +32,7 @@ const ASPECT_RATIO_DIMENSIONS: Record<string, { width: number; height: number }>
 
 function generatePlaceholder(brief: string, aspectRatio: keyof typeof ASPECT_RATIO_DIMENSIONS): GenerateImageOutput {
     const dimensions = ASPECT_RATIO_DIMENSIONS[aspectRatio];
-    console.warn('⚠️  Replicate falló (puede ser por falta de créditos). Usando placeholder de picsum.photos.');
+    console.warn('⚠️  Replicate falló (puede ser por falta de créditos o error de API). Usando placeholder de picsum.photos.');
     return {
         imageUrl: `https://picsum.photos/seed/${encodeURIComponent(brief.slice(0,10))}/${dimensions.width}/${dimensions.height}`,
         refinedPrompt: brief,
@@ -72,7 +71,7 @@ const generateImageFlow = ai.defineFlow(
     const dimensions = ASPECT_RATIO_DIMENSIONS[input.aspectRatio] || ASPECT_RATIO_DIMENSIONS['1:1'];
 
     try {
-      console.log(`🎨  Enviando prompt a Replicate con SDXL: "${input.creativeBrief.substring(0, 80)}..."`);
+      console.log(`🎨  Enviando prompt a Replicate con FLUX.1.1 Pro: "${input.creativeBrief.substring(0, 80)}..."`);
       
       const output = await replicate.run(
         REPLICATE_MODEL_ID as `${string}/${string}:${string}`,
@@ -97,7 +96,7 @@ const generateImageFlow = ai.defineFlow(
       return {
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief,
-        cost: 0.003, // Costo aproximado de SDXL
+        cost: 0, // El modelo FLUX es gratuito
         model: REPLICATE_MODEL_ID,
       };
 
