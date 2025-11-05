@@ -1,3 +1,4 @@
+
 /**
  * Servicio de Generación de Imágenes con Replicate
  * 
@@ -139,8 +140,6 @@ class ReplicateImageService {
         {
           input: {
             prompt: options.prompt,
-            negative_prompt: options.negativePrompt || 
-              'low quality, blurry, distorted, watermark, text, logo, brand name, ugly, deformed',
             width: options.width || 1024,
             height: options.height || 1024,
             num_outputs: options.numOutputs || 1,

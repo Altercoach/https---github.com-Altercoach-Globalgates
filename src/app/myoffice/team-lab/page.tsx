@@ -333,51 +333,49 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                     </Card>
                 )}
             </div>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
+             <DialogContent className="sm:max-w-2xl h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Generador de Imagen con IA</DialogTitle>
                     <DialogDescription>
                         Usa la idea del post para generar un recurso visual. Puedes refinar el prompt antes de generar.
                     </DialogDescription>
                 </DialogHeader>
-                <ScrollArea className="pr-4">
-                    <div className="space-y-4">
-                        <div>
-                            <Label htmlFor="creative-brief" className="font-semibold">Brief Creativo (Prompt)</Label>
-                            <Textarea 
-                                id="creative-brief"
-                                value={currentPost?.copyIn || ''} 
-                                onChange={(e) => setCurrentPost(prev => prev ? {...prev, copyIn: e.target.value} : null)}
-                                rows={5}
-                                className="mt-2"
-                            />
-                        </div>
-                        <Button onClick={handleGenerateImage} disabled={isGeneratingImage} className="w-full">
-                            {isGeneratingImage ? <Loader2 className="mr-2 animate-spin" /> : <Sparkles className="mr-2" />}
-                            {isGeneratingImage ? 'Generando imagen...' : 'Generar Imagen con IA'}
-                        </Button>
-
-                        {isGeneratingImage && (
-                            <div className="flex justify-center items-center h-64 bg-muted rounded-lg">
-                            <Loader2 className="h-12 w-12 text-primary animate-spin"/>
-                            </div>
-                        )}
-
-                        {generatedImageUrl && (
-                            <div className="space-y-4">
-                                <div className="relative w-full overflow-hidden bg-muted rounded-lg">
-                                    <Image src={generatedImageUrl} alt="Imagen generada por IA" width={1024} height={1024} className="object-contain w-full h-auto" />
-                                </div>
-                                <a href={generatedImageUrl} download={`post_image_${currentPost?.postNumber}.png`}>
-                                    <Button variant="secondary" className="w-full">
-                                        <Download className="mr-2" />
-                                        Descargar Imagen
-                                    </Button>
-                                </a>
-                            </div>
-                        )}
+                <div className="flex-1 overflow-y-auto pr-4 space-y-4">
+                    <div>
+                        <Label htmlFor="creative-brief" className="font-semibold">Brief Creativo (Prompt)</Label>
+                        <Textarea 
+                            id="creative-brief"
+                            value={currentPost?.copyIn || ''} 
+                            onChange={(e) => setCurrentPost(prev => prev ? {...prev, copyIn: e.target.value} : null)}
+                            rows={5}
+                            className="mt-2"
+                        />
                     </div>
-                </ScrollArea>
+                    <Button onClick={handleGenerateImage} disabled={isGeneratingImage} className="w-full">
+                        {isGeneratingImage ? <Loader2 className="mr-2 animate-spin" /> : <Sparkles className="mr-2" />}
+                        {isGeneratingImage ? 'Generando imagen...' : 'Generar Imagen con IA'}
+                    </Button>
+
+                    {isGeneratingImage && (
+                        <div className="flex justify-center items-center h-64 bg-muted rounded-lg">
+                           <Loader2 className="h-12 w-12 text-primary animate-spin"/>
+                        </div>
+                    )}
+
+                    {generatedImageUrl && (
+                        <div className="space-y-4">
+                            <div className="relative w-full overflow-hidden bg-muted rounded-lg">
+                                <Image src={generatedImageUrl} alt="Imagen generada por IA" width={1024} height={1024} className="object-contain w-full h-auto" />
+                            </div>
+                            <a href={generatedImageUrl} download={`post_image_${currentPost?.postNumber}.png`}>
+                                <Button variant="secondary" className="w-full">
+                                    <Download className="mr-2" />
+                                    Descargar Imagen
+                                </Button>
+                            </a>
+                        </div>
+                    )}
+                </div>
             </DialogContent>
         </Dialog>
     );
