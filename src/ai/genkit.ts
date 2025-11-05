@@ -26,10 +26,10 @@ export const GEMINI_15_PRO = 'gemini-1.5-pro';
 
 
 /**
- * OPCIÓN 3: Imagen 4 - PARA GENERACIÓN DE IMÁGENES
- * - Mejor para: Creación de recursos visuales a partir de texto.
+ * OPCIÓN 3: Gemini 1.5 Flash - PARA GENERACIÓN DE IMÁGENES
+ * - Mejor para: Creación de recursos visuales a partir de texto en este entorno.
  */
-export const IMAGEN_4 = 'imagen-4.0-fast-generate-001';
+export const GEMINI_15_FLASH_FOR_IMAGES = 'gemini-1.5-flash';
 
 
 // ============================================
@@ -43,7 +43,7 @@ export const IMAGEN_4 = 'imagen-4.0-fast-generate-001';
  * - GEMINI_2_FLASH (recomendado para desarrollo y producción ligera)
  * - GEMINI_15_PRO (recomendado para análisis complejos y producción crítica)
  */
-export const ACTIVE_MODEL_ID = GEMINI_15_PRO; // 👈 CAMBIA AQUÍ
+export const ACTIVE_TEXT_MODEL_ID = GEMINI_15_PRO; // 👈 CAMBIA AQUÍ
 
 // ============================================
 // CONFIGURACIÓN DE GENKIT
@@ -61,7 +61,7 @@ export const ai = genkit({
  * Obtener modelo activo
  */
 export function getActiveModel() {
-  return googleAI.model(ACTIVE_MODEL_ID);
+  return googleAI.model(ACTIVE_TEXT_MODEL_ID);
 }
 
 /**
@@ -87,7 +87,7 @@ export function getFastModel() {
  */
 export const MODEL_BY_TASK = {
   // Tareas creativas y de contenido
-  imageGeneration: googleAI.model(IMAGEN_4), 
+  imageGeneration: googleAI.model(GEMINI_15_FLASH_FOR_IMAGES), 
   copywriting: getFastModel(),
   socialMedia: getFastModel(),
   
@@ -120,7 +120,8 @@ export function getModelForTask(task: keyof typeof MODEL_BY_TASK) {
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
   console.log('🤖 Genkit AI Configuration:');
-  console.log(`   Active Model: ${ACTIVE_MODEL_ID}`);
+  console.log(`   Active Text Model: ${ACTIVE_TEXT_MODEL_ID}`);
+  console.log(`   Active Image Model: ${GEMINI_15_FLASH_FOR_IMAGES}`);
   console.log(`   Fast Model: ${GEMINI_2_FLASH}`);
   console.log(`   Heavy Model: ${GEMINI_15_PRO}`);
 }

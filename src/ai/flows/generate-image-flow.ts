@@ -10,7 +10,6 @@
  */
 
 import { ai, getModelForTask } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'genkit';
 
 const GenerateImageInputSchema = z.object({
@@ -83,6 +82,9 @@ const generateImageFlow = ai.defineFlow(
     const { media } = await ai.generate({
       model: getModelForTask('imageGeneration'), // Use a compatible model for image generation
       prompt: finalPrompt,
+      config: {
+        responseModalities: ['IMAGE'],
+      },
     });
 
     const imageUrl = media?.url;
