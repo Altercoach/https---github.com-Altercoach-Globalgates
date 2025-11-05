@@ -23,7 +23,7 @@ import Replicate from 'replicate';
 export const REPLICATE_MODELS = {
   // 🆓 GRATIS - Muy rápido, buena calidad
   FLUX_SCHNELL: {
-    id: 'black-forest-labs/flux-schnell',
+    id: 'black-forest-labs/flux-schnell:3f649479b14771b9c24090b7194f4699026a7a0b16f39386d758f1f7e4c7cb81',
     cost: 0, // GRATIS
     speed: '⚡⚡⚡⚡⚡',
     quality: '⭐⭐⭐⭐',
@@ -41,7 +41,7 @@ export const REPLICATE_MODELS = {
   
   // 💎 PREMIUM - Máxima calidad
   FLUX_PRO: {
-    id: 'black-forest-labs/flux-pro',
+    id: 'black-forest-labs/flux-pro:67c3383a151528c11e3895a73b754f93845b91b5853c847582e3450e1320490b',
     cost: 0.055, // $0.055 por imagen
     speed: '⚡⚡⚡',
     quality: '⭐⭐⭐⭐⭐⭐',
@@ -60,7 +60,7 @@ export const REPLICATE_MODELS = {
  * Para producción: SDXL (económico y de calidad)
  * Para clientes premium: FLUX_PRO (máxima calidad)
  */
-export const ACTIVE_IMAGE_MODEL = REPLICATE_MODELS.FLUX_SCHNELL; // 👈 CAMBIA AQUÍ
+export const ACTIVE_IMAGE_MODEL = REPLICATE_MODELS.SDXL; // 👈 CAMBIADO a un modelo robusto
 
 // ============================================
 // INTERFAZ DEL SERVICIO
@@ -99,7 +99,7 @@ class ReplicateImageService {
   private initialize() {
     const apiToken = process.env.REPLICATE_API_TOKEN;
     
-    if (!apiToken) {
+    if (!apiToken || apiToken === 'r8_tu_token_aqui') {
       console.warn('⚠️ REPLICATE_API_TOKEN no configurado. Usando modo placeholder.');
       this.isConfigured = false;
       return;
@@ -136,7 +136,7 @@ class ReplicateImageService {
       console.log(`🎨 Generando imagen con ${model.id}`);
 
       const output = await this.client.run(
-        model.id as `${string}/${string}`,
+        model.id as `${string}/${string}:${string}`,
         {
           input: {
             prompt: options.prompt,
@@ -144,7 +144,7 @@ class ReplicateImageService {
             height: options.height || 1024,
             num_outputs: options.numOutputs || 1,
             guidance_scale: 7.5,
-            num_inference_steps: 30,
+            num_inference_steps: 25,
           },
         }
       );
@@ -155,6 +155,8 @@ class ReplicateImageService {
       if (!imageUrl || typeof imageUrl !== 'string') {
         throw new Error('La respuesta de Replicate no contiene una URL de imagen válida.');
       }
+      
+      console.log('✅ Imagen generada por IA exitosamente.');
 
       return {
         url: imageUrl as string,
