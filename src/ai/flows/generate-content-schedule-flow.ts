@@ -88,7 +88,7 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: getModelForTask('contentGeneration') });
+    const { output } = await prompt(input, { model: getModelForTask('socialMedia') });
     if (!output) {
       throw new Error('The AI failed to generate a content schedule.');
     }

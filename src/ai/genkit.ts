@@ -87,7 +87,7 @@ export function getFastModel() {
  */
 export const MODEL_BY_TASK = {
   // Tareas creativas y de contenido
-  contentGeneration: googleAI.model(IMAGEN_4), // Corrected to use the image model
+  imageGeneration: googleAI.model(IMAGEN_4), 
   copywriting: getFastModel(),
   socialMedia: getFastModel(),
   
