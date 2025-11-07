@@ -9,8 +9,8 @@
  * - RecommendPlanOutput - The return type for the function.
  */
 
-import {ai, getAbacusModelForTask} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai, getAbacusModelForTask } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const RecommendPlanInputSchema = z.object({
   businessDescription: z.string().describe('The description of the user\'s business.'),
@@ -30,8 +30,8 @@ export async function recommendPlan(input: RecommendPlanInput): Promise<Recommen
 
 const prompt = ai.definePrompt({
   name: 'recommendPlanPrompt',
-  input: {schema: RecommendPlanInputSchema},
-  output: {schema: RecommendPlanOutputSchema},
+  input: { schema: RecommendPlanInputSchema },
+  output: { schema: RecommendPlanOutputSchema },
   prompt: `You are an expert business consultant. Your task is to analyze a business description and recommend the best plan(s) from the available products.
 
   **Business Description:**
@@ -56,7 +56,7 @@ const recommendPlanFlow = ai.defineFlow(
   },
   async input => {
     const modelId = getAbacusModelForTask('chat');
-    const {output} = await prompt(input, { model: `abacus/${modelId}` });
+    const { output } = await prompt(input, { model: `googleai/${modelId}` });
     return output!;
   }
 );

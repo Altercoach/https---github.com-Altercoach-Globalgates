@@ -60,7 +60,7 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
   async (input) => {
     // Uses the Abacus AI model designated for evaluation tasks.
     const modelId = getAbacusModelForTask('evaluation');
-    const { output } = await prompt(input, { model: `abacus/${modelId}` });
+    const { output } = await prompt(input, { model: `googleai/${modelId}` });
     
     if (!output) {
       throw new Error('The AI failed to generate an analysis.');

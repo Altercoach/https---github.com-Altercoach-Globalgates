@@ -1,47 +1,45 @@
 
 import { genkit } from 'genkit';
-import { abacusAI } from './abacus-plugin';
+import { googleAI } from '@genkit-ai/google-genai';
 
 // ============================================
-// CONFIGURACIÓN DE GENKIT CON ABACUS AI
+// CONFIGURACIÓN DE GENKIT 
 // ============================================
 
 export const ai = genkit({
-  plugins: [abacusAI()], // Use the custom Abacus AI plugin
+  plugins: [googleAI()], // Usamos el plugin oficial de Google AI
 });
 
 // ============================================
-// HELPER PARA OBTENER EL MODELO EN FLUJOS (Simulando Abacus)
+// HELPER PARA OBTENER EL MODELO SEGÚN LA TAREA (Simulando la lógica de Abacus)
 // ============================================
 
 /**
- * Maps task types to specific Abacus AI model names.
- * This aligns with the "Executive Order" vision.
+ * Mapea los nombres de modelo de la "Orden Ejecutiva" a modelos reales de Google AI.
+ * Esto centraliza la lógica de selección de IA.
  */
 export const MODEL_BY_TASK = {
   // Text & Logic
-  onboarding: 'qwen-3',
-  evaluation: 'qwen-3',
-  copywriting: 'qwen-3',
-  chat: 'qwen-3',
+  onboarding: 'gemini-1.5-flash',
+  evaluation: 'gemini-1.5-pro', // Tarea más compleja
+  copywriting: 'gemini-1.5-flash',
+  chat: 'gemini-1.5-flash',
 
   // Research & Strategy
-  research: 'deepseek-r1',
-  strategic: 'deepseek-r1', // Or map to a future Claude model in Abacus
+  research: 'gemini-1.5-pro',
+  strategic: 'gemini-1.5-pro',
 
   // Visuals
-  imageGeneration: 'flux-1.1-pro',
-  videoGeneration: 'wan-2.1', // Placeholder for future implementation
+  imageGeneration: 'imagen-2', // Modelo de generación de imágenes
+  videoGeneration: 'gemini-1.5-pro', // Placeholder para futura implementación
 
   // Analytics
-  analytics: 'deepseek-r1', // Placeholder
-
+  analytics: 'gemini-1.5-pro', // Placeholder
 };
 
 /**
- * Gets the recommended Abacus model for a specific task.
- * Note: Genkit automatically prefixes the model name with the plugin name,
- * so we just need to return the model ID.
+ * Obtiene el ID del modelo de Google AI recomendado para una tarea específica.
+ * Genkit antepone automáticamente 'googleai/' al nombre del modelo.
  */
 export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): string {
   return MODEL_BY_TASK[task];
@@ -52,8 +50,8 @@ export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): string 
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with Abacus AI Plugin.');
-  console.log(`   Default Text Model (Qwen-3): ${MODEL_BY_TASK.copywriting}`);
-  console.log(`   Research Model (DeepSeek): ${MODEL_BY_TASK.research}`);
-  console.log(`   Image Model (Flux): ${MODEL_BY_TASK.imageGeneration}`);
+  console.log('🤖 Genkit configured with Google AI Plugin (simulating Abacus architecture).');
+  console.log(`   Text Model (Flash): ${MODEL_BY_TASK.copywriting}`);
+  console.log(`   Strategic Model (Pro): ${MODEL_BY_TASK.strategic}`);
+  console.log(`   Image Model (Imagen): ${MODEL_BY_TASK.imageGeneration}`);
 }

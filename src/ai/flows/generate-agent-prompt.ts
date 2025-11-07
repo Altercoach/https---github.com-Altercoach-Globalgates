@@ -59,7 +59,7 @@ const generateAgentPromptFlow = ai.defineFlow(
   },
   async (input) => {
     const modelId = getAbacusModelForTask('strategic');
-    const { output } = await prompt(input, { model: `abacus/${modelId}` });
+    const { output } = await prompt(input, { model: `googleai/${modelId}` });
     
     if (!output) {
       throw new Error('The AI failed to generate an agent prompt.');

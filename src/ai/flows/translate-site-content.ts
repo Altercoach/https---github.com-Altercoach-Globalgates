@@ -9,8 +9,8 @@
  * - TranslateSiteContentOutput - The return type for the translateSiteContent function.
  */
 
-import {ai, getAbacusModelForTask} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai, getAbacusModelForTask } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const TranslateSiteContentInputSchema = z.object({
   siteContent: z.string().describe('The JSON string representing the site content to translate. This content is originally in Spanish.'),
@@ -27,8 +27,8 @@ export async function translateSiteContent(input: TranslateSiteContentInput): Pr
 
 const prompt = ai.definePrompt({
   name: 'translateSiteContentPrompt',
-  input: {schema: TranslateSiteContentInputSchema},
-  output: {schema: z.string().nullable()},
+  input: { schema: TranslateSiteContentInputSchema },
+  output: { schema: z.string().nullable() },
   prompt: `You are a professional translator specializing in marketing content. Translate the provided Spanish JSON content into the target language, preserving the JSON structure and keys perfectly.
 
 The target language is: **{{{targetLanguage}}}**.
@@ -51,8 +51,8 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const modelId = getAbacusModelForTask('onboarding'); // Using a general text model for translation
-    const {output} = await prompt(input, { model: `abacus/${modelId}` });
+    const modelId = getAbacusModelForTask('onboarding');
+    const { output } = await prompt(input, { model: `googleai/${modelId}` });
     return output || '{}';
   }
 );
