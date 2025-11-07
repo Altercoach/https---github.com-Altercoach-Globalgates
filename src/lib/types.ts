@@ -1,5 +1,6 @@
 
 import { z } from 'zod';
+import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
 
 export type MultilingualString = {
   es: string;
@@ -141,3 +142,5 @@ export const GenerateBatchImagesOutputSchema = z.object({
   failureCount: z.number(),
 });
 export type GenerateBatchImagesOutput = z.infer<typeof GenerateBatchImagesOutputSchema>;
+
+export type { ContentPost };
