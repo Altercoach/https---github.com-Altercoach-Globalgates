@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2, Zap } from 'lucide-react';
+import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2, Zap, Image as ImageIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
@@ -15,9 +15,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { sampleAnswers } from '@/lib/data/dashboard-data';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { generateContentSchedule, GenerateContentScheduleOutput, ContentPost } from '@/ai/flows/generate-content-schedule-flow';
+import { generateImageFromPrompt, GenerateImageOutput } from '@/ai/flows/generate-image-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import NextImage from 'next/image';
+
 
 const initialProjects: Project[] = [
   {
@@ -241,6 +244,100 @@ const ContentScheduleDialog = ({ project, phase }: { project: Project, phase: Pr
     )
 }
 
+const ImageGenerationDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
+    const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
+    const [schedule, setSchedule] = useState<GenerateContentScheduleOutput | null>(null);
+    const [imageOutput, setImageOutput] = useState<GenerateImageOutput | null>(null);
+
+    const clientBusinessDescription = `Cliente: ${project.customerName}, cafetería de especialidad. Tono: cercano y amigable.`;
+
+    const getSchedule = async () => {
+        if(schedule) return; // Don't re-fetch if we already have it
+        setIsLoading(true);
+        try {
+            const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
+            setSchedule(result);
+        } catch (error) {
+            toast({ title: "Error al generar la parrilla", variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleRunImageGenerator = async () => {
+        if (!schedule || !schedule.posts.length) {
+            toast({ title: "Primero genera una parrilla de contenido", variant: "destructive" });
+            return;
+        }
+        setIsLoading(true);
+        setImageOutput(null);
+        try {
+            const firstPost = schedule.posts[0];
+            const result = await generateImageFromPrompt({ creativeBrief: firstPost.copyIn });
+            setImageOutput(result);
+        } catch (error) {
+            toast({ title: "Error al generar la imagen", variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+
+    return (
+        <Dialog onOpenChange={(open) => open && getSchedule()}>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full text-xs justify-start">
+                    <ImageIcon className="mr-2 h-3 w-3" /> Ejecutar y Revisar
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl">
+                 <DialogHeader>
+                    <DialogTitle>Simulador: {phase.name}</DialogTitle>
+                    <DialogDescription>
+                        Generando una imagen para el primer post del cliente: {project.customerName}.
+                    </DialogDescription>
+                </DialogHeader>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[70vh] overflow-y-auto">
+                    {/* Input Data */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold">Entrada: Brief Creativo del Post #1</h4>
+                        <Card className="bg-muted/50">
+                            <CardContent className="p-4 text-sm font-mono h-48">
+                                {isLoading && !schedule && "Cargando parrilla para obtener brief..."}
+                                {schedule ? schedule.posts[0].copyIn : "No se ha generado la parrilla de contenido."}
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* AI Output */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold">Salida: Imagen Generada por IA</h4>
+                        <Card>
+                            <CardHeader>
+                                <Button onClick={handleRunImageGenerator} disabled={isLoading || !schedule}>
+                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando Imagen...</> : <><Bot className="mr-2 h-4 w-4" /> Generar Imagen</>}
+                                </Button>
+                            </CardHeader>
+                            <CardContent className="min-h-48 flex items-center justify-center">
+                                {isLoading && <p className="text-sm text-muted-foreground">La IA está dibujando...</p>}
+                                {imageOutput?.imageUrl && (
+                                   <div className="space-y-2 text-center">
+                                      <NextImage src={imageOutput.imageUrl} alt="Generated image" width={256} height={256} className="rounded-lg border"/>
+                                      <p className="text-xs text-muted-foreground"><strong>Prompt usado:</strong> {imageOutput.refinedPrompt}</p>
+                                   </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+};
+
+
 const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Project, phase: ProjectPhase, isCurrent: boolean, isCompleted: boolean }) => {
     
     const isSimulatorClient = project.customerName.includes("James Bond");
@@ -267,6 +364,8 @@ const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Projec
                 return <AnalysisReviewDialog project={project} phase={phase} />;
             case 'planning':
                 return <ContentScheduleDialog project={project} phase={phase} />;
+            case 'execution':
+                return <ImageGenerationDialog project={project} phase={phase} />;
             default:
                  return (
                     <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled>

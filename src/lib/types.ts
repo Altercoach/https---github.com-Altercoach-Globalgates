@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
 
@@ -130,7 +131,7 @@ export type Project = {
   customerName: string;
   currentPhase: ProjectPhaseId;
   phases: ProjectPhase[];
-  status?: 'Active' | 'Suspended' | 'Canceled';
+  status: 'Active' | 'Suspended' | 'Canceled';
 };
 
 
