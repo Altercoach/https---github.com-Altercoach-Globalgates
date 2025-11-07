@@ -4,15 +4,18 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CheckCircle, Clock, Search, Settings, User, ChevronDown } from 'lucide-react';
-import { initialCustomers } from '@/lib/constants';
+import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Project, ProjectPhase, projectPhases } from '@/lib/types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import type { Project, ProjectPhase } from '@/lib/types';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { sampleAnswers } from '@/lib/data/dashboard-data';
+import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 
 const initialProjects: Project[] = [
   {
@@ -59,6 +62,99 @@ const initialProjects: Project[] = [
   }
 ];
 
+const AnalysisReviewDialog = ({ phase }: { phase: ProjectPhase }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(null);
+    const { toast } = useToast();
+    const { language } = useLanguage();
+
+    const handleRunAnalysis = async () => {
+        setIsLoading(true);
+        setAnalysis(null);
+        try {
+            const result = await analyzeBusinessEvaluation({ 
+                answersJson: JSON.stringify(sampleAnswers.eval),
+                targetLanguage: language.code,
+            });
+            setAnalysis(result);
+        } catch (error) {
+            console.error("Analysis failed", error);
+            toast({
+              variant: "destructive",
+              title: "Error de Análisis",
+              description: "La IA no pudo procesar las respuestas.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground">
+                    <Settings className="mr-2 h-3 w-3" /> Ver/Editar Detalles
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-3xl">
+                <DialogHeader>
+                    <DialogTitle>Revisión de Fase: {phase.name}</DialogTitle>
+                    <DialogDescription>
+                        Revisa la información de entrada y el resultado generado por la IA para esta fase.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-6 py-4 max-h-[60vh] overflow-y-auto">
+                    {/* Input Data */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold">Entrada: Respuestas del Cuestionario</h4>
+                        <Card className="bg-muted/50">
+                            <CardContent className="p-4 space-y-4 text-sm">
+                                {Object.entries(sampleAnswers.eval).map(([section, answers]: [string, any]) => (
+                                <div key={section}>
+                                    <h5 className="font-semibold mb-1">{section}</h5>
+                                    {Object.entries(answers).map(([question, answer]: [string, any]) => (
+                                    <div key={question} className="text-xs">
+                                        <p className="text-muted-foreground">{question}</p>
+                                        <p className="font-medium pl-2">{answer}</p>
+                                    </div>
+                                    ))}
+                                </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* AI Output */}
+                    <div className="space-y-4">
+                         <h4 className="font-semibold">Salida: Análisis de IA</h4>
+                        <Card>
+                            <CardHeader>
+                                <Button onClick={handleRunAnalysis} disabled={isLoading}>
+                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analizando...</> : <><Bot className="mr-2 h-4 w-4" /> Ejecutar y Revisar</>}
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                {isLoading && <p className="text-sm text-muted-foreground">La IA está trabajando...</p>}
+                                {analysis && (
+                                    <div className="prose prose-sm max-w-none">
+                                        <h4>Análisis FODA</h4>
+                                        <p><strong>Fortalezas:</strong> {analysis.swot.strengths}</p>
+                                        <p><strong>Debilidades:</strong> {analysis.swot.weaknesses}</p>
+                                        <p><strong>Oportunidades:</strong> {analysis.swot.opportunities}</p>
+                                        <p><strong>Amenazas:</strong> {analysis.swot.threats}</p>
+                                        <h4 className="mt-4">Recomendaciones Estratégicas</h4>
+                                        <p className="whitespace-pre-wrap">{analysis.recommendations}</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 
 const PhaseCard = ({ phase, isCurrent, isCompleted }: { phase: ProjectPhase, isCurrent: boolean, isCompleted: boolean }) => {
     
@@ -84,9 +180,13 @@ const PhaseCard = ({ phase, isCurrent, isCompleted }: { phase: ProjectPhase, isC
                  <Progress value={progressValue} className={cn("h-1 mt-2", {'[&>*]:animate-pulse': isCurrent})} indicatorClassName={progressColor} />
             </CardContent>
             <CardFooter>
-                 <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled={!isCurrent && !isCompleted}>
-                    <Settings className="mr-2 h-3 w-3" /> Ver/Editar Detalles
-                </Button>
+                 {phase.id === 'research' ? (
+                    <AnalysisReviewDialog phase={phase} />
+                 ) : (
+                    <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled={!isCurrent && !isCompleted}>
+                        <Settings className="mr-2 h-3 w-3" /> Ver/Editar Detalles
+                    </Button>
+                 )}
             </CardFooter>
         </Card>
     )

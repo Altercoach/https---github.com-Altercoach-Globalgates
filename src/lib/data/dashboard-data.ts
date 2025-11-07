@@ -1,6 +1,6 @@
 
 import type { ChartConfig } from '@/components/ui/chart';
-import { Project } from '@/lib/types';
+import type { Project } from '@/lib/types';
 
 
 export const chartData = [
@@ -29,6 +29,7 @@ export const projectWorkflowData: Project = {
     customerId: 'cus_002',
     customerName: 'Jane Smith',
     currentPhase: 'closure',
+    status: 'Active',
     phases: [
       { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación', details: 'Formularios completados el 15/05/24' },
       { id: 'research', status: 'completed', name: 'Investigación y Estrategia', details: 'Análisis SWOT y de competencia finalizado.' },
@@ -68,4 +69,25 @@ export const visibleAnalysesData = {
   fr: [ { id: 'analysis-eval-001', title: 'Analyse de l\'Évaluation d\'Entreprise', analysis: { swot: { strengths: "Produit phare (cold brew) avec une forte demande potentielle.", weaknesses: "Faible présence de marque et absence de canal de vente numérique clair.", opportunities: "Marché local en croissance pour les cafés de spécialité.", threats: "Concurrence des cafés établis au centre-ville." }, recommendations: "1. **Lancer une campagne de branding locale**: Se concentrer sur Instagram pour faire connaître le 'cold brew'.\n2. **Mettre en place un entonnoir de vente**: Créer une page de destination pour capturer les prospects intéressés par les grosses commandes.\n\n**Plan suggéré**: Engager 'Setup Funnel' et 'Marketing de Contenu'." } } ],
 };
 
+// Sample answers for AI flow simulation
+export const sampleAnswers = {
+  eval: {
+    'Sección 1: Información General del Negocio': {
+      '¿Cuáles son los principales productos y servicios que ofrece tu negocio?': 'Café de especialidad, pastelería artesanal y desayunos.',
+      '¿Cuál es tu producto o servicio estrella?': 'Nuestro café "cold brew" y el pastel de zanahoria.',
+    },
+    'Sección 2: Objetivos de Marketing': {
+      '¿Cuál es su principal objetivo con esta estrategia?': 'Aumentar las ventas en un 20% y posicionar la marca en la zona centro.',
+    }
+  },
+  agent: {
+      'Sección 1: Leads y Seguimiento Comercial': {
+        'Canales preferidos para que el agente contacte a leads (WhatsApp, correo, llamada, chat web)': 'WhatsApp y correo electrónico.',
+        'Criterios para considerar un lead “calificado” o “prioritario”': 'Clientes que pregunten por nuestros granos de café de origen único o por pedidos de más de 10 pasteles.',
+      },
+      'Sección 3: Atención al Cliente': {
+          'Tono de comunicación deseado: Formal / Cercano / Amigable / Técnico / Otro:': 'Cercano y amigable, pero conocedor del café.',
+      }
+  }
+};
     
