@@ -14,20 +14,22 @@ import type { Project, ProjectPhase } from '@/lib/types';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { sampleAnswers } from '@/lib/data/dashboard-data';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
+import { generateContentSchedule, GenerateContentScheduleOutput, ContentPost } from '@/ai/flows/generate-content-schedule-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const initialProjects: Project[] = [
   {
     id: 'proj_001',
     customerId: 'cus_001',
     customerName: 'James Bond (Agente 007)',
-    currentPhase: 'research',
+    currentPhase: 'planning',
     status: 'Active',
     phases: [
       { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación' },
-      { id: 'research', status: 'in_progress', name: 'Investigación y Estrategia' },
-      { id: 'planning', status: 'pending', name: 'Planificación y Calendario' },
+      { id: 'research', status: 'completed', name: 'Investigación y Estrategia' },
+      { id: 'planning', status: 'in_progress', name: 'Planificación y Calendario' },
       { id: 'execution', status: 'pending', name: 'Generación y Ejecución' },
       { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
     ]
@@ -96,14 +98,14 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
                     <Bot className="mr-2 h-3 w-3" /> Ejecutar y Revisar
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-3xl">
+            <DialogContent className="sm:max-w-4xl">
                 <DialogHeader>
                     <DialogTitle>Simulador: {phase.name}</DialogTitle>
                     <DialogDescription>
                         Revisando el cliente: {project.customerName}. Aquí puedes simular la ejecución de la IA y auditar la calidad del resultado.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-2 gap-6 py-4 max-h-[60vh] overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[60vh] overflow-y-auto">
                     {/* Input Data */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Entrada: Respuestas del Cuestionario (Ejemplo)</h4>
@@ -155,6 +157,89 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
     )
 }
 
+const ContentScheduleDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [schedule, setSchedule] = useState<GenerateContentScheduleOutput | null>(null);
+    const { toast } = useToast();
+
+    const clientBusinessDescription = `
+    Cliente: ${project.customerName}
+    Plan Contratado: Dúo Conexión VIP
+    Análisis Estratégico (resumen): El cliente es una cafetería de especialidad con un producto estrella (cold brew) y una fuerte oportunidad en el mercado local, pero con baja presencia de marca.
+    Instrucciones del Equipo de Marketing: Crear una parrilla de contenido para Instagram y Facebook. El objetivo es aumentar el brand awareness y generar tráfico a la tienda física. Enfocarse en la calidad del café, el ambiente del local y promociones locales. El tono debe ser cercano y amigable.
+    `;
+
+    const handleRunGenerator = async () => {
+        setIsLoading(true);
+        setSchedule(null);
+        try {
+            const result = await generateContentSchedule({ 
+                clientBusiness: clientBusinessDescription,
+            });
+            setSchedule(result);
+        } catch (error) {
+            console.error("Content schedule generation failed", error);
+            toast({
+              variant: "destructive",
+              title: "Error de Generación",
+              description: "La IA no pudo generar la parrilla de contenido.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full text-xs justify-start">
+                    <Bot className="mr-2 h-3 w-3" /> Ejecutar y Revisar
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Simulador: {phase.name}</DialogTitle>
+                    <DialogDescription>
+                        Revisando el cliente: {project.customerName}. Simula la generación de la parrilla de contenido mensual.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[70vh] overflow-y-auto">
+                    {/* Input Data */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold">Entrada: Perfil del Cliente e Instrucciones</h4>
+                        <Card className="bg-muted/50">
+                            <CardContent className="p-4 text-xs whitespace-pre-wrap font-mono">
+                                {clientBusinessDescription.trim()}
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* AI Output */}
+                    <div className="space-y-4">
+                        <h4 className="font-semibold">Salida: Parrilla de Contenido Generada por IA</h4>
+                        <Card>
+                            <CardHeader>
+                                <Button onClick={handleRunGenerator} disabled={isLoading}>
+                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando Parrilla...</> : <><Bot className="mr-2 h-4 w-4" /> Ejecutar Generador de Contenido</>}
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                {isLoading && <p className="text-sm text-muted-foreground">La IA está creando el calendario...</p>}
+                                {schedule && (
+                                    <ScrollArea className="h-[400px] p-4 border rounded-md">
+                                        <pre className="text-xs whitespace-pre-wrap font-mono">
+                                            {JSON.stringify(schedule.posts, null, 2)}
+                                        </pre>
+                                    </ScrollArea>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Project, phase: ProjectPhase, isCurrent: boolean, isCompleted: boolean }) => {
     
@@ -162,11 +247,35 @@ const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Projec
 
     const getIcon = () => {
         if(isCompleted) return <CheckCircle className="h-5 w-5 text-green-500" />;
-        if(isCurrent) return <Zap className="h-5 w-5 text-orange-500" />;
+        if(isCurrent) return <Zap className="h-5 w-5 text-orange-500 animate-pulse" />;
         return <Clock className="h-5 w-5 text-muted-foreground" />;
     }
 
     const progressValue = isCompleted ? 100 : isCurrent ? 50 : 0;
+    
+    const renderAction = () => {
+        if (!isSimulatorClient) {
+            return (
+                <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled>
+                    <Settings className="mr-2 h-3 w-3" /> Ver Detalles (Auto)
+                </Button>
+            )
+        }
+        
+        switch(phase.id) {
+            case 'research':
+                return <AnalysisReviewDialog project={project} phase={phase} />;
+            case 'planning':
+                return <ContentScheduleDialog project={project} phase={phase} />;
+            default:
+                 return (
+                    <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled>
+                        <Settings className="mr-2 h-3 w-3" /> Próximamente
+                    </Button>
+                 )
+        }
+    }
+
 
     return (
         <Card className={cn('transition-all w-full', { 'border-primary shadow-lg': isCurrent, 'bg-muted/30': isCompleted, 'border-dashed': !isCurrent && !isCompleted })}>
@@ -180,18 +289,12 @@ const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Projec
                 </p>
                  {isCurrent && (
                      <div className="mt-2 space-y-1">
-                        <Progress value={progressValue} className="h-1" indicatorClassName="bg-orange-500 animate-pulse" />
+                        <Progress value={progressValue} className="h-1" indicatorClassName="bg-orange-500" />
                     </div>
                 )}
             </CardContent>
             <CardFooter>
-                 {(isSimulatorClient && phase.id === 'research') ? (
-                    <AnalysisReviewDialog project={project} phase={phase} />
-                 ) : (
-                    <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled={!isCurrent && !isCompleted}>
-                        <Settings className="mr-2 h-3 w-3" /> Ver Detalles
-                    </Button>
-                 )}
+                 {renderAction()}
             </CardFooter>
         </Card>
     )
