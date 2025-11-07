@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import type { SiteData, Product, ProductFeature, MultilingualString } from '@/lib/types';
-import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff, GripVertical, Save } from 'lucide-react';
+import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff, GripVertical, Save, ExternalLink } from 'lucide-react';
 import { defaultFeatures } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -34,6 +34,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import Link from 'next/link';
 
 const labels = {
   es: {
@@ -316,10 +317,10 @@ export default function ProductsEditorPage() {
                                   <div className="space-y-4">
                                       {(product.features || []).map(feature => (
                                           <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border bg-background p-4">
-                                              <Label htmlFor={`switch-${product.id}-${feature.id}`} className="font-normal flex flex-col">
+                                              <Link href={feature.href} className="font-normal flex items-center gap-2 text-primary underline-offset-4 hover:underline" target="_blank">
                                                   {feature.name}
-                                                  <span className="text-xs text-muted-foreground">ID: {feature.id}</span>
-                                              </Label>
+                                                  <ExternalLink className="h-3 w-3" />
+                                              </Link>
                                               <Switch
                                                   id={`switch-${product.id}-${feature.id}`}
                                                   checked={feature.enabled}

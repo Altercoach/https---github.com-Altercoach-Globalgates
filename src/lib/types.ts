@@ -13,6 +13,7 @@ export type ProductFeature = {
   name: string;
   stage: 'onboarding' | 'campaign_start' | 'campaign_end' | 'on_demand';
   enabled: boolean;
+  href: string;
 };
 
 export type Product = {
