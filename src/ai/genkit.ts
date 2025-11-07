@@ -20,21 +20,21 @@ export const ai = genkit({
  */
 export const MODEL_BY_TASK = {
   // Text & Logic
-  onboarding: 'gemini-1.5-flash',
-  evaluation: 'gemini-1.5-pro', // Tarea más compleja
-  copywriting: 'gemini-1.5-flash',
-  chat: 'gemini-1.5-flash',
+  onboarding: 'gemini-1.5-flash-latest',
+  evaluation: 'gemini-1.5-pro-latest', // Tarea más compleja
+  copywriting: 'gemini-1.5-flash-latest',
+  chat: 'gemini-1.5-flash-latest',
 
   // Research & Strategy
-  research: 'gemini-1.5-pro',
-  strategic: 'gemini-1.5-pro',
+  research: 'gemini-1.5-pro-latest',
+  strategic: 'gemini-1.5-pro-latest',
 
   // Visuals
   imageGeneration: 'imagen-2', // Modelo de generación de imágenes
-  videoGeneration: 'gemini-1.5-pro', // Placeholder para futura implementación
+  videoGeneration: 'gemini-1.5-pro-latest', // Placeholder para futura implementación
 
   // Analytics
-  analytics: 'gemini-1.5-pro', // Placeholder
+  analytics: 'gemini-1.5-pro-latest', // Placeholder
 };
 
 /**
