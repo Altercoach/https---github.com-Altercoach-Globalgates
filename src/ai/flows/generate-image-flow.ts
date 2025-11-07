@@ -43,7 +43,7 @@ export const generateImageFlow = ai.defineFlow(
         throw new Error('La IA no devolvió una URL de imagen válida.');
       }
       
-      console.log('✅ ÉXITO! Imagen generada:', imageUrl);
+      console.log('✅ ÉXITO! Imagen generada.');
       
       return {
         imageUrl: imageUrl,
@@ -56,7 +56,7 @@ export const generateImageFlow = ai.defineFlow(
       console.error('❌ ERROR en la generación de imagen:', error.message);
       // Return a placeholder on failure to prevent app from breaking.
        return {
-        imageUrl: `https://picsum.photos/seed/${Date.now()}/1024/1024`,
+        imageUrl: '', // Return empty string on failure
         refinedPrompt: input.creativeBrief,
         cost: 0,
         model: 'error-fallback',

@@ -11,30 +11,30 @@ export const ai = genkit({
 });
 
 // ============================================
-// HELPER PARA OBTENER EL MODELO SEGÚN LA TAREA (Simulando la lógica de Abacus)
+// MAPEO DE MODELOS (Lógica Simplificada)
 // ============================================
 
 /**
- * Mapea los nombres de modelo de la "Orden Ejecutiva" a modelos reales de Google AI.
- * Esto centraliza la lógica de selección de IA.
+ * Mapea tareas a modelos reales y estables de Google AI.
+ * Esta es la fuente de verdad para la selección de modelos en la app.
  */
 export const MODEL_BY_TASK = {
   // Text & Logic
   onboarding: 'gemini-1.5-flash-latest',
-  evaluation: 'gemini-1.5-flash-latest', // Tarea más compleja -> Cambiado a flash para estabilidad
+  evaluation: 'gemini-1.5-flash-latest', 
   copywriting: 'gemini-1.5-flash-latest',
   chat: 'gemini-1.5-flash-latest',
 
   // Research & Strategy
-  research: 'gemini-1.5-flash-latest', // Cambiado a flash
-  strategic: 'gemini-1.5-flash-latest', // Cambiado a flash
+  research: 'gemini-1.5-flash-latest',
+  strategic: 'gemini-1.5-flash-latest',
 
   // Visuals
   imageGeneration: 'imagen-2', // Modelo de generación de imágenes
   videoGeneration: 'gemini-1.5-flash-latest', // Placeholder para futura implementación
 
   // Analytics
-  analytics: 'gemini-1.5-flash-latest', // Placeholder, cambiado a flash
+  analytics: 'gemini-1.5-flash-latest', // Placeholder
 };
 
 /**
@@ -50,8 +50,7 @@ export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): string 
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with Google AI Plugin (simulating Abacus architecture).');
-  console.log(`   Text Model (Flash): ${MODEL_BY_TASK.copywriting}`);
-  console.log(`   Strategic Model (Pro): ${MODEL_BY_TASK.strategic}`);
-  console.log(`   Image Model (Imagen): ${MODEL_BY_TASK.imageGeneration}`);
+  console.log('🤖 Genkit configured with simplified Google AI model mapping.');
+  console.log(`   Default Text Model: ${MODEL_BY_TASK.chat}`);
+  console.log(`   Image Model: ${MODEL_BY_TASK.imageGeneration}`);
 }
