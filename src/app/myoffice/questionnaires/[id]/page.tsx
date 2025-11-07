@@ -145,7 +145,7 @@ const labels = {
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
   const { id: questionnaireId } = params;
-  const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001';
+  const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001' || questionnaireId === 'business-evaluation-001';
   const isAgentTraining = questionnaireId === 'agent-training-001';
   const { toast } = useToast();
 
@@ -157,8 +157,9 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
   const questionnaireTitle = useMemo(() => {
-      return t.questionnaireTypes[questionnaireId as keyof typeof t.questionnaireTypes] || t.questionnaireTypes.default;
-  }, [questionnaireId, t]);
+      const key = isAgentTraining ? 'agent-training-001' : 'default';
+      return t.questionnaireTypes[key];
+  }, [isAgentTraining, t]);
 
   const currentAnswers = useMemo(() => {
     if (isAgentTraining) return sampleAnswers.agent;
