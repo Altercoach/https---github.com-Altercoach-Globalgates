@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 import { ai } from '@/ai/genkit';
-import { googleAI }s from '@genkit-ai/google-genai';
+import { googleAI } from '@genkit-ai/google-genai';
 import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
 import { GenerateImageInputSchema } from '@/lib/types';
 
