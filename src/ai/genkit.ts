@@ -1,5 +1,5 @@
 
-import { genkit } from 'genkit';
+import { genkit, Model } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
 // ============================================
@@ -11,7 +11,7 @@ export const ai = genkit({
 });
 
 // ============================================
-// MAPEO DE MODELOS (Lógica Simplificada)
+// MAPEO DE MODELOS (Lógica Abstraída)
 // ============================================
 
 /**
@@ -30,19 +30,20 @@ export const MODEL_BY_TASK = {
   strategic: 'gemini-1.5-flash-latest',
 
   // Visuals
-  imageGeneration: 'imagen-2', // Modelo de generación de imágenes
-  videoGeneration: 'gemini-1.5-flash-latest', // Placeholder para futura implementación
+  imageGeneration: 'imagen-2', 
+  videoGeneration: 'gemini-1.5-flash-latest', // Placeholder
 
   // Analytics
   analytics: 'gemini-1.5-flash-latest', // Placeholder
 };
 
 /**
- * Obtiene el ID del modelo de Google AI recomendado para una tarea específica.
- * Genkit antepone automáticamente 'googleai/' al nombre del modelo.
+ * Obtiene el objeto de modelo de Genkit configurado para una tarea específica.
+ * Esta función ahora devuelve un objeto Model en lugar de solo un string.
  */
-export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): string {
-  return MODEL_BY_TASK[task];
+export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): Model {
+  const modelId = MODEL_BY_TASK[task];
+  return googleAI.model(modelId);
 }
 
 // ============================================
@@ -50,7 +51,7 @@ export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): string 
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with simplified Google AI model mapping.');
+  console.log('🤖 Genkit configured with Abacus model abstraction.');
   console.log(`   Default Text Model: ${MODEL_BY_TASK.chat}`);
   console.log(`   Image Model: ${MODEL_BY_TASK.imageGeneration}`);
 }

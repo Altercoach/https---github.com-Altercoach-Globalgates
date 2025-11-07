@@ -55,8 +55,8 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const modelId = getAbacusModelForTask('chat');
-    const { output } = await prompt(input, { model: `googleai/${modelId}` });
+    const abacusModel = getAbacusModelForTask('chat');
+    const { output } = await prompt(input, { model: abacusModel });
     return output!;
   }
 );

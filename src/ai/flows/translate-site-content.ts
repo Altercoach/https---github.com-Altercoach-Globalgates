@@ -51,8 +51,8 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const modelId = getAbacusModelForTask('onboarding');
-    const { output } = await prompt(input, { model: `googleai/${modelId}` });
+    const abacusModel = getAbacusModelForTask('onboarding');
+    const { output } = await prompt(input, { model: abacusModel });
     return output || '{}';
   }
 );

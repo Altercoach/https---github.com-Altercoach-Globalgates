@@ -27,10 +27,10 @@ export const generateImageFlow = ai.defineFlow(
     try {
       console.log(`🎨 Generating image with prompt: ${input.creativeBrief}`);
       
-      const modelId = getAbacusModelForTask('imageGeneration');
+      const abacusModel = getAbacusModelForTask('imageGeneration');
       
       const { media } = await ai.generate({
-        model: `googleai/${modelId}`,
+        model: abacusModel,
         prompt: input.creativeBrief,
         config: {
           // You can add model-specific config here if needed
@@ -49,7 +49,7 @@ export const generateImageFlow = ai.defineFlow(
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief,
         cost: 0, // Assuming cost is handled elsewhere or is 0 for this model.
-        model: modelId,
+        model: abacusModel.name,
       };
 
     } catch (error: any) {

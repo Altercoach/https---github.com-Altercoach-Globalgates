@@ -69,8 +69,8 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
-    const modelId = getAbacusModelForTask('copywriting');
-    const { output } = await prompt(input, { model: `googleai/${modelId}` });
+    const abacusModel = getAbacusModelForTask('copywriting');
+    const { output } = await prompt(input, { model: abacusModel });
 
     if (!output) {
       throw new Error('The AI failed to generate a content schedule.');

@@ -71,8 +71,8 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const modelId = getAbacusModelForTask('chat');
-    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: `googleai/${modelId}` });
+    const abacusModel = getAbacusModelForTask('chat');
+    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: abacusModel });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');
