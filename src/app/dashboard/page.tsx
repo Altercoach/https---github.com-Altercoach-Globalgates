@@ -100,7 +100,9 @@ const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) 
                                                 {mockDeliverables.filter(item => item.platform === p).map(item => (
                                                     <Card key={item.id}>
                                                         <CardContent className="p-4 grid grid-cols-[150px_1fr] gap-4">
-                                                            <Image src={item.imageUrl} alt={item.title} width={150} height={150} className="rounded-md object-cover aspect-square"/>
+                                                            <div className="relative aspect-square w-[150px] h-[150px]">
+                                                              <Image src={item.imageUrl} alt={item.title} fill className="rounded-md object-cover"/>
+                                                            </div>
                                                             <div className="space-y-2">
                                                                 <h5 className="font-semibold">{item.title}</h5>
                                                                 <p className="text-sm text-muted-foreground">{item.copy}</p>
@@ -254,5 +256,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+    
 
     
