@@ -130,6 +130,7 @@ export type Project = {
   customerName: string;
   currentPhase: ProjectPhaseId;
   phases: ProjectPhase[];
+  status?: 'Active' | 'Suspended' | 'Canceled';
 };
 
 
