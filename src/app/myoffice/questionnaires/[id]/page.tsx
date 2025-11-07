@@ -144,7 +144,7 @@ const labels = {
 
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
-  const { id: questionnaireId } = params;
+  const questionnaireId = params.id;
   const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001' || questionnaireId === 'business-evaluation-001';
   const isAgentTraining = questionnaireId === 'agent-training-001';
   const { toast } = useToast();
