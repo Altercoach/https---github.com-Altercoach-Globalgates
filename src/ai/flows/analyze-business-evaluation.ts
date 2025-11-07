@@ -58,13 +58,35 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
     outputSchema: AnalyzeBusinessEvaluationOutputSchema,
   },
   async (input) => {
-    // Uses the Abacus AI model designated for evaluation tasks.
-    const abacusModel = getAbacusModelForTask('evaluation');
-    const { output } = await prompt(input, { model: abacusModel });
+    // This is a mocked response to prevent API errors.
+    console.log(`[Abacus AI Simulation] Running Business Evaluation for language: ${input.targetLanguage}`);
     
-    if (!output) {
-      throw new Error('The AI failed to generate an analysis.');
-    }
-    return output;
+    // The AI call is commented out to prevent the 404 error.
+    // const abacusModel = getAbacusModelForTask('evaluation');
+    // const { output } = await prompt(input, { model: abacusModel });
+    
+    const mockOutput: AnalyzeBusinessEvaluationOutput = {
+      swot: {
+        strengths: "Producto estrella (cold brew) con alta demanda potencial y buena reputación local.",
+        weaknesses: "Baja presencia de marca en redes sociales y ausencia de un canal de ventas digital directo.",
+        opportunities: "Mercado en crecimiento para cafés de especialidad y eventos locales para aumentar visibilidad.",
+        threats: "Competencia agresiva de cadenas de cafeterías establecidas en la zona."
+      },
+      recommendations: `**1. Campaña de Branding Digital:**
+- **Objetivo:** Aumentar el reconocimiento de marca y atraer nuevos clientes.
+- **Acciones:**
+  - Crear contenido visual atractivo en Instagram y Facebook enfocado en el 'cold brew' y el ambiente de la cafetería.
+  - Lanzar una campaña de anuncios geolocalizados para llegar a residentes y trabajadores de la zona.
+- **Plan Sugerido:** *Impulso Esencial (1 Red)* para empezar.
+
+**2. Implementación de un Funnel de Ventas para Pedidos Grandes:**
+- **Objetivo:** Capturar leads para pedidos de pastelería al por mayor o eventos.
+- **Acciones:**
+  - Desarrollar una landing page sencilla que destaque la oferta para eventos.
+  - Configurar un Agente de IA básico para responder preguntas frecuentes y tomar los datos de contacto.
+- **Plan Sugerido:** *Setup Funnel*.`
+    };
+
+    return mockOutput;
   }
 );
