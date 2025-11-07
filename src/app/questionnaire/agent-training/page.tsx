@@ -255,7 +255,7 @@ export default function AgentTrainingPage() {
 
             <Section title="Sección 14: Entrenamiento Específico y Base de Conocimiento">
                 <Question label="URLs de referencia (página de precios, FAQ, sobre nosotros, etc.):">
-                    <Textarea placeholder="https://ejemplo.com/precios&#10;https://ejemplo.com/faq" />
+                    <Textarea placeholder="https://ejemplo.com/precios\nhttps://ejemplo.com/faq" />
                 </Question>
                 <FileUpload 
                     label="Archivos de conocimiento (PDF con políticas, XLS con inventario, etc.)"
