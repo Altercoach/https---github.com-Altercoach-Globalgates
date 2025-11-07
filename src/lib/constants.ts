@@ -12,10 +12,10 @@ export const LS_KEYS = {
 };
 
 export const defaultFeatures: ProductFeature[] = [
-  { id: 'business-evaluation', name: 'Business Evaluation (Doctor RX)', stage: 'onboarding', enabled: false, href: '/myoffice/questionnaires/business-evaluation-001' },
-  { id: 'brief-marketing', name: 'Professional Marketing Brief', stage: 'onboarding', enabled: false, href: '/myoffice/questionnaires/brief-marketing' },
-  { id: 'agent-training', name: 'AI Agent Training', stage: 'onboarding', enabled: false, href: '/myoffice/questionnaires/agent-training' },
-  { id: 'satisfaction-survey', name: 'Satisfaction Survey', stage: 'campaign_end', enabled: false, href: '/myoffice/questionnaires/satisfaction-survey' },
+  { id: 'business-evaluation', name: 'Business Evaluation (Doctor RX)', stage: 'onboarding', enabled: false, href: '/myoffice/questionnaires/edit' },
+  { id: 'brief-marketing', name: 'Professional Marketing Brief', stage: 'onboarding', enabled: false, href: '/myoffice/questionnaires/edit' },
+  { id: 'agent-training', name: 'AI Agent Training', stage: 'onboarding', enabled: false, href: '/myoffice/questionnaires/edit' },
+  { id: 'satisfaction-survey', name: 'Satisfaction Survey', stage: 'campaign_end', enabled: false, href: '/myoffice/questionnaires/edit' },
 ];
 
 export const LANGUAGES: Language[] = [
