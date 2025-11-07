@@ -11,7 +11,7 @@ export const ai = genkit({
 });
 
 // ============================================
-// MAPEO DE MODELOS (Lógica Abstraída)
+// MAPEO DE MODELOS "ABACUS AI" (Lógica Abstraída)
 // ============================================
 
 /**
@@ -31,15 +31,15 @@ export const MODEL_BY_TASK = {
 
   // Visuals
   imageGeneration: 'imagen-2', 
-  videoGeneration: 'gemini-1.5-flash-latest', // Placeholder
 
   // Analytics
-  analytics: 'gemini-1.5-flash-latest', // Placeholder
+  analytics: 'gemini-1.5-flash-latest',
 };
 
 /**
  * Obtiene el objeto de modelo de Genkit configurado para una tarea específica.
  * Esta función ahora devuelve un objeto Model en lugar de solo un string.
+ * Esta es la implementación de "Abacus AI" que abstrae la selección del modelo.
  */
 export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): Model {
   const modelId = MODEL_BY_TASK[task];
@@ -51,7 +51,7 @@ export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): Model {
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with Abacus model abstraction.');
-  console.log(`   Default Text Model: ${MODEL_BY_TASK.chat}`);
-  console.log(`   Image Model: ${MODEL_BY_TASK.imageGeneration}`);
+  console.log('🤖 Genkit configured with Abacus AI model abstraction.');
+  console.log(`   Default Text Model (Abacus): ${MODEL_BY_TASK.chat}`);
+  console.log(`   Image Model (Abacus): ${MODEL_BY_TASK.imageGeneration}`);
 }

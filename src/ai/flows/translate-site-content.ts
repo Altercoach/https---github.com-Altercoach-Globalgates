@@ -51,6 +51,7 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
+    // Uses the Abacus AI model for onboarding/translation tasks.
     const abacusModel = getAbacusModelForTask('onboarding');
     const { output } = await prompt(input, { model: abacusModel });
     return output || '{}';

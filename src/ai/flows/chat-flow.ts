@@ -71,6 +71,7 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
+    // Uses the Abacus AI model designated for chat tasks.
     const abacusModel = getAbacusModelForTask('chat');
     const { output } = await prompt({ ...input, history: augmentedHistory }, { model: abacusModel });
     

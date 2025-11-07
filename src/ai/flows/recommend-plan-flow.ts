@@ -55,6 +55,7 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
+    // Uses the Abacus AI model for chat/recommendation tasks.
     const abacusModel = getAbacusModelForTask('chat');
     const { output } = await prompt(input, { model: abacusModel });
     return output!;

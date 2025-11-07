@@ -69,6 +69,7 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
+    // Uses the Abacus AI model for copywriting tasks.
     const abacusModel = getAbacusModelForTask('copywriting');
     const { output } = await prompt(input, { model: abacusModel });
 

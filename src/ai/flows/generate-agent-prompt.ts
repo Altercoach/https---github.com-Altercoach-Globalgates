@@ -58,6 +58,7 @@ const generateAgentPromptFlow = ai.defineFlow(
     outputSchema: GenerateAgentPromptOutputSchema,
   },
   async (input) => {
+    // Uses the Abacus AI model for strategic tasks.
     const abacusModel = getAbacusModelForTask('strategic');
     const { output } = await prompt(input, { model: abacusModel });
     
