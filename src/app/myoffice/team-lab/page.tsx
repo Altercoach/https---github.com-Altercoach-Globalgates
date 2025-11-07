@@ -1,392 +1,150 @@
-
 'use client';
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CalendarDays, Bot, Image as ImageIcon, Video, Users, Loader2, Download, Mail, Copy, File, Sparkles } from 'lucide-react';
-import { generateContentSchedule } from '@/ai/flows/generate-content-schedule-flow';
-import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
-import { generateImageFromPrompt } from '@/ai/flows/generate-image-flow';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Beaker, CheckCircle, Clock, Loader2, PlayCircle, Settings, User } from 'lucide-react';
 import { initialCustomers } from '@/lib/constants';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import Image from 'next/image';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import type { GenerateImageInput } from '@/lib/types';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Project, ProjectPhase, projectPhases } from '@/lib/types';
 
-export default function TeamLabPage() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [schedule, setSchedule] = useState<ContentPost[] | null>(null);
-    const [selectedClientId, setSelectedClientId] = useState<string | undefined>();
-    const [additionalInstructions, setAdditionalInstructions] = useState('Enfócate en un estilo de vida saludable, equilibrio mente-cuerpo y constancia. Público objetivo: personas de 25-45 años que buscan más que solo ejercicio.');
-    const { toast } = useToast();
+
+const initialProjects: Project[] = [
+  {
+    id: 'proj_002',
+    customerId: 'cus_002',
+    customerName: 'Jane Smith',
+    currentPhase: 'execution',
+    phases: [
+      { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación' },
+      { id: 'research', status: 'completed', name: 'Investigación y Estrategia' },
+      { id: 'planning', status: 'completed', name: 'Planificación y Calendario' },
+      { id: 'execution', status: 'in_progress', name: 'Generación y Ejecución' },
+      { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
+    ]
+  },
+   {
+    id: 'proj_001',
+    customerId: 'cus_001',
+    customerName: 'John Doe',
+    currentPhase: 'research',
+    phases: [
+      { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación' },
+      { id: 'research', status: 'in_progress', name: 'Investigación y Estrategia' },
+      { id: 'planning', status: 'pending', name: 'Planificación y Calendario' },
+      { id: 'execution', status: 'pending', name: 'Generación y Ejecución' },
+      { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
+    ]
+  },
+  {
+    id: 'proj_004',
+    customerId: 'cus_004',
+    customerName: 'Emily Brown',
+    currentPhase: 'onboarding',
+     phases: [
+      { id: 'onboarding', status: 'pending', name: 'Onboarding y Evaluación' },
+      { id: 'research', status: 'pending', name: 'Investigación y Estrategia' },
+      { id: 'planning', status: 'pending', name: 'Planificación y Calendario' },
+      { id: 'execution', status: 'pending', name: 'Generación y Ejecución' },
+      { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
+    ]
+  }
+];
+
+
+const PhaseCard = ({ phase, isCurrent, isCompleted }: { phase: ProjectPhase, isCurrent: boolean, isCompleted: boolean }) => {
     
-    const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
-    const [currentPost, setCurrentPost] = useState<ContentPost | null>(null);
-    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-    const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
-
-
-    const handleGenerateSchedule = async () => {
-        if (!selectedClientId) {
-            toast({
-                title: "Cliente no seleccionado",
-                description: "Por favor, selecciona un cliente para generar su parrilla de contenido.",
-                variant: "destructive"
-            });
-            return;
-        }
-        
-        const selectedCustomer = initialCustomers.find(c => c.id === selectedClientId);
-        if (!selectedCustomer) {
-            toast({ title: "Error", description: "Cliente no encontrado.", variant: "destructive" });
-            return;
-        }
-
-        const clientBusinessDescription = `Cliente: ${selectedCustomer.name} (${selectedCustomer.email}). 
-Plan contratado: ${selectedCustomer.plan}.
-Instrucciones adicionales del equipo: ${additionalInstructions}`;
-
-        setIsLoading(true);
-        setSchedule(null);
-        try {
-            const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
-            setSchedule(result.posts);
-            toast({
-                title: "¡Parrilla Generada!",
-                description: "La IA ha creado una nueva parrilla de contenido."
-            })
-        } catch (error) {
-            console.error("Failed to generate schedule", error);
-            toast({
-                title: "Error al generar",
-                description: "La IA no pudo generar la parrilla. Inténtalo de nuevo.",
-                variant: "destructive"
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-    
-    const handleScheduleChange = (index: number, field: keyof ContentPost, value: string) => {
-        if (!schedule) return;
-        const newSchedule = [...schedule];
-        (newSchedule[index] as any)[field] = value;
-        setSchedule(newSchedule);
-    };
-
-    const downloadCSV = () => {
-        if (!schedule) return;
-        const headers = ['postNumber', 'format', 'topic', 'copyIn', 'copyOut'];
-        const csvContent = [
-            headers.join(','),
-            ...schedule.map(post => 
-                headers.map(header => `"${((post as any)[header] || '').replace(/"/g, '""')}"`).join(',')
-            )
-        ].join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        if (link.download !== undefined) {
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `parrilla_contenido_${selectedClientId}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    };
-    
-    const downloadPDF = () => {
-        if (!schedule) return;
-        const doc = new jsPDF();
-        const customer = initialCustomers.find(c => c.id === selectedClientId);
-
-        doc.text(`Parrilla de Contenido para: ${customer?.name || selectedClientId}`, 14, 15);
-
-        (doc as any).autoTable({
-            startY: 25,
-            head: [['Post', 'Formato', 'Tópico', 'Copy In', 'Copy Out']],
-            body: schedule.map(post => [
-                post.postNumber,
-                post.format,
-                post.topic,
-                post.copyIn,
-                post.copyOut
-            ]),
-            styles: { fontSize: 8 },
-            headStyles: { fillColor: [34, 49, 63] },
-            columnStyles: {
-              3: { cellWidth: 50 },
-              4: { cellWidth: 50 },
-            }
-        });
-
-        doc.save(`parrilla_contenido_${selectedClientId}.pdf`);
-    };
-
-    const sendByEmail = () => {
-        if (!schedule) return;
-        const customer = initialCustomers.find(c => c.id === selectedClientId);
-        const subject = `Parrilla de Contenido para ${customer?.name || selectedClientId}`;
-        const tableRows = schedule.map(post => `
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">${post.postNumber}</td>
-                <td style="border: 1px solid #ddd; padding: 8px;">${post.format}</td>
-                <td style="border: 1px solid #ddd; padding: 8px;">${post.topic}</td>
-                <td style="border: 1px solid #ddd; padding: 8px;">${post.copyIn.replace(/\n/g, '<br>')}</td>
-                <td style="border: 1px solid #ddd; padding: 8px;">${post.copyOut.replace(/\n/g, '<br>')}</td>
-            </tr>
-        `).join('');
-
-        const emailBody = `
-            <h2>Parrilla de Contenido</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Post</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Formato</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Tópico</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Copy In</th>
-                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Copy Out</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
-        `;
-        
-        const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-        window.location.href = mailtoLink;
-    };
-
-    const openImageDialog = (post: ContentPost) => {
-        setCurrentPost(post);
-        setGeneratedImageUrl(null);
-        setIsImageDialogOpen(true);
-    };
-
-    const handleGenerateImage = async () => {
-        if (!currentPost?.copyIn) {
-            toast({
-                title: "Brief Creativo Vacío",
-                description: "El campo 'Copy In' no puede estar vacío para generar una imagen.",
-                variant: "destructive"
-            });
-            return;
-        }
-        setIsGeneratingImage(true);
-        setGeneratedImageUrl(null);
-        try {
-            const input: GenerateImageInput = {
-                creativeBrief: currentPost.copyIn,
-                aspectRatio: '1:1', // O puedes hacerlo configurable
-            };
-            const result = await generateImageFromPrompt(input);
-            if (result.imageUrl && !result.imageUrl.includes('picsum.photos')) {
-                setGeneratedImageUrl(result.imageUrl);
-                 toast({
-                    title: "¡Imagen Generada!",
-                    description: "La IA ha creado una nueva imagen para tu post."
-                });
-            } else {
-                 throw new Error("La IA devolvió una imagen de placeholder.");
-            }
-        } catch (error: any) {
-            console.error("Failed to generate image", error);
-            toast({
-                title: "Error al generar imagen",
-                description: error.message || "La IA no pudo crear la imagen. Inténtalo de nuevo.",
-                variant: "destructive"
-            });
-        } finally {
-            setIsGeneratingImage(false);
-        }
-    };
-    
-    const handleAutomateDelivery = () => {
-        toast({
-            title: "Automatización Iniciada",
-            description: "La generación en lote de todos los recursos ha comenzado. (Funcionalidad futura)",
-        });
+    const getIcon = () => {
+        if(isCompleted) return <CheckCircle className="h-5 w-5 text-green-500" />;
+        if(isCurrent) return <Loader2 className="h-5 w-5 text-primary animate-spin" />;
+        return <Clock className="h-5 w-5 text-muted-foreground" />;
     }
 
+    return (
+        <Card className={`transition-all ${isCurrent ? 'border-primary shadow-lg' : isCompleted ? 'bg-muted/50' : 'border-dashed'}`}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-base font-medium">{phase.name}</CardTitle>
+                {getIcon()}
+            </CardHeader>
+            <CardContent>
+                <p className="text-xs text-muted-foreground">
+                    {isCompleted ? 'Completado' : isCurrent ? 'En progreso...' : 'Pendiente'}
+                </p>
+            </CardContent>
+            <CardFooter>
+                 <Button variant="ghost" size="sm" className="w-full text-xs justify-start" disabled={!isCurrent && !isCompleted}>
+                    <Settings className="mr-2 h-3 w-3" /> Ver/Editar Detalles
+                </Button>
+            </CardFooter>
+        </Card>
+    )
+}
+
+
+export default function TeamLabPage() {
+    const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(initialProjects[0].id);
+    
+    const selectedProject = initialProjects.find(p => p.id === selectedProjectId);
 
     return (
-        <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
-            <div className="space-y-6">
-                <header>
-                    <div className="flex items-center gap-3 mb-2">
-                        <Beaker className="h-8 w-8 text-primary" />
-                        <h1 className="text-3xl font-bold font-headline">Team Lab Marketing</h1>
-                    </div>
-                    <p className="text-muted-foreground">
-                        Centro de operaciones para la creación, gestión y producción de entregables para clientes.
-                    </p>
-                </header>
+        <div className="space-y-6">
+            <header>
+                <div className="flex items-center gap-3 mb-2">
+                    <Beaker className="h-8 w-8 text-primary" />
+                    <h1 className="text-3xl font-bold font-headline">Team Lab: Supervisión de Proyectos</h1>
+                </div>
+                <p className="text-muted-foreground">
+                    Supervisa el flujo de trabajo automatizado de cada cliente y toma el control manual cuando sea necesario.
+                </p>
+            </header>
 
-                <Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><User /> Selección de Cliente</CardTitle>
+                    <CardDescription>
+                        Elige un proyecto de cliente para ver el estado de su flujo de trabajo automatizado.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="max-w-md">
+                        <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                            <SelectTrigger id="client-select">
+                                <SelectValue placeholder="Elige un cliente..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {initialProjects.map(project => (
+                                    <SelectItem key={project.id} value={project.id}>
+                                        {project.customerName} - (Proyecto: {project.id})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {selectedProject && (
+                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><CalendarDays /> Parrilla de Contenido IA</CardTitle>
-                        <CardDescription>
-                            Selecciona un cliente, añade instrucciones y genera una parrilla de contenido mensual. La IA usará los datos del cliente y tus notas.
-                        </CardDescription>
+                        <CardTitle>Flujo de Trabajo para: {selectedProject.customerName}</CardTitle>
+                        <CardDescription>Este es el estado en tiempo real de las fases del proyecto. Puedes intervenir en la fase actual.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid lg:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="client-select">Seleccionar Cliente</Label>
-                                <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                                    <SelectTrigger id="client-select">
-                                        <SelectValue placeholder="Elige un cliente..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {initialCustomers.map(customer => (
-                                            <SelectItem key={customer.id} value={customer.id}>
-                                                {customer.name} - ({customer.email})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="business-description">Instrucciones Adicionales para la IA</Label>
-                                <Textarea
-                                    id="business-description"
-                                    placeholder="Ej: Enfocarse en un diseño estético, analizar la competencia para el Buen Fin, etc."
-                                    value={additionalInstructions}
-                                    onChange={(e) => setAdditionalInstructions(e.target.value)}
-                                    rows={3}
+                    <CardContent className="overflow-x-auto">
+                        <div className="flex items-start gap-4 pb-4">
+                            {selectedProject.phases.map((phase, index) => (
+                               <div key={phase.id} className="min-w-[220px]">
+                                 <PhaseCard 
+                                    phase={phase}
+                                    isCurrent={phase.id === selectedProject.currentPhase}
+                                    isCompleted={phase.status === 'completed'}
                                 />
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Button onClick={handleGenerateSchedule} disabled={isLoading}>
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Generando...
-                                    </>
-                                ) : (
-                                    "Generar Parrilla con IA"
-                                )}
-                            </Button>
-                            <Button onClick={handleAutomateDelivery} disabled={!schedule}>
-                                <Sparkles className="mr-2 h-4 w-4"/>
-                                Automatizar Entrega
-                            </Button>
+                               </div>
+                            ))}
                         </div>
                     </CardContent>
                 </Card>
-
-                {schedule && (
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>Parrilla de Contenido Editable</CardTitle>
-                            <CardDescription>Ajusta el contenido generado por la IA y luego expórtalo o compártelo.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="overflow-x-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[80px]">Post</TableHead>
-                                        <TableHead className="w-[120px]">Formato</TableHead>
-                                        <TableHead className="w-[150px]">Tópico</TableHead>
-                                        <TableHead className="min-w-[250px]">Copy In (Ideas)</TableHead>
-                                        <TableHead className="min-w-[250px]">Copy Out (Publicación)</TableHead>
-                                        <TableHead className="w-[120px]">Acción</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {schedule.map((post, index) => (
-                                        <TableRow key={post.postNumber}>
-                                            <TableCell>
-                                                <Input value={post.postNumber} onChange={e => handleScheduleChange(index, 'postNumber', e.target.value)} className="text-center font-bold"/>
-                                            </TableCell>
-                                            <TableCell>
-                                                 <Input value={post.format} onChange={e => handleScheduleChange(index, 'format', e.target.value)} />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Input value={post.topic} onChange={e => handleScheduleChange(index, 'topic', e.target.value)} />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Textarea value={post.copyIn} onChange={e => handleScheduleChange(index, 'copyIn', e.target.value)} rows={4} className="text-xs" />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Textarea value={post.copyOut} onChange={e => handleScheduleChange(index, 'copyOut', e.target.value)} rows={4} className="text-xs"/>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button variant="outline" size="sm" onClick={() => openImageDialog(post)}>Crear Recurso</Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                        <CardFooter className="flex justify-end gap-2 pt-4">
-                            <Button variant="outline" onClick={downloadPDF}><File className="mr-2"/> Descargar PDF</Button>
-                            <Button variant="outline" onClick={downloadCSV}><Download className="mr-2"/> Descargar CSV</Button>
-                            <Button variant="outline" onClick={sendByEmail}><Mail className="mr-2"/> Enviar por Email</Button>
-                        </CardFooter>
-                    </Card>
-                )}
-            </div>
-            <DialogContent className="sm:max-w-2xl h-[90vh] flex flex-col">
-                <DialogHeader>
-                    <DialogTitle>Generador de Imagen con IA</DialogTitle>
-                    <DialogDescription>
-                        Usa la idea del post para generar un recurso visual. Puedes refinar el prompt antes de generar.
-                    </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="flex-1 -mx-6">
-                    <div className="px-6 space-y-4">
-                        <div>
-                            <Label htmlFor="creative-brief" className="font-semibold">Brief Creativo (Prompt)</Label>
-                            <Textarea 
-                                id="creative-brief"
-                                value={currentPost?.copyIn || ''} 
-                                onChange={(e) => setCurrentPost(prev => prev ? {...prev, copyIn: e.target.value} : null)}
-                                rows={5}
-                                className="mt-2"
-                            />
-                        </div>
-                        <Button onClick={handleGenerateImage} disabled={isGeneratingImage} className="w-full">
-                            {isGeneratingImage ? <Loader2 className="mr-2 animate-spin" /> : <Sparkles className="mr-2" />}
-                            {isGeneratingImage ? 'Generando imagen...' : 'Generar Imagen con IA'}
-                        </Button>
-
-                        {isGeneratingImage && (
-                            <div className="flex justify-center items-center h-64 bg-muted rounded-lg">
-                               <Loader2 className="h-12 w-12 text-primary animate-spin"/>
-                            </div>
-                        )}
-
-                        {generatedImageUrl && (
-                            <div className="space-y-4">
-                                <div className="relative w-full overflow-hidden bg-muted rounded-lg">
-                                    <Image src={generatedImageUrl} alt="Imagen generada por IA" width={1024} height={1024} className="object-contain w-full h-auto" />
-                                </div>
-                                <a href={generatedImageUrl} download={`post_image_${currentPost?.postNumber}.png`}>
-                                    <Button variant="secondary" className="w-full">
-                                        <Download className="mr-2" />
-                                        Descargar Imagen
-                                    </Button>
-                                </a>
-                            </div>
-                        )}
-                    </div>
-                </ScrollArea>
-            </DialogContent>
-        </Dialog>
+            )}
+        </div>
     );
 }

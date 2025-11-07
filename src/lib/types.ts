@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
 
@@ -104,6 +103,35 @@ export type Customer = {
   signupDate: Date;
   revenue: number;
 };
+
+
+// Project Workflow Types
+export type ProjectPhaseId = 'onboarding' | 'research' | 'planning' | 'execution' | 'closure';
+export type ProjectPhaseStatus = 'pending' | 'in_progress' | 'completed' | 'error';
+
+export const projectPhases: { id: ProjectPhaseId, name: string }[] = [
+  { id: 'onboarding', name: 'Onboarding y Evaluación' },
+  { id: 'research', name: 'Investigación y Estrategia' },
+  { id: 'planning', name: 'Planificación y Calendario' },
+  { id: 'execution', name: 'Generación y Ejecución' },
+  { id: 'closure', name: 'Optimización y Cierre' },
+];
+
+export type ProjectPhase = {
+  id: ProjectPhaseId;
+  name: string;
+  status: ProjectPhaseStatus;
+  details?: string; // Optional details about the phase status
+};
+
+export type Project = {
+  id: string;
+  customerId: string;
+  customerName: string;
+  currentPhase: ProjectPhaseId;
+  phases: ProjectPhase[];
+};
+
 
 // AI Flow Schemas
 export const GenerateImageInputSchema = z.object({

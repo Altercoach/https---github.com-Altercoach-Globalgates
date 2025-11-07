@@ -1,5 +1,6 @@
-
 import type { ChartConfig } from '@/components/ui/chart';
+import { Project } from '@/lib/types';
+
 
 export const chartData = [
   { month: "Enero", leads: 186, closed: 20 },
@@ -20,6 +21,22 @@ export const chartConfig = {
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
+
+
+export const projectWorkflowData: Project = {
+    id: 'proj_002',
+    customerId: 'cus_002',
+    customerName: 'Jane Smith',
+    currentPhase: 'execution',
+    phases: [
+      { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación', details: 'Formularios completados el 15/05/24' },
+      { id: 'research', status: 'completed', name: 'Investigación y Estrategia', details: 'Análisis SWOT y de competencia finalizado.' },
+      { id: 'planning', status: 'completed', name: 'Planificación y Calendario', details: 'Parrilla de contenido generada y aprobada.' },
+      { id: 'execution', status: 'in_progress', name: 'Generación y Ejecución', details: 'Generando posts 5-8 de 15. Programados para la próxima semana.' },
+      { id: 'closure', status: 'pending', name: 'Optimización y Cierre', details: 'Fase iniciará al completar la ejecución.' },
+    ]
+};
+
 
 export const pendingActionsData = {
   es: [
@@ -42,6 +59,8 @@ export const pendingActionsData = {
   ]
 }
 
+// THIS IS DEPRECATED AND WILL BE REMOVED.
+// The analysis is now part of the project workflow.
 export const visibleAnalysesData = {
   es: [ { id: 'analysis-eval-001', title: 'Análisis de Evaluación de Negocio', analysis: { swot: { strengths: "Producto estrella (cold brew) con alta demanda potencial.", weaknesses: "Poca presencia de marca y falta de un canal de ventas digital claro.", opportunities: "Mercado local en crecimiento para cafés de especialidad.", threats: "Competencia de cafeterías establecidas en la zona centro." }, recommendations: "1. **Lanzar Campaña de Branding Local**: Enfocarse en Instagram para dar a conocer el 'cold brew'.\n2. **Implementar Funnel de Ventas**: Crear una landing page para capturar leads interesados en pedidos grandes.\n\n**Plan Sugerido**: Contratar 'Setup Funnel' y 'Marketing de Contenido'." } } ],
   en: [ { id: 'analysis-eval-001', title: 'Business Evaluation Analysis', analysis: { swot: { strengths: "Star product (cold brew) with high potential demand.", weaknesses: "Low brand presence and lack of a clear digital sales channel.", opportunities: "Growing local market for specialty coffees.", threats: "Competition from established coffee shops downtown." }, recommendations: "1. **Launch Local Branding Campaign**: Focus on Instagram to promote the 'cold brew'.\n2. **Implement Sales Funnel**: Create a landing page to capture leads interested in large orders.\n\n**Suggested Plan**: Hire 'Setup Funnel' and 'Content Marketing'." } } ],
