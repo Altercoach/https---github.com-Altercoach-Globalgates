@@ -193,7 +193,15 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                 aspectRatio: '1:1', // O puedes hacerlo configurable
             };
             const result = await generateImageFromPrompt(input);
-            setGeneratedImageUrl(result.imageUrl);
+            if (result.imageUrl && !result.imageUrl.includes('picsum.photos')) {
+                setGeneratedImageUrl(result.imageUrl);
+                 toast({
+                    title: "¡Imagen Generada!",
+                    description: "La IA ha creado una nueva imagen para tu post."
+                });
+            } else {
+                 throw new Error("La IA devolvió una imagen de placeholder.");
+            }
         } catch (error: any) {
             console.error("Failed to generate image", error);
             toast({
@@ -333,7 +341,7 @@ Instrucciones adicionales del equipo: ${additionalInstructions}`;
                     </Card>
                 )}
             </div>
-             <DialogContent className="sm:max-w-2xl h-[90vh] flex flex-col">
+            <DialogContent className="sm:max-w-2xl h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Generador de Imagen con IA</DialogTitle>
                     <DialogDescription>

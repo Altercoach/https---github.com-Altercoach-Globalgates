@@ -1,4 +1,3 @@
-
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
@@ -13,7 +12,7 @@ import { googleAI } from '@genkit-ai/google-genai';
  * - Costo: 💰 (Económico)
  * - Estabilidad: 🟡 (Experimental pero funcional)
  */
-export const GEMINI_2_FLASH = 'gemini-2.0-flash-exp';
+export const GEMINI_2_FLASH = 'gemini-1.5-flash';
 
 /**
  * OPCIÓN 2: Gemini 1.5 Pro - MÁS ESTABLE Y POTENTE
@@ -43,7 +42,7 @@ export const REPLICATE_IMAGE_MODEL = 'replicate';
  * - GEMINI_2_FLASH (recomendado para desarrollo y producción ligera)
  * - GEMINI_15_PRO (recomendado para análisis complejos y producción crítica)
  */
-export const ACTIVE_TEXT_MODEL_ID = GEMINI_15_PRO; // 👈 CAMBIA AQUÍ
+export const ACTIVE_TEXT_MODEL_ID = GEMINI_15_PRO; // 👈 YA ESTÁ CORRECTO
 
 // ============================================
 // CONFIGURACIÓN DE GENKIT

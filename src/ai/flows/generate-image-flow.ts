@@ -3,113 +3,87 @@
 
 import { z } from 'zod';
 import { ai } from '@/ai/genkit';
-import Replicate from 'replicate';
+import { googleAI }s from '@genkit-ai/google-genai';
 import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
 import { GenerateImageInputSchema } from '@/lib/types';
-
-// ============================================
-// MODELO Y FALLBACK
-// ============================================
-
-const REPLICATE_MODEL_ID = 'black-forest-labs/flux-schnell';
-
-function generatePlaceholder(brief: string): GenerateImageOutput {
-    console.warn('⚠️  Replicate falló (puede ser por falta de créditos o error de API). Usando placeholder de picsum.photos.');
-    const seed = brief.slice(0, 10).replace(/[^a-zA-Z0-9]/g, '');
-    return {
-        imageUrl: `https://picsum.photos/seed/${seed}/1024/1024`,
-        refinedPrompt: brief,
-        cost: 0,
-        model: 'placeholder',
-    };
-}
-
-// ============================================
-// FLUJO PRINCIPAL DE GENERACIÓN
-// ============================================
 
 const generateImageFlow = ai.defineFlow(
   {
     name: 'generateImage',
     inputSchema: GenerateImageInputSchema,
     outputSchema: z.object({
-      imageUrl: z.string().describe('URL de la imagen generada'),
-      refinedPrompt: z.string().describe('Prompt usado para generar la imagen'),
-      cost: z.number().describe('Costo de la generación en USD'),
-      model: z.string().describe('Modelo usado para la generación'),
+      imageUrl: z.string(),
+      refinedPrompt: z.string(),
+      cost: z.number(),
+      model: z.string(),
     }),
   },
   async (input) => {
-    
-    if (!process.env.REPLICATE_API_TOKEN) {
-      console.warn('REPLICATE_API_TOKEN no está configurado. Usando modo placeholder.');
-      return generatePlaceholder(input.creativeBrief);
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn('❌ GEMINI_API_KEY no configurado');
+      const seed = Date.now();
+      return {
+        imageUrl: `https://picsum.photos/seed/${seed}/1024/1024`,
+        refinedPrompt: input.creativeBrief,
+        cost: 0,
+        model: 'placeholder',
+      };
     }
     
-    if (!input.creativeBrief || input.creativeBrief.trim().length === 0) {
-      throw new Error('El brief creativo está vacío, no se puede generar una imagen.');
+    if (!input.creativeBrief?.trim()) {
+      throw new Error('El brief está vacío');
     }
     
     try {
-      const replicate = new Replicate({ auth: process.env.REPLICATE_API_TOKEN });
-      
-      console.log(`🎨 Generando imagen con FLUX Schnell (GRATIS)`);
+      console.log('🎨 Generando con Imagen 2...');
       console.log('📝 Prompt:', input.creativeBrief.substring(0, 100));
 
-      const output = await replicate.run(
-        REPLICATE_MODEL_ID as `${string}/${string}:${string}`,
-        {
-          input: {
-            prompt: input.creativeBrief,
-            go_fast: true,
-            num_outputs: 1,
-            aspect_ratio: input.aspectRatio,
-            output_format: "webp",
-            output_quality: 80,
-          }
+      const { media } = await ai.generate({
+        model: googleAI.model('imagen-2'),
+        prompt: input.creativeBrief,
+        config: {
+            aspectRatio: input.aspectRatio || '1:1',
+            numImages: 1,
         }
-      );
+      });
       
-      const imageUrl = Array.isArray(output) ? output[0] : String(output);
+      const imageUrl = media[0]?.url;
 
-      if (!imageUrl || !imageUrl.startsWith('https')) {
-        throw new Error(`La respuesta de Replicate no fue una URL válida: ${imageUrl}`);
+      if (!imageUrl || !imageUrl.startsWith('data:')) {
+        console.error('❌ URL inválida:', imageUrl);
+        throw new Error('URL inválida de Google AI');
       }
 
-      console.log('✅ Imagen generada exitosamente por IA.');
-      console.log('🔗 URL:', imageUrl);
-
+      console.log('✅ ÉXITO! Imagen generada');
+      
       return {
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief,
-        cost: 0, 
-        model: 'flux-schnell',
+        cost: 0, // El costo se puede calcular si es necesario
+        model: 'imagen-2',
       };
 
     } catch (error: any) {
-      console.error('❌ Error al generar imagen con Replicate:', error.message);
-      return generatePlaceholder(input.creativeBrief);
+      console.error('❌ ERROR COMPLETO DE GOOGLE AI:');
+      console.error('Mensaje:', error.message);
+      console.error('Stack:', error.stack);
+      const seed = Date.now();
+      return {
+        imageUrl: `https://picsum.photos/seed/${seed}/1024/1024`,
+        refinedPrompt: input.creativeBrief,
+        cost: 0,
+        model: 'error-fallback',
+      };
     }
   }
 );
 
-
-// ============================================
-// FUNCIONES WRAPPER (EXPORTABLES)
-// ============================================
-
-/**
- * Genera una sola imagen a partir de un brief creativo.
- */
 export async function generateImageFromPrompt(input: GenerateImageInput): Promise<GenerateImageOutput> {
   return await generateImageFlow(input);
 }
 
-/**
- * Genera un lote de imágenes (FUNCIONALIDAD FUTURA, NO IMPLEMENTADA).
- */
 export async function generateBatchImages(input: GenerateBatchImagesInput): Promise<GenerateBatchImagesOutput> {
-    console.warn("La generación en lote aún no está implementada en este flujo simplificado.");
+    console.warn("Generación en lote no implementada");
     return {
         results: [],
         totalCost: 0,
