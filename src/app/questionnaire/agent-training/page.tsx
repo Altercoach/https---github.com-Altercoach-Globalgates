@@ -214,7 +214,7 @@ export default function AgentTrainingPage() {
                  <YesNoQuestion label="Adaptación de tono según tipo de consulta:" descriptionLabel="¿Qué tonos para qué consultas?"/>
             </Section>
 
-            <Section title="Sección 11: Agenda y Gestión de Citas Avanzada">
+             <Section title="Sección 11: Agenda y Gestión de Citas Avanzada">
                  <YesNoQuestion label="Sugerencia automática de horarios disponibles:" descriptionLabel="¿De qué calendarios?"/>
                  <YesNoQuestion label="Manejo de bloqueos por días festivos o vacaciones:" descriptionLabel="¿Cómo se gestionan?"/>
                  <Question label="Tipos de recordatorios automáticos: SMS / Email / WhatsApp / Otro:"><Input/></Question>
@@ -225,7 +225,7 @@ export default function AgentTrainingPage() {
                  <YesNoQuestion label="Manejo de citas recurrentes:" descriptionLabel="¿Cómo se configuran?"/>
                  <YesNoQuestion label="Reportes de ocupación, cancelaciones y efectividad:" descriptionLabel="¿Qué métricas son importantes?"/>
                  <Question label="Prioridad según cliente o tipo de servicio:"><Input/></Question>
-            </Section>
+             </Section>
 
              <Section title="Sección 12: Escenarios Especiales y Excepciones">
                  <Question label="Manejo de información incompleta o incorrecta:"><Textarea/></Question>
