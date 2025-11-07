@@ -89,7 +89,7 @@ export default function MyOfficeLayout({
   const router = useRouter();
   const { site, hasUnsavedChanges } = useSite();
   const { auth, logout } = useAuth();
-  const { language, translatedSite } = useLanguage();
+  const { language, getTranslation } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
 
@@ -119,7 +119,7 @@ export default function MyOfficeLayout({
     );
   }
   
-  const siteName = translatedSite?.brand?.name || site.brand.name;
+  const siteName = getTranslation(site.brand.name);
 
   return (
     <SidebarProvider>
