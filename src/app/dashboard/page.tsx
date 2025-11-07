@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Edit, Target, Percent, UserPlus, CheckCircle, Clock, Loader2, ArrowRight } from 'lucide-react';
+import { Edit, Target, Percent, UserPlus, CheckCircle, Clock, Zap, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useLanguage } from '@/hooks/use-language';
@@ -11,18 +12,21 @@ import { chartData, pendingActionsData, projectWorkflowData } from '@/lib/data/d
 import Link from 'next/link';
 import type { ProjectPhase } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { Progress } from "@/components/ui/progress";
 
 const labels = {
-  es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campaña automatizada.' },
-  en: { pageTitle: 'Customer Dashboard', welcome: 'Welcome', generatedLeads: 'Generated Leads', inLast6Months: 'In the last 6 months', conversionRate: 'Conversion Rate', fromLeadToSale: 'From lead to sale', newFollowers: 'New Followers', inAllWindows: 'On all networks', pendingActions: 'Pending Actions', pendingActionsDescription: 'Complete these forms to unlock your strategy and start growing.', complete: 'Complete', projectWorkflow: 'Project Workflow', projectWorkflowDescription: 'Follow the real-time progress of your automated campaign.' },
-  fr: { pageTitle: 'Tableau de Bord Client', welcome: 'Bienvenue', generatedLeads: 'Prospects Générés', inLast6Months: 'Au cours des 6 derniers mois', conversionRate: 'Taux de Conversion', fromLeadToSale: 'Du prospect à la vente', newFollowers: 'Nouveaux Abonnés', inAllWindows: 'Sur tous les réseaux', pendingActions: 'Actions en Attente', pendingActionsDescription: 'Remplissez ces formulaires pour débloquer votre stratégie et commencer à grandir.', complete: 'Compléter', projectWorkflow: 'Flux de Travail du Projet', projectWorkflowDescription: 'Suivez en temps réel l\'avancement de votre campagne automatisée.' }
+  es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campaña automatizada.', inProgress: "En Progreso" },
+  en: { pageTitle: 'Customer Dashboard', welcome: 'Welcome', generatedLeads: 'Generated Leads', inLast6Months: 'In the last 6 months', conversionRate: 'Conversion Rate', fromLeadToSale: 'From lead to sale', newFollowers: 'New Followers', inAllWindows: 'On all networks', pendingActions: 'Pending Actions', pendingActionsDescription: 'Complete these forms to unlock your strategy and start growing.', complete: 'Complete', projectWorkflow: 'Project Workflow', projectWorkflowDescription: 'Follow the real-time progress of your automated campaign.', inProgress: "In Progress" },
+  fr: { pageTitle: 'Tableau de Bord Client', welcome: 'Bienvenue', generatedLeads: 'Prospects Générés', inLast6Months: 'Au cours des 6 derniers mois', conversionRate: 'Taux de Conversion', fromLeadToSale: 'Du prospect à la vente', newFollowers: 'Nouveaux Abonnés', inAllWindows: 'Sur tous les réseaux', pendingActions: 'Actions en Attente', pendingActionsDescription: 'Remplissez ces formulaires pour débloquer votre stratégie et commencer à grandir.', complete: 'Compléter', projectWorkflow: 'Flux de Travail du Projet', projectWorkflowDescription: 'Suivez en temps réel l\'avancement de votre campagne automatisée.', inProgress: "En Cours" }
 };
 
 const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) => {
+    const { language } = useLanguage();
+    const t = labels[language.code as keyof typeof labels] || labels.en;
     
     const getIcon = () => {
         if(phase.status === 'completed') return <CheckCircle className="h-6 w-6 text-green-500" />;
-        if(phase.status === 'in_progress') return <Loader2 className="h-6 w-6 text-primary animate-spin" />;
+        if(phase.status === 'in_progress') return <Zap className="h-6 w-6 text-orange-500" />;
         return <Clock className="h-6 w-6 text-muted-foreground" />;
     }
 
@@ -31,16 +35,22 @@ const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) 
             <div className="flex flex-col items-center">
                 <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", {
                     'bg-green-100 dark:bg-green-900/50': phase.status === 'completed',
-                    'bg-primary/10 dark:bg-primary/50': phase.status === 'in_progress',
+                    'bg-orange-100 dark:bg-orange-900/50': phase.status === 'in_progress',
                     'bg-muted': phase.status === 'pending'
                 })}>
                     {getIcon()}
                 </div>
-                {!isLast && <div className="mt-2 h-16 w-px bg-border" />}
+                {!isLast && <div className="mt-2 h-24 w-px bg-border" />}
             </div>
-            <div className="pt-2">
+            <div className="pt-2 flex-1">
                 <h4 className="font-semibold">{phase.name}</h4>
                 <p className="text-sm text-muted-foreground">{phase.details}</p>
+                 {phase.status === 'in_progress' && (
+                    <div className="mt-2 space-y-1">
+                        <span className="text-xs font-semibold text-orange-600">{t.inProgress}...</span>
+                        <Progress value={50} className="h-1 [&>*]:bg-orange-500 [&>*]:animate-pulse" />
+                    </div>
+                )}
             </div>
         </div>
     )
