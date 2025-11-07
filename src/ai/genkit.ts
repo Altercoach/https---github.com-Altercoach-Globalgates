@@ -1,111 +1,50 @@
 
 import { genkit } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import { abacusAI } from './abacus-plugin';
 
 // ============================================
-// CONFIGURACIÓN DE MODELOS DISPONIBLES
-// ============================================
-
-/**
- * OPCIÓN 1: Gemini 1.5 Flash (Experimental) - MÁS RÁPIDO Y RECIENTE
- * - Mejor para: Generación de contenido, análisis rápido, tareas creativas
- * - Velocidad: ⚡⚡⚡⚡⚡ (Muy rápido)
- * - Costo: 💰 (Económico)
- * - Estabilidad: 🟡 (Experimental pero funcional)
- */
-export const GEMINI_15_FLASH = 'gemini-1.5-flash';
-
-/**
- * OPCIÓN 2: Gemini 1.5 Pro - MÁS ESTABLE Y POTENTE
- * - Mejor para: Análisis complejos, razonamiento profundo, tareas críticas
- * - Velocidad: ⚡⚡⚡ (Moderado)
- * - Costo: 💰💰💰 (Más costoso)
- * - Estabilidad: 🟢 (Producción ready)
- */
-export const GEMINI_15_PRO = 'gemini-1.5-pro';
-
-
-/**
- * OPCIÓN 3: Imagen 2 - PARA GENERACIÓN DE IMÁGENES
- */
-export const IMAGEN_2 = 'imagen-2';
-
-
-// ============================================
-// CONFIGURACIÓN DE GENKIT
+// CONFIGURACIÓN DE GENKIT CON ABACUS AI
 // ============================================
 
 export const ai = genkit({
-  plugins: [googleAI()],
+  plugins: [abacusAI()], // Use the custom Abacus AI plugin
 });
 
 // ============================================
-// HELPER PARA OBTENER EL MODELO EN FLUJOS
+// HELPER PARA OBTENER EL MODELO EN FLUJOS (Simulando Abacus)
 // ============================================
 
 /**
- * Obtener modelo específico para tareas pesadas
- */
-export function getHeavyModel() {
-  return googleAI.model(GEMINI_15_PRO);
-}
-
-/**
- * Obtener modelo específico para tareas rápidas
- */
-export function getFastModel() {
-  return googleAI.model(GEMINI_15_FLASH);
-}
-
-// ============================================
-// CONFIGURACIÓN DE MODELOS POR TAREA (Simulando Abacus AI)
-// ============================================
-
-/**
- * Configuración recomendada de modelos por tipo de tarea,
- * simulando la arquitectura de agentes especializados.
+ * Maps task types to specific Abacus AI model names.
+ * This aligns with the "Executive Order" vision.
  */
 export const MODEL_BY_TASK = {
-  // Tareas creativas y de contenido
-  imageGeneration: IMAGEN_2, 
-  copywriting: getFastModel(),
-  socialMedia: getFastModel(),
-  
-  // Tareas analíticas (Agente Estratégico, de Investigación)
-  businessAnalysis: getHeavyModel(),
-  dataAnalysis: getHeavyModel(),
-  strategicPlanning: getHeavyModel(),
-  
-  // Tareas conversacionales y de recomendación
-  chat: getFastModel(),
-  customerService: getFastModel(),
-  
-  // Tareas de traducción
-  translation: getFastModel(),
-  
-  // Tareas de generación de prompts (meta-programación)
-  promptGeneration: getHeavyModel(),
+  // Text & Logic
+  onboarding: 'qwen-3',
+  evaluation: 'qwen-3',
+  copywriting: 'qwen-3',
+  chat: 'qwen-3',
+
+  // Research & Strategy
+  research: 'deepseek-r1',
+  strategic: 'deepseek-r1', // Or map to a future Claude model in Abacus
+
+  // Visuals
+  imageGeneration: 'flux-1.1-pro',
+  videoGeneration: 'wan-2.1', // Placeholder for future implementation
+
+  // Analytics
+  analytics: 'deepseek-r1', // Placeholder
+
 };
 
 /**
- * Obtener modelo recomendado para una tarea específica
+ * Gets the recommended Abacus model for a specific task.
+ * Note: Genkit automatically prefixes the model name with the plugin name,
+ * so we just need to return the model ID.
  */
-export function getModelForTask(task: keyof typeof MODEL_BY_TASK) {
-  const modelOrId = MODEL_BY_TASK[task];
-  
-  if (modelOrId === IMAGEN_2) {
-    // El flujo `generate-image-flow` se encargará de llamar a este servicio.
-    // Retornamos un modelo de texto rápido como placeholder si se llama desde otro lugar.
-    return getFastModel(); 
-  }
-
-  // Si ya es un objeto de modelo, lo retornamos directamente.
-  // Si es un ID, creamos la instancia del modelo.
-  if (typeof modelOrId === 'object') {
-    return modelOrId;
-  }
-  
-  return googleAI.model(modelOrId);
+export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): string {
+  return MODEL_BY_TASK[task];
 }
 
 // ============================================
@@ -113,8 +52,8 @@ export function getModelForTask(task: keyof typeof MODEL_BY_TASK) {
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit AI Configuration (Task-Oriented):');
-  console.log(`   Fast Model (Chat, Social): ${GEMINI_15_FLASH}`);
-  console.log(`   Heavy Model (Analysis): ${GEMINI_15_PRO}`);
-  console.log(`   Image Model: ${IMAGEN_2}`);
+  console.log('🤖 Genkit configured with Abacus AI Plugin.');
+  console.log(`   Default Text Model (Qwen-3): ${MODEL_BY_TASK.copywriting}`);
+  console.log(`   Research Model (DeepSeek): ${MODEL_BY_TASK.research}`);
+  console.log(`   Image Model (Flux): ${MODEL_BY_TASK.imageGeneration}`);
 }

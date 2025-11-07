@@ -2,25 +2,25 @@
 'use server';
 
 /**
- * @fileOverview Recomienda un plan de marketing basado en la descripción del negocio del usuario.
+ * @fileOverview Recommends a marketing plan based on the user's business description, using Abacus AI.
  *
- * - recommendPlan - Una función que recomienda un plan.
- * - RecommendPlanInput - El tipo de entrada para la función recommendPlan.
- * - RecommendPlanOutput - El tipo de retorno para la función recommendPlan.
+ * - recommendPlan - A function that recommends a plan.
+ * - RecommendPlanInput - The input type for the function.
+ * - RecommendPlanOutput - The return type for the function.
  */
 
-import {ai, getModelForTask} from '@/ai/genkit';
+import {ai, getAbacusModelForTask} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const RecommendPlanInputSchema = z.object({
-  businessDescription: z.string().describe('La descripción del negocio del usuario.'),
-  products: z.string().describe('El JSON string que representa la lista de productos disponibles.'),
+  businessDescription: z.string().describe('The description of the user\'s business.'),
+  products: z.string().describe('A JSON string representing the list of available products.'),
 });
 export type RecommendPlanInput = z.infer<typeof RecommendPlanInputSchema>;
 
 const RecommendPlanOutputSchema = z.object({
-  productIds: z.array(z.string()).describe('Un array de IDs de los productos recomendados. Si no hay suficiente información, este array puede estar vacío.'),
-  reasoning: z.string().describe('Una explicación de por qué se recomendaron estos productos, o una pregunta para obtener más detalles si la información es insuficiente.'),
+  productIds: z.array(z.string()).describe('An array of IDs of the recommended products. If there is not enough information, this array may be empty.'),
+  reasoning: z.string().describe('An explanation of why these products were recommended, or a question to get more details if the information is insufficient.'),
 });
 export type RecommendPlanOutput = z.infer<typeof RecommendPlanOutputSchema>;
 
@@ -32,22 +32,20 @@ const prompt = ai.definePrompt({
   name: 'recommendPlanPrompt',
   input: {schema: RecommendPlanInputSchema},
   output: {schema: RecommendPlanOutputSchema},
-  prompt: `Eres un consultor de negocios experto especializado en marketing digital y crecimiento. Tu tarea es analizar la descripción de un negocio y recomendar el mejor plan o combinación de planes de los productos disponibles.
+  prompt: `You are an expert business consultant. Your task is to analyze a business description and recommend the best plan(s) from the available products.
 
-  **Descripción del Negocio:**
+  **Business Description:**
   {{{businessDescription}}}
 
-  **Productos Disponibles (en formato JSON):**
+  **Available Products (JSON):**
   {{{products}}}
 
-  **Instrucciones:**
-  1.  Lee cuidadosamente la descripción del negocio para entender sus necesidades (p. ej., empezar, conseguir leads, construir marca, análisis de mercado, etc.).
-  2.  Revisa la lista de productos disponibles y sus descripciones para entender qué ofrece cada uno.
-  3.  **Análisis y Acción:**
-      *   **Si la descripción del negocio es clara y suficiente:** Selecciona uno o más IDs de productos que mejor se adapten a las necesidades. No recomiendes productos de tipo 'info'. Proporciona una explicación clara y concisa (en español) de por qué estás recomendando esos productos.
-      *   **Si la descripción es muy vaga o insuficiente para tomar una decisión informada:** No selecciones ningún producto (deja 'productIds' como un array vacío). En su lugar, formula una pregunta específica y amigable (en español) en el campo 'reasoning' para ayudar al usuario a proporcionar la información que necesitas. Por ejemplo, si dicen "quiero crecer", podrías preguntar: "¿Excelente! Para darte la mejor recomendación, ¿podrías decirme si tu prioridad es aumentar tus seguidores en redes sociales o capturar directamente datos de clientes potenciales (leads)?".
-
-  4.  Devuelve tu respuesta en el formato solicitado.`,
+  **Instructions:**
+  1.  Analyze the business description to understand its needs.
+  2.  Review the available products.
+  3.  **If the description is clear:** Select one or more product IDs that are the best fit. Provide a clear reasoning in Spanish. Do not recommend 'info' type products.
+  4.  **If the description is vague:** Do not select any products (leave 'productIds' empty). Instead, ask a specific, friendly question in Spanish in the 'reasoning' field to get the necessary information.
+  5.  Return your response in the requested JSON format.`,
 });
 
 const recommendPlanFlow = ai.defineFlow(
@@ -57,7 +55,8 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input, { model: getModelForTask('chat') });
+    const modelId = getAbacusModelForTask('chat');
+    const {output} = await prompt(input, { model: `abacus/${modelId}` });
     return output!;
   }
 );

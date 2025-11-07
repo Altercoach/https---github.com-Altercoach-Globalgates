@@ -2,12 +2,17 @@
 'use server';
 
 import { z } from 'zod';
-import { ai, getModelForTask } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
-import type { GenerateImageOutput, GenerateImageInput, GenerateBatchImagesInput, GenerateBatchImagesOutput } from '@/lib/types';
+import { ai } from '@/ai/genkit';
+import Replicate from 'replicate';
+import type { GenerateImageOutput, GenerateImageInput } from '@/lib/types';
 import { GenerateImageInputSchema } from '@/lib/types';
+import { getAbacusModelForTask } from '@/ai/genkit';
 
-const generateImageFlow = ai.defineFlow(
+
+// This is the correct, free, and fast model ID based on user's research.
+const REPLICATE_MODEL_ID = 'black-forest-labs/flux-schnell';
+
+export const generateImageFlow = ai.defineFlow(
   {
     name: 'generateImage',
     inputSchema: GenerateImageInputSchema,
@@ -19,57 +24,65 @@ const generateImageFlow = ai.defineFlow(
     }),
   },
   async (input) => {
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn('❌ GEMINI_API_KEY no configurado');
-      const seed = Date.now();
-      return {
-        imageUrl: `https://picsum.photos/seed/${seed}/1024/1024`,
+    if (!input.creativeBrief?.trim()) {
+      throw new Error('El brief creativo está vacío');
+    }
+    
+    // Using Replicate directly as Abacus AI SDK doesn't have a direct image generation method shown
+    // and this follows the user's executive order to use specific models.
+    const apiToken = process.env.REPLICATE_API_TOKEN;
+
+    if (!apiToken || apiToken === 'r8_tu_token_aqui') {
+       console.warn('⚠️ REPLICATE_API_TOKEN no configurado, usando placeholder.');
+       return {
+        imageUrl: `https://picsum.photos/seed/${Date.now()}/1024/1024`,
         refinedPrompt: input.creativeBrief,
         cost: 0,
         model: 'placeholder',
       };
     }
     
-    if (!input.creativeBrief?.trim()) {
-      throw new Error('El brief está vacío');
-    }
-    
     try {
-      console.log('🎨 Generando con Imagen 2...');
+      const replicate = new Replicate({ auth: apiToken });
+
+      console.log(`🎨 Generando imagen con ${REPLICATE_MODEL_ID}`);
       console.log('📝 Prompt:', input.creativeBrief.substring(0, 100));
 
-      const { media } = await ai.generate({
-        model: googleAI.model('imagen-2'),
-        prompt: input.creativeBrief,
-        config: {
-            aspectRatio: input.aspectRatio || '1:1',
-            numImages: 1,
+      const output = await replicate.run(
+        REPLICATE_MODEL_ID as `${string}/${string}`,
+        {
+          input: {
+            prompt: input.creativeBrief,
+            aspect_ratio: input.aspectRatio,
+            // Parameters specific to flux-schnell
+            go_fast: true,
+            num_outputs: 1,
+            output_format: "webp",
+            output_quality: 80,
+          }
         }
-      });
+      );
       
-      const imageUrl = media[0]?.url;
-
-      if (!imageUrl || !imageUrl.startsWith('data:')) {
-        console.error('❌ URL inválida:', imageUrl);
-        throw new Error('URL inválida de Google AI');
+      const imageUrl = Array.isArray(output) ? output[0] : output;
+      
+      if (!imageUrl || typeof imageUrl !== 'string') {
+        throw new Error('La API de Replicate no devolvió una URL de imagen válida.');
       }
-
-      console.log('✅ ÉXITO! Imagen generada');
+      
+      console.log('✅ ÉXITO! Imagen generada:', imageUrl);
       
       return {
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief,
-        cost: 0, // El costo se puede calcular si es necesario
-        model: 'imagen-2',
+        cost: 0, // FLUX Schnell is free, so cost is 0.
+        model: 'flux-schnell',
       };
 
     } catch (error: any) {
-      console.error('❌ ERROR COMPLETO DE GOOGLE AI:');
-      console.error('Mensaje:', error.message);
-      console.error('Stack:', error.stack);
-      const seed = Date.now();
+      console.error('❌ ERROR en la API de Replicate:', error.message);
+      // Return a placeholder on failure to prevent app from breaking.
       return {
-        imageUrl: `https://picsum.photos/seed/${seed}/1024/1024`,
+        imageUrl: `https://picsum.photos/seed/${Date.now()}/1024/1024`,
         refinedPrompt: input.creativeBrief,
         cost: 0,
         model: 'error-fallback',
@@ -78,16 +91,7 @@ const generateImageFlow = ai.defineFlow(
   }
 );
 
+
 export async function generateImageFromPrompt(input: GenerateImageInput): Promise<GenerateImageOutput> {
   return await generateImageFlow(input);
-}
-
-export async function generateBatchImages(input: GenerateBatchImagesInput): Promise<GenerateBatchImagesOutput> {
-    console.warn("Generación en lote no implementada");
-    return {
-        results: [],
-        totalCost: 0,
-        successCount: 0,
-        failureCount: input.posts.length,
-    };
 }

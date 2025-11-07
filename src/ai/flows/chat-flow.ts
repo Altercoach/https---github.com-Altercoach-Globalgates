@@ -1,14 +1,14 @@
 
 'use server';
 /**
- * @fileOverview A simple chat flow for the AI Agent.
+ * @fileOverview A simple chat flow for the AI Agent, using Abacus AI.
  *
  * - chat - A function that handles the chat interaction.
  * - ChatInput - The input type for the chat function.
  * - ChatOutput - The return type for the chat function.
  */
 
-import { ai, getModelForTask } from '@/ai/genkit';
+import { ai, getAbacusModelForTask } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const ChatHistorySchema = z.object({
@@ -71,7 +71,8 @@ const chatFlow = ai.defineFlow(
       isUser: message.role === 'user',
     }));
 
-    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: getModelForTask('chat') });
+    const modelId = getAbacusModelForTask('chat');
+    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: `abacus/${modelId}` });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');

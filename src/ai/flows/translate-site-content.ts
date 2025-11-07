@@ -2,14 +2,14 @@
 'use server';
 
 /**
- * @fileOverview Translates site content to a specified language using AI.
+ * @fileOverview Translates site content to a specified language using Abacus AI.
  *
  * - translateSiteContent - A function that translates the site content.
  * - TranslateSiteContentInput - The input type for the translateSiteContent function.
  * - TranslateSiteContentOutput - The return type for the translateSiteContent function.
  */
 
-import {ai, getModelForTask} from '@/ai/genkit';
+import {ai, getAbacusModelForTask} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const TranslateSiteContentInputSchema = z.object({
@@ -29,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'translateSiteContentPrompt',
   input: {schema: TranslateSiteContentInputSchema},
   output: {schema: z.string().nullable()},
-  prompt: `You are a professional translator specializing in website and marketing content. You will be provided with website content in JSON format, which is originally in Spanish. Your task is to translate it into the target language, preserving the JSON structure and keys perfectly. Pay special attention to marketing and business terminology to ensure it is accurate and culturally relevant in the translated language.
+  prompt: `You are a professional translator specializing in marketing content. Translate the provided Spanish JSON content into the target language, preserving the JSON structure and keys perfectly.
 
 The target language is: **{{{targetLanguage}}}**.
 
@@ -51,7 +51,8 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const {output} = await prompt(input, { model: getModelForTask('translation') });
+    const modelId = getAbacusModelForTask('onboarding'); // Using a general text model for translation
+    const {output} = await prompt(input, { model: `abacus/${modelId}` });
     return output || '{}';
   }
 );

@@ -2,14 +2,14 @@
 'use server';
 
 /**
- * @fileOverview Generates a monthly content schedule for a client using AI.
+ * @fileOverview Generates a monthly content schedule for a client using Abacus AI.
  *
  * - generateContentSchedule - A function that creates the content schedule.
  * - GenerateContentScheduleInput - The input type for the function.
  * - GenerateContentScheduleOutput - The return type for the function.
  */
 
-import { ai, getModelForTask } from '@/ai/genkit';
+import { ai, getAbacusModelForTask } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateContentScheduleInputSchema = z.object({
@@ -40,45 +40,26 @@ const prompt = ai.definePrompt({
   name: 'generateContentSchedulePrompt',
   input: { schema: GenerateContentScheduleInputSchema },
   output: { schema: GenerateContentScheduleOutputSchema },
-  prompt: `You are a world-class social media content strategist. Your task is to create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and specific instructions from the marketing team.
+  prompt: `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions.
 
-  **Client Information & Team Instructions:**
+  **Client Information & Instructions:**
   {{{clientBusiness}}}
 
   **Your Task:**
-  Based on the provided information, create a diverse and engaging content schedule. For each post, you must define the following:
-  1.  **postNumber**: The sequential number of the post (e.g., "1", "2", "3-4").
-  2.  **format**: The type of post. Choose from: 'Post fijo', 'Historia', 'Carrusel', 'Video'.
-  3.  **topic**: The strategic theme. Choose from: 'Venta' (Sales), 'Branding', 'Dato curioso' (Fun Fact), 'Recomendación' (Recommendation), 'Interacción' (Interaction).
-  4.  **copyIn**: The internal creative brief. This should include a 'Título', a 'Subtítulo', and if it's a carousel or video, ideas for 'Slide 1', 'Slide 2', etc. This is the core idea for the creative team.
-  5.  **copyOut**: The final, ready-to-publish text for the post's caption. This should be engaging, well-written, and MUST include 3-4 relevant, popular hashtags.
+  Create a diverse content schedule. For each post, define:
+  1.  **postNumber**: Sequential number.
+  2.  **format**: Choose from: 'Post fijo', 'Historia', 'Carrusel', 'Video'.
+  3.  **topic**: Strategic theme (e.g., 'Venta', 'Branding', 'Interacción').
+  4.  **copyIn**: Internal creative brief (Title, Subtitle, ideas).
+  5.  **copyOut**: Final, public-facing caption with 3-4 relevant hashtags.
 
-  **Instructions & Tone:**
-  - Analyze the client's business and the team's instructions to tailor the content perfectly.
-  - Create a balanced mix of formats and topics. Don't just make sales posts. Include branding, educational, and interactive content to build a community.
-  - The 'copyIn' should be a clear instruction for a designer or video editor.
-  - The 'copyOut' should be creative, persuasive, and reflect the brand's voice.
-  - Ensure the hashtags are specific to the industry and the post's content.
+  **Instructions:**
+  - Tailor content to the client's business.
+  - Create a balanced mix of formats and topics.
+  - The 'copyIn' should be a clear brief for a designer.
+  - The 'copyOut' should be creative and persuasive.
   - The entire output must be in Spanish.
-  - The final output MUST be a JSON object containing a single key "posts", which is an array of the post objects you generate.`,
-  safetySettings: [
-    {
-      category: 'HARM_CATEGORY_HATE_SPEECH',
-      threshold: 'BLOCK_ONLY_HIGH',
-    },
-    {
-      category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-      threshold: 'BLOCK_NONE',
-    },
-    {
-      category: 'HARM_CATEGORY_HARASSMENT',
-      threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-    },
-    {
-      category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-      threshold: 'BLOCK_LOW_AND_ABOVE',
-    },
-  ],
+  - The final output MUST be a JSON object containing a single key "posts".`,
 });
 
 const generateContentScheduleFlow = ai.defineFlow(
@@ -88,7 +69,9 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input, { model: getModelForTask('socialMedia') });
+    const modelId = getAbacusModelForTask('copywriting');
+    const { output } = await prompt(input, { model: `abacus/${modelId}` });
+
     if (!output) {
       throw new Error('The AI failed to generate a content schedule.');
     }
