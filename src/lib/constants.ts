@@ -31,7 +31,7 @@ export const CURRENCIES: Currency[] = [
 ];
 
 export const initialCustomers: Customer[] = [
-  { id: 'cus_001', name: 'John Doe', email: 'john.doe@example.com', plan: 'Marketing de Contenido', status: 'Active', signupDate: new Date('2023-10-15'), revenue: 350 },
+  { id: 'cus_001', name: 'James Bond (Agente 007)', email: 'james.bond@example.com', plan: 'Marketing de Contenido', status: 'Active', signupDate: new Date('2023-10-15'), revenue: 350 },
   { id: 'cus_002', name: 'Jane Smith', email: 'demo@cliente.com', plan: 'Setup Funnel + Contenido', status: 'Active', signupDate: new Date('2023-11-01'), revenue: 650 },
   { id: 'cus_003', name: 'Mike Johnson', email: 'mike.j@example.com', plan: 'Branding (8 pub)', status: 'Suspended', signupDate: new Date('2023-09-20'), revenue: 200 },
   { id: 'cus_004', name: 'Emily Brown', email: 'emily.b@example.com', plan: 'Marketing de Contenido', status: 'Active', signupDate: new Date('2023-12-05'), revenue: 350 },

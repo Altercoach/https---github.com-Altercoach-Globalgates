@@ -19,6 +19,20 @@ import { useLanguage } from '@/hooks/use-language';
 
 const initialProjects: Project[] = [
   {
+    id: 'proj_001',
+    customerId: 'cus_001',
+    customerName: 'James Bond (Agente 007)',
+    currentPhase: 'research',
+    status: 'Active',
+    phases: [
+      { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación' },
+      { id: 'research', status: 'in_progress', name: 'Investigación y Estrategia' },
+      { id: 'planning', status: 'pending', name: 'Planificación y Calendario' },
+      { id: 'execution', status: 'pending', name: 'Generación y Ejecución' },
+      { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
+    ]
+  },
+  {
     id: 'proj_002',
     customerId: 'cus_002',
     customerName: 'Jane Smith (demo@cliente.com)',
@@ -29,20 +43,6 @@ const initialProjects: Project[] = [
       { id: 'research', status: 'completed', name: 'Investigación y Estrategia' },
       { id: 'planning', status: 'completed', name: 'Planificación y Calendario' },
       { id: 'execution', status: 'in_progress', name: 'Generación y Ejecución' },
-      { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
-    ]
-  },
-   {
-    id: 'proj_001',
-    customerId: 'cus_001',
-    customerName: 'John Doe (john.doe@example.com)',
-    currentPhase: 'research',
-    status: 'Active',
-    phases: [
-      { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación' },
-      { id: 'research', status: 'in_progress', name: 'Investigación y Estrategia' },
-      { id: 'planning', status: 'pending', name: 'Planificación y Calendario' },
-      { id: 'execution', status: 'pending', name: 'Generación y Ejecución' },
       { id: 'closure', status: 'pending', name: 'Optimización y Cierre' },
     ]
   },
@@ -62,7 +62,7 @@ const initialProjects: Project[] = [
   }
 ];
 
-const AnalysisReviewDialog = ({ phase }: { phase: ProjectPhase }) => {
+const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(null);
     const { toast } = useToast();
@@ -92,21 +92,21 @@ const AnalysisReviewDialog = ({ phase }: { phase: ProjectPhase }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground">
-                    <Settings className="mr-2 h-3 w-3" /> Ver/Editar Detalles
+                <Button variant="outline" size="sm" className="w-full text-xs justify-start">
+                    <Bot className="mr-2 h-3 w-3" /> Ejecutar y Revisar
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>Revisión de Fase: {phase.name}</DialogTitle>
+                    <DialogTitle>Simulador: {phase.name}</DialogTitle>
                     <DialogDescription>
-                        Revisa la información de entrada y el resultado generado por la IA para esta fase.
+                        Revisando el cliente: {project.customerName}. Aquí puedes simular la ejecución de la IA y auditar la calidad del resultado.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-2 gap-6 py-4 max-h-[60vh] overflow-y-auto">
                     {/* Input Data */}
                     <div className="space-y-4">
-                        <h4 className="font-semibold">Entrada: Respuestas del Cuestionario</h4>
+                        <h4 className="font-semibold">Entrada: Respuestas del Cuestionario (Ejemplo)</h4>
                         <Card className="bg-muted/50">
                             <CardContent className="p-4 space-y-4 text-sm">
                                 {Object.entries(sampleAnswers.eval).map(([section, answers]: [string, any]) => (
@@ -130,7 +130,7 @@ const AnalysisReviewDialog = ({ phase }: { phase: ProjectPhase }) => {
                         <Card>
                             <CardHeader>
                                 <Button onClick={handleRunAnalysis} disabled={isLoading}>
-                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analizando...</> : <><Bot className="mr-2 h-4 w-4" /> Ejecutar y Revisar</>}
+                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analizando...</> : <><Bot className="mr-2 h-4 w-4" /> Ejecutar Análisis de Negocio</>}
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -156,16 +156,17 @@ const AnalysisReviewDialog = ({ phase }: { phase: ProjectPhase }) => {
 }
 
 
-const PhaseCard = ({ phase, isCurrent, isCompleted }: { phase: ProjectPhase, isCurrent: boolean, isCompleted: boolean }) => {
+const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Project, phase: ProjectPhase, isCurrent: boolean, isCompleted: boolean }) => {
     
+    const isSimulatorClient = project.customerName.includes("James Bond");
+
     const getIcon = () => {
         if(isCompleted) return <CheckCircle className="h-5 w-5 text-green-500" />;
-        if(isCurrent) return <div className="h-5 w-5 rounded-full bg-orange-500 animate-pulse" />;
+        if(isCurrent) return <Zap className="h-5 w-5 text-orange-500" />;
         return <Clock className="h-5 w-5 text-muted-foreground" />;
     }
 
     const progressValue = isCompleted ? 100 : isCurrent ? 50 : 0;
-    const progressColor = isCompleted ? "bg-green-500" : isCurrent ? "bg-orange-500" : "bg-muted";
 
     return (
         <Card className={cn('transition-all w-full', { 'border-primary shadow-lg': isCurrent, 'bg-muted/30': isCompleted, 'border-dashed': !isCurrent && !isCompleted })}>
@@ -174,17 +175,21 @@ const PhaseCard = ({ phase, isCurrent, isCompleted }: { phase: ProjectPhase, isC
                 {getIcon()}
             </CardHeader>
             <CardContent>
-                <p className="text-xs text-muted-foreground">
+                 <p className="text-xs text-muted-foreground">
                     {isCompleted ? 'Completado' : isCurrent ? 'En progreso...' : 'Pendiente'}
                 </p>
-                 <Progress value={progressValue} className={cn("h-1 mt-2", {'[&>*]:animate-pulse': isCurrent})} indicatorClassName={progressColor} />
+                 {isCurrent && (
+                     <div className="mt-2 space-y-1">
+                        <Progress value={progressValue} className="h-1" indicatorClassName="bg-orange-500 animate-pulse" />
+                    </div>
+                )}
             </CardContent>
             <CardFooter>
-                 {phase.id === 'research' ? (
-                    <AnalysisReviewDialog phase={phase} />
+                 {(isSimulatorClient && phase.id === 'research') ? (
+                    <AnalysisReviewDialog project={project} phase={phase} />
                  ) : (
                     <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled={!isCurrent && !isCompleted}>
-                        <Settings className="mr-2 h-3 w-3" /> Ver/Editar Detalles
+                        <Settings className="mr-2 h-3 w-3" /> Ver Detalles
                     </Button>
                  )}
             </CardFooter>
@@ -218,7 +223,7 @@ export default function TeamLabPage() {
                     <h1 className="text-3xl font-bold font-headline">Team Lab: Supervisión de Proyectos</h1>
                 </div>
                 <p className="text-muted-foreground">
-                    Supervisa el flujo de trabajo automatizado de cada cliente y toma el control manual cuando sea necesario.
+                    Supervisa el flujo de trabajo automatizado de cada cliente. Usa a "James Bond" para simular y validar las tareas de la IA.
                 </p>
             </header>
 
@@ -226,7 +231,7 @@ export default function TeamLabPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><User /> Lista de Clientes y Proyectos</CardTitle>
                     <CardDescription>
-                        Busca un cliente y expande para ver el estado de su flujo de trabajo automatizado.
+                        Busca un cliente y expande para ver el estado de su flujo de trabajo.
                     </CardDescription>
                     <div className="relative pt-4">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1.5 h-4 w-4 text-muted-foreground" />
@@ -257,6 +262,7 @@ export default function TeamLabPage() {
                                           {project.phases.map((phase) => (
                                              <div key={phase.id} className="min-w-[240px]">
                                                <PhaseCard 
+                                                  project={project}
                                                   phase={phase}
                                                   isCurrent={phase.id === project.currentPhase}
                                                   isCompleted={phase.status === 'completed'}
