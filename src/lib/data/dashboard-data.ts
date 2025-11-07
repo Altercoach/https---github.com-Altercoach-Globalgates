@@ -1,3 +1,4 @@
+
 import type { ChartConfig } from '@/components/ui/chart';
 import { Project } from '@/lib/types';
 
@@ -27,13 +28,13 @@ export const projectWorkflowData: Project = {
     id: 'proj_002',
     customerId: 'cus_002',
     customerName: 'Jane Smith',
-    currentPhase: 'execution',
+    currentPhase: 'closure',
     phases: [
       { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación', details: 'Formularios completados el 15/05/24' },
       { id: 'research', status: 'completed', name: 'Investigación y Estrategia', details: 'Análisis SWOT y de competencia finalizado.' },
       { id: 'planning', status: 'completed', name: 'Planificación y Calendario', details: 'Parrilla de contenido generada y aprobada.' },
-      { id: 'execution', status: 'in_progress', name: 'Generación y Ejecución', details: 'Generando posts 5-8 de 15. Programados para la próxima semana.' },
-      { id: 'closure', status: 'pending', name: 'Optimización y Cierre', details: 'Fase iniciará al completar la ejecución.' },
+      { id: 'execution', status: 'completed', name: 'Generación y Ejecución', details: '15 de 15 posts generados y publicados.' },
+      { id: 'closure', status: 'in_progress', name: 'Optimización y Cierre', details: 'Analizando métricas finales de la campaña.' },
     ]
 };
 
@@ -42,7 +43,7 @@ export const pendingActionsData = {
   es: [
     { id: 'brief-marketing', title: 'Brief de Marketing Profesional', description: 'Completa este formulario para que podamos crear tu estrategia.', href: '/questionnaire/brief-marketing'},
     { id: 'eval-negocio', title: 'Evaluación de Negocio (Doctor RX)', description: 'Ayúdanos a entender tu negocio para un diagnóstico preciso.', href: '/questionnaire/eval-001'},
-    { id: 'agent-training', title: 'Entrenamiento de Agente de IA', description: 'Proporciona la información para configurar tu asistente virtual.', href: '/questionnaire/agent-training'},
+    { id: 'agent-training', title: 'Entrenamiento de Agente IA', description: 'Proporciona la información para configurar tu asistente virtual.', href: '/questionnaire/agent-training'},
     { id: 'satisfaction-survey', title: 'Encuesta de Satisfacción', description: 'Tu opinión nos ayuda a mejorar nuestros servicios.', href: '/questionnaire/satisfaction-survey'},
   ],
   en: [
@@ -66,3 +67,5 @@ export const visibleAnalysesData = {
   en: [ { id: 'analysis-eval-001', title: 'Business Evaluation Analysis', analysis: { swot: { strengths: "Star product (cold brew) with high potential demand.", weaknesses: "Low brand presence and lack of a clear digital sales channel.", opportunities: "Growing local market for specialty coffees.", threats: "Competition from established coffee shops downtown." }, recommendations: "1. **Launch Local Branding Campaign**: Focus on Instagram to promote the 'cold brew'.\n2. **Implement Sales Funnel**: Create a landing page to capture leads interested in large orders.\n\n**Suggested Plan**: Hire 'Setup Funnel' and 'Content Marketing'." } } ],
   fr: [ { id: 'analysis-eval-001', title: 'Analyse de l\'Évaluation d\'Entreprise', analysis: { swot: { strengths: "Produit phare (cold brew) avec une forte demande potentielle.", weaknesses: "Faible présence de marque et absence de canal de vente numérique clair.", opportunities: "Marché local en croissance pour les cafés de spécialité.", threats: "Concurrence des cafés établis au centre-ville." }, recommendations: "1. **Lancer une campagne de branding locale**: Se concentrer sur Instagram pour faire connaître le 'cold brew'.\n2. **Mettre en place un entonnoir de vente**: Créer une page de destination pour capturer les prospects intéressés par les grosses commandes.\n\n**Plan suggéré**: Engager 'Setup Funnel' et 'Marketing de Contenu'." } } ],
 };
+
+    

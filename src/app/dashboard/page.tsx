@@ -4,21 +4,41 @@
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Edit, Target, Percent, UserPlus, CheckCircle, Clock, Zap, ArrowRight } from 'lucide-react';
+import { Edit, Target, Percent, UserPlus, CheckCircle, Clock, Zap, ArrowRight, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/hooks/use-language';
 import { chartData, pendingActionsData, projectWorkflowData } from '@/lib/data/dashboard-data';
 import Link from 'next/link';
 import type { ProjectPhase } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
 
 const labels = {
-  es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campaña automatizada.', inProgress: "En Progreso" },
-  en: { pageTitle: 'Customer Dashboard', welcome: 'Welcome', generatedLeads: 'Generated Leads', inLast6Months: 'In the last 6 months', conversionRate: 'Conversion Rate', fromLeadToSale: 'From lead to sale', newFollowers: 'New Followers', inAllWindows: 'On all networks', pendingActions: 'Pending Actions', pendingActionsDescription: 'Complete these forms to unlock your strategy and start growing.', complete: 'Complete', projectWorkflow: 'Project Workflow', projectWorkflowDescription: 'Follow the real-time progress of your automated campaign.', inProgress: "In Progress" },
-  fr: { pageTitle: 'Tableau de Bord Client', welcome: 'Bienvenue', generatedLeads: 'Prospects Générés', inLast6Months: 'Au cours des 6 derniers mois', conversionRate: 'Taux de Conversion', fromLeadToSale: 'Du prospect à la vente', newFollowers: 'Nouveaux Abonnés', inAllWindows: 'Sur tous les réseaux', pendingActions: 'Actions en Attente', pendingActionsDescription: 'Remplissez ces formulaires pour débloquer votre stratégie et commencer à grandir.', complete: 'Compléter', projectWorkflow: 'Flux de Travail du Projet', projectWorkflowDescription: 'Suivez en temps réel l\'avancement de votre campagne automatisée.', inProgress: "En Cours" }
+  es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campaña automatizada.', inProgress: "En Progreso", viewDeliverables: 'Ver Entregables', deliverablesTitle: 'Entregables de la Campaña', deliverablesDescription: 'Aquí puedes ver el contenido generado y publicado en tus redes.', viewLivePost: 'Ver Publicación en Vivo' },
+  en: { pageTitle: 'Customer Dashboard', welcome: 'Welcome', generatedLeads: 'Generated Leads', inLast6Months: 'In the last 6 months', conversionRate: 'Conversion Rate', fromLeadToSale: 'From lead to sale', newFollowers: 'New Followers', inAllWindows: 'On all networks', pendingActions: 'Pending Actions', pendingActionsDescription: 'Complete these forms to unlock your strategy and start growing.', complete: 'Complete', projectWorkflow: 'Project Workflow', projectWorkflowDescription: 'Follow the real-time progress of your automated campaign.', inProgress: "In Progress", viewDeliverables: 'View Deliverables', deliverablesTitle: 'Campaign Deliverables', deliverablesDescription: 'Here you can see the content generated and published on your networks.', viewLivePost: 'View Live Post' },
+  fr: { pageTitle: 'Tableau de Bord Client', welcome: 'Bienvenue', generatedLeads: 'Prospects Générés', inLast6Months: 'Au cours des 6 derniers mois', conversionRate: 'Taux de Conversion', fromLeadToSale: 'Du prospect à la vente', newFollowers: 'Nouveaux Abonnés', inAllWindows: 'Sur tous les réseaux', pendingActions: 'Actions en Attente', pendingActionsDescription: 'Remplissez ces formulaires pour débloquer votre stratégie et commencer à grandir.', complete: 'Compléter', projectWorkflow: 'Flux de Travail du Projet', projectWorkflowDescription: 'Suivez en temps réel l\'avancement de votre campagne automatisée.', inProgress: "En Cours", viewDeliverables: 'Voir les livrables', deliverablesTitle: 'Livrables de la campagne', deliverablesDescription: 'Ici, vous pouvez voir le contenu généré et publié sur vos réseaux.', viewLivePost: 'Voir la publication en direct' }
 };
+
+const mockDeliverables = Array.from({ length: 15 }, (_, i) => ({
+    id: `post-${i + 1}`,
+    title: `Publicación ${i + 1}: Tópico de Branding`,
+    copy: "Este es el copy generado por la IA para la publicación. Es atractivo, persuasivo y utiliza hashtags relevantes. #MarketingDigital #Crecimiento #IA",
+    imageUrl: `https://picsum.photos/seed/${100 + i}/1080/1080`,
+    liveUrl: 'https://instagram.com'
+}));
 
 const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) => {
     const { language } = useLanguage();
@@ -48,8 +68,45 @@ const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) 
                  {phase.status === 'in_progress' && (
                     <div className="mt-2 space-y-1">
                         <span className="text-xs font-semibold text-orange-600">{t.inProgress}...</span>
-                        <Progress value={50} className="h-1 [&>*]:bg-orange-500 [&>*]:animate-pulse" />
+                        <Progress value={50} className="h-1 [&>*]:bg-orange-500" />
                     </div>
+                )}
+                 {phase.status === 'completed' && phase.id === 'execution' && (
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button className="mt-2" size="sm">
+                                <ArrowRight className="mr-2 h-4 w-4" />
+                                {t.viewDeliverables}
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-4xl h-[90vh]">
+                             <DialogHeader>
+                                <DialogTitle>{t.deliverablesTitle}</DialogTitle>
+                                <DialogDescription>{t.deliverablesDescription}</DialogDescription>
+                            </DialogHeader>
+                             <ScrollArea className="h-full">
+                                <div className="space-y-6 pr-6">
+                                    {mockDeliverables.map(item => (
+                                        <Card key={item.id}>
+                                            <CardContent className="p-4 grid grid-cols-[150px_1fr] gap-4">
+                                                <Image src={item.imageUrl} alt={item.title} width={150} height={150} className="rounded-md object-cover aspect-square"/>
+                                                <div className="space-y-2">
+                                                    <h5 className="font-semibold">{item.title}</h5>
+                                                    <p className="text-sm text-muted-foreground">{item.copy}</p>
+                                                    <Button asChild variant="outline" size="sm">
+                                                        <Link href={item.liveUrl} target="_blank">
+                                                            <ExternalLink className="mr-2 h-4 w-4" />
+                                                            {t.viewLivePost}
+                                                        </Link>
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </DialogContent>
+                    </Dialog>
                 )}
             </div>
         </div>
@@ -179,3 +236,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
