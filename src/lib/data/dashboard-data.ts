@@ -43,19 +43,19 @@ export const projectWorkflowData: Project = {
 export const pendingActionsData = {
   es: [
     { id: 'brief-marketing', title: 'Brief de Marketing Profesional', description: 'Completa este formulario para que podamos crear tu estrategia.', href: '/questionnaire/brief-marketing'},
-    { id: 'eval-negocio', title: 'Evaluación de Negocio (Doctor RX)', description: 'Ayúdanos a entender tu negocio para un diagnóstico preciso.', href: '/questionnaire/eval-001'},
+    { id: 'eval-negocio', title: 'Evaluación de Negocio (Doctor RX)', description: 'Ayúdanos a entender tu negocio para un diagnóstico preciso.', href: '/questionnaire/business-evaluation-001'},
     { id: 'agent-training', title: 'Entrenamiento de Agente IA', description: 'Proporciona la información para configurar tu asistente virtual.', href: '/questionnaire/agent-training'},
     { id: 'satisfaction-survey', title: 'Encuesta de Satisfacción', description: 'Tu opinión nos ayuda a mejorar nuestros servicios.', href: '/questionnaire/satisfaction-survey'},
   ],
   en: [
     { id: 'brief-marketing', title: 'Professional Marketing Brief', description: 'Complete this form so we can create your strategy.', href: '/questionnaire/brief-marketing'},
-    { id: 'eval-negocio', title: 'Business Evaluation (Doctor RX)', description: 'Help us understand your business for an accurate diagnosis.', href: '/questionnaire/eval-001'},
+    { id: 'eval-negocio', title: 'Business Evaluation (Doctor RX)', description: 'Help us understand your business for an accurate diagnosis.', href: '/questionnaire/business-evaluation-001'},
     { id: 'agent-training', title: 'AI Agent Training', description: 'Provide the information to configure your virtual assistant.', href: '/questionnaire/agent-training'},
     { id: 'satisfaction-survey', title: 'Satisfaction Survey', description: 'Your feedback helps us improve our services.', href: '/questionnaire/satisfaction-survey'},
   ],
   fr: [
     { id: 'brief-marketing', title: 'Brief de Marketing Professionnel', description: 'Remplissez ce formulaire pour que nous puissions créer votre stratégie.', href: '/questionnaire/brief-marketing'},
-    { id: 'eval-negocio', title: 'Évaluation d\'Entreprise (Docteur RX)', description: 'Aidez-nous à comprendre votre entreprise pour un diagnostic précis.', href: '/questionnaire/eval-001'},
+    { id: 'eval-negocio', title: 'Évaluation d\'Entreprise (Docteur RX)', description: 'Aidez-nous à comprendre votre entreprise pour un diagnostic précis.', href: '/questionnaire/business-evaluation-001'},
     { id: 'agent-training', title: 'Formation d\'Agent IA', description: 'Fournissez les informations pour configurer votre assistant virtuel.', href: '/questionnaire/agent-training'},
     { id: 'satisfaction-survey', title: 'Enquête de Satisfaction', description: 'Vos commentaires nous aident à améliorer nos services.', href: '/questionnaire/satisfaction-survey'},
   ]
