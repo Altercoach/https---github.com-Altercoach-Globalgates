@@ -8,11 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound, MessageSquare, Linkedin, Twitter } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound, MessageSquare, Linkedin, Twitter, Link as LinkIcon, Copy } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
 import { useSite } from '@/hooks/use-site';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useToast } from '@/hooks/use-toast';
 
 const labels = {
   es: {
@@ -26,6 +28,9 @@ const labels = {
     agentFirstName: "Nombre",
     agentLastName: "Apellido",
     agentAvatar: "Foto de Perfil",
+    agentGender: "Género",
+    genderMale: "Hombre",
+    genderFemale: "Mujer",
     agentStatus: "Estado del Agente",
     agentActive: "Activo",
     agentInactive: "Inactivo",
@@ -43,6 +48,12 @@ const labels = {
     supportEmail: "Email de Soporte/Ventas",
     exclusionTitle: "Reglas de Exclusión",
     exclusionDesc: "Añade emails o teléfonos (uno por línea) de contactos que el agente NUNCA debe atender (ej. proveedores, familia).",
+    shareAgentTitle: "Compartir Agente",
+    shareAgentDesc: "Usa esta URL para una página de chat dedicada o pega el código embed en tu sitio web.",
+    shareUrl: "URL del Agente",
+    embedCode: "Código de Inserción (Embed)",
+    copy: "Copiar",
+    copied: "¡Copiado!",
   },
   en: {
     pageTitle: "AI Agent Configuration",
@@ -55,6 +66,9 @@ const labels = {
     agentFirstName: "First Name",
     agentLastName: "Last Name",
     agentAvatar: "Profile Picture",
+    agentGender: "Gender",
+    genderMale: "Male",
+    genderFemale: "Female",
     agentStatus: "Agent Status",
     agentActive: "Active",
     agentInactive: "Inactive",
@@ -72,6 +86,12 @@ const labels = {
     supportEmail: "Support/Sales Email",
     exclusionTitle: "Exclusion Rules",
     exclusionDesc: "Add emails or phone numbers (one per line) of contacts the agent should NEVER attend to (e.g., suppliers, family).",
+    shareAgentTitle: "Share Agent",
+    shareAgentDesc: "Use this URL for a dedicated chat page or paste the embed code on your website.",
+    shareUrl: "Agent URL",
+    embedCode: "Embed Code",
+    copy: "Copy",
+    copied: "Copied!",
   },
   fr: {
     pageTitle: "Configuration de l'Agent IA",
@@ -84,6 +104,9 @@ const labels = {
     agentFirstName: "Prénom",
     agentLastName: "Nom de famille",
     agentAvatar: "Photo de profil",
+    agentGender: "Genre",
+    genderMale: "Homme",
+    genderFemale: "Femme",
     agentStatus: "Statut de l'Agent",
     agentActive: "Actif",
     agentInactive: "Inactif",
@@ -101,6 +124,12 @@ const labels = {
     supportEmail: "Email de Support/Ventes",
     exclusionTitle: "Règles d'Exclusion",
     exclusionDesc: "Ajoutez les e-mails ou numéros de téléphone (un par ligne) des contacts que l'agent ne doit JAMAIS prendre en charge (ex: fournisseurs, famille).",
+    shareAgentTitle: "Partager l'Agent",
+    shareAgentDesc: "Utilisez cette URL pour une page de chat dédiée ou collez le code d'intégration sur votre site web.",
+    shareUrl: "URL de l'Agent",
+    embedCode: "Code d'Intégration",
+    copy: "Copier",
+    copied: "Copié !",
   }
 };
 
@@ -120,13 +149,17 @@ https://goldenkey.agency/contact
 Horario de atención del equipo: Lunes a Viernes, 9am - 6pm (Hora del Pacífico).
 Promoción actual: 10% de descuento en el plan 'Portal Maestro Digital' para nuevos clientes. Código: LAUNCH10.`;
 
+const agentUrl = "https://goldenkey.agency/chat/alex-rider";
+const embedCode = `<iframe src="${agentUrl}" width="100%" height="600" frameborder="0"></iframe>`;
 
 export default function AgentConfigPage() {
     const { language } = useLanguage();
     const { site, setSite, setHasUnsavedChanges } = useSite();
+    const { toast } = useToast();
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
     const [isActive, setIsActive] = useState(true);
+    const [gender, setGender] = useState('female');
     const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt);
     const [knowledgeBase, setKnowledgeBase] = useState(defaultKnowledgeBase);
     
@@ -163,6 +196,11 @@ export default function AgentConfigPage() {
             agentPersona: { ...prev.agentPersona, [field]: value }
         }));
         setHasUnsavedChanges(true);
+    };
+
+    const copyToClipboard = (textToCopy: string) => {
+        navigator.clipboard.writeText(textToCopy);
+        toast({ title: t.copied });
     };
 
     return (
@@ -203,6 +241,19 @@ export default function AgentConfigPage() {
                                 <Input id="agent-lastname" value={site.agentPersona.lastName} onChange={(e) => handleTextChange('lastName', e.target.value)} />
                             </div>
                         </div>
+                        <div className="space-y-2">
+                           <Label>{t.agentGender}</Label>
+                           <RadioGroup defaultValue={gender} onValueChange={setGender} className="flex gap-4">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="female" id="r-female" />
+                                    <Label htmlFor="r-female">{t.genderFemale}</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="male" id="r-male" />
+                                    <Label htmlFor="r-male">{t.genderMale}</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
                         <div className="flex items-center space-x-4 rounded-lg border p-4">
                             <div className="flex items-center space-x-2">
                                 <Switch id="agent-status" checked={isActive} onCheckedChange={setIsActive} />
@@ -211,6 +262,33 @@ export default function AgentConfigPage() {
                             <p className={`text-sm font-medium ${isActive ? 'text-green-600' : 'text-muted-foreground'}`}>
                                 {isActive ? t.agentActive : t.agentInactive}
                             </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><LinkIcon /> {t.shareAgentTitle}</CardTitle>
+                    <CardDescription>{t.shareAgentDesc}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="agent-url">{t.shareUrl}</Label>
+                        <div className="flex gap-2">
+                            <Input id="agent-url" readOnly value={agentUrl} />
+                            <Button variant="outline" size="icon" onClick={() => copyToClipboard(agentUrl)}>
+                                <Copy />
+                            </Button>
+                        </div>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="embed-code">{t.embedCode}</Label>
+                        <div className="flex gap-2">
+                            <Textarea id="embed-code" readOnly value={embedCode} rows={3} className="font-mono text-xs" />
+                            <Button variant="outline" size="icon" onClick={() => copyToClipboard(embedCode)}>
+                                <Copy />
+                            </Button>
                         </div>
                     </div>
                 </CardContent>

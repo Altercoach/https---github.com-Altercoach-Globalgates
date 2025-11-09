@@ -46,7 +46,7 @@ const FileUpload = ({ label, files, onFileChange, onFileRemove }: { label: strin
                     <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Haz clic para subir</span> o arrastra y suelta</p>
                     <p className="text-xs text-muted-foreground">PDF, XLS, DOC, TXT (MAX. 5MB)</p>
                 </div>
-                <Input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} multiple />
+                <Input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} multiple accept=".pdf,.xls,.xlsx,.doc,.docx,.txt"/>
             </label>
         </div>
         {files.length > 0 && (

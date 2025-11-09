@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { useSite } from '@/hooks/use-site';
 import { initialCustomers } from '@/lib/constants';
 import { useAuth } from '@/hooks/use-auth';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const labels = {
   es: {
@@ -28,6 +29,9 @@ const labels = {
     agentFirstName: "Nombre",
     agentLastName: "Apellido",
     agentAvatar: "Foto de Perfil",
+    agentGender: "Género",
+    genderMale: "Hombre",
+    genderFemale: "Mujer",
     knowledgeBase: "Base de Conocimiento (Entrenamiento)",
     knowledgeBaseDesc: "Pega aquí URLs, FAQs, o cualquier información que el agente deba conocer.",
     integrations: "Conexión de Canales",
@@ -49,6 +53,9 @@ const labels = {
     agentFirstName: "First Name",
     agentLastName: "Last Name",
     agentAvatar: "Profile Picture",
+    agentGender: "Gender",
+    genderMale: "Male",
+    genderFemale: "Female",
     knowledgeBase: "Knowledge Base (Training)",
     knowledgeBaseDesc: "Paste URLs, FAQs, or any information the agent should know.",
     integrations: "Channel Connections",
@@ -70,6 +77,9 @@ const labels = {
     agentFirstName: "Prénom",
     agentLastName: "Nom de famille",
     agentAvatar: "Photo de profil",
+    agentGender: "Genre",
+    genderMale: "Homme",
+    genderFemale: "Femme",
     knowledgeBase: "Base de Connaissances (Formation)",
     knowledgeBaseDesc: "Collez ici les URL, FAQ ou toute information que l'agent doit connaître.",
     integrations: "Connexions des Canaux",
@@ -104,10 +114,12 @@ export default function CustomerAgentConfigPage() {
     const [firstName, setFirstName] = useState("Agente");
     const [lastName, setLastName] = useState("Digital");
     const [avatar, setAvatar] = useState("https://i.pravatar.cc/150?u=customeragent");
+    const [gender, setGender] = useState('female');
     const [knowledgeBase, setKnowledgeBase] = useState(defaultKnowledgeBase);
     
     const [whatsappKey, setWhatsappKey] = useState('');
     const [instagramKey, setInstagramKey] = useState('');
+    const [messengerKey, setMessengerKey] = useState('');
 
     const triggerFilePicker = () => document.getElementById('avatarPicker')?.click();
     const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +136,8 @@ export default function CustomerAgentConfigPage() {
 
     // Logic to determine available channels based on the plan
     const isVipPlan = planName.toLowerCase().includes('vip');
-    const availableChannels = isVipPlan ? 2 : 1; // Example logic
+    const isProPlan = planName.toLowerCase().includes('profesional');
+    const availableChannels = isVipPlan ? 3 : isProPlan ? 2 : 1;
 
     return (
         <div className="space-y-6">
@@ -157,6 +170,19 @@ export default function CustomerAgentConfigPage() {
                                 <Label htmlFor="agent-lastname">{t.agentLastName}</Label>
                                 <Input id="agent-lastname" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                             </div>
+                        </div>
+                        <div className="space-y-2">
+                           <Label>{t.agentGender}</Label>
+                           <RadioGroup defaultValue={gender} onValueChange={setGender} className="flex gap-4">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="female" id="r-female" />
+                                    <Label htmlFor="r-female">{t.genderFemale}</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="male" id="r-male" />
+                                    <Label htmlFor="r-male">{t.genderMale}</Label>
+                                </div>
+                            </RadioGroup>
                         </div>
                     </div>
                 </CardContent>
@@ -203,7 +229,7 @@ export default function CustomerAgentConfigPage() {
                         )}
                         <div className={`space-y-2 ${availableChannels < 3 ? 'opacity-50' : ''}`}>
                             <Label htmlFor="messenger-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.messengerApiKey}</Label>
-                            <Input id="messenger-api" disabled={availableChannels < 3} placeholder="Actualiza tu plan"/>
+                            <Input id="messenger-api" disabled={availableChannels < 3} placeholder={availableChannels < 3 ? 'Actualiza tu plan' : 'Introduce tu clave...'} value={messengerKey} onChange={e => setMessengerKey(e.target.value)}/>
                         </div>
                     </div>
                 </CardContent>
