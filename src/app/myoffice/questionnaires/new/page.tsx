@@ -49,9 +49,6 @@ const labels = {
     linkGenerated: "Template Generated and Saved!",
     linkCopied: "Link copied!",
     linkCopiedDesc: "You can view it and assign it to your service plans.",
-    emailRequired: "Please enter an email.",
-    sentToast: "Template generated!",
-    sentToastDesc: "The new template is ready to be assigned.",
     createAnother: "Create another template"
   },
   fr: {
