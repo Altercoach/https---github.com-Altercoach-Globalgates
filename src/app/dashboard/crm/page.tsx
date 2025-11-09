@@ -22,7 +22,7 @@ const labels = {
     allChannels: "Todos los Canales",
     noConversation: "Selecciona una conversación de la lista.",
     messagePlaceholder: "Escribe una respuesta...",
-    humanRequested: "Necesita Intervención",
+    humanRequested: "Intervención Necesaria",
     takeOver: "Tomar Control",
   },
   en: {

@@ -26,7 +26,7 @@ const labels = {
     you: "Tú (Supervisor)",
     humanRequested: "Intervención Solicitada",
     takeOver: "Tomar Control",
-    attentionNeeded: "Necesita Atención",
+    attentionNeeded: "Atención Requerida",
   },
   en: {
     pageTitle: "Supervision Center (CRM)",
@@ -172,7 +172,8 @@ export default function CrmPage() {
                 <div className="flex flex-col border rounded-lg h-full">
                     {selectedConversation ? (
                         <>
-                            <div className="p-4 border-b flex items-center gap-3">
+                            <div className="p-4 border-b flex items-center justify-between gap-3">
+                               <div className="flex items-center gap-3">
                                 <Avatar>
                                     <AvatarImage src={selectedConversation.avatar} />
                                     <AvatarFallback>{selectedConversation.name.charAt(0)}</AvatarFallback>
@@ -181,18 +182,15 @@ export default function CrmPage() {
                                     <p className="font-semibold">{selectedConversation.name}</p>
                                     {selectedConversation.needsAttention && <p className="text-xs text-destructive font-semibold">{t.humanRequested}</p>}
                                 </div>
+                               </div>
+                                {selectedConversation.needsAttention && (
+                                    <Button size="sm"><AlertTriangle className="mr-2 h-4 w-4"/> {t.takeOver}</Button>
+                                )}
                             </div>
                             <ScrollArea className="flex-1 p-4 space-y-4">
                                {chatHistory.map((msg, index) => {
                                    if (msg.from === 'human_request') {
-                                       return (
-                                           <div key={index} className="text-center my-4">
-                                               <p className="text-xs text-destructive-foreground bg-destructive/80 rounded-full px-3 py-1 inline-flex items-center gap-2">
-                                                   <AlertTriangle className="h-4 w-4"/> {msg.text}
-                                               </p>
-                                                <Button size="sm" className="mt-2">{t.takeOver}</Button>
-                                           </div>
-                                       )
+                                       return null;
                                    }
                                    
                                    const isUser = msg.from === 'user';
