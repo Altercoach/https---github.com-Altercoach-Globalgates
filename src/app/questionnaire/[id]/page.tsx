@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 // Estas son las preguntas que me proporcionaste.
 const questions = {
@@ -73,9 +74,9 @@ const questions = {
   ]
 };
 
-export default function QuestionnaireFillPage({ params }: { params: { id: string } }) {
+export default function QuestionnaireFillPage() {
   const { toast } = useToast();
-  // Safe access to params.id
+  const params = useParams();
   const questionnaireId = params.id;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -141,3 +142,5 @@ export default function QuestionnaireFillPage({ params }: { params: { id: string
     </div>
   );
 }
+
+    
