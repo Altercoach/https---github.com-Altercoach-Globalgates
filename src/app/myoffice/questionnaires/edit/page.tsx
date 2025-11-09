@@ -77,7 +77,7 @@ export default function QuestionnaireEditPage() {
     <div className="space-y-6">
       <header>
           <Button variant="outline" size="sm" asChild className="mb-4">
-              <Link href="/myoffice/products"><ArrowLeft className="mr-2"/> Volver a Planes</Link>
+              <Link href="/myoffice/questionnaires"><ArrowLeft className="mr-2"/> Volver a Plantillas</Link>
           </Button>
           <h1 className="font-headline text-3xl font-bold">Editor de Plantilla de Cuestionario</h1>
           <p className="text-muted-foreground">Revisa y gestiona las preguntas de este formulario.</p>

@@ -8,9 +8,9 @@ import { Edit, Target, Percent, UserPlus, CheckCircle, Clock, Zap, ArrowRight, E
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/hooks/use-language';
-import { chartData, pendingActionsData, projectWorkflowData } from '@/lib/data/dashboard-data';
+import { chartData, pendingActionsData, projectWorkflowData, sampleAnswers } from '@/lib/data/dashboard-data';
 import Link from 'next/link';
-import type { ProjectPhase } from '@/lib/types';
+import type { ProjectPhase, ContentPost } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
 import {
@@ -20,34 +20,114 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose
 } from "@/components/ui/dialog";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from '@/hooks/use-toast';
+import { generateContentSchedule, GenerateContentScheduleOutput } from '@/ai/flows/generate-content-schedule-flow';
+import { Loader2 } from 'lucide-react';
 
 
 const labels = {
-  es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campaña automatizada.', inProgress: "En Progreso", viewDeliverables: 'Ver Entregables', deliverablesTitle: 'Entregables de la Campaña', deliverablesDescription: 'Filtra por plataforma para ver el contenido generado y publicado en tus redes.', viewLivePost: 'Ver Publicación en Vivo', publishedOn: 'Publicado el' },
-  en: { pageTitle: 'Customer Dashboard', welcome: 'Welcome', generatedLeads: 'Generated Leads', inLast6Months: 'In the last 6 months', conversionRate: 'Conversion Rate', fromLeadToSale: 'From lead to sale', newFollowers: 'New Followers', inAllWindows: 'On all networks', pendingActions: 'Pending Actions', pendingActionsDescription: 'Complete these forms to unlock your strategy and start growing.', complete: 'Complete', projectWorkflow: 'Project Workflow', projectWorkflowDescription: 'Follow the real-time progress of your automated campaign.', inProgress: "In Progress", viewDeliverables: 'View Deliverables', deliverablesTitle: 'Campaign Deliverables', deliverablesDescription: 'Filter by platform to see the content generated and published on your networks.', viewLivePost: 'View Live Post', publishedOn: 'Published on' },
-  fr: { pageTitle: 'Tableau de Bord Client', welcome: 'Bienvenue', generatedLeads: 'Prospects Générés', inLast6Months: 'Au cours des 6 derniers mois', conversionRate: 'Taux de Conversion', fromLeadToSale: 'Du prospect à la vente', newFollowers: 'Nouveaux Abonnés', inAllWindows: 'Sur tous les réseaux', pendingActions: 'Actions en Attente', pendingActionsDescription: 'Remplissez ces formulaires pour débloquer votre stratégie et commencer à grandir.', complete: 'Compléter', projectWorkflow: 'Flux de Travail du Projet', projectWorkflowDescription: 'Suivez en temps réel l\'avancement de votre campagne automatisée.', inProgress: "En Cours", viewDeliverables: 'Voir les livrables', deliverablesTitle: 'Livrables de la campagne', deliverablesDescription: 'Filtrez par plateforme pour voir le contenu généré et publié sur vos réseaux.', viewLivePost: 'Voir la publication en direct', publishedOn: 'Publié le' }
+  es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los últimos 6 meses', conversionRate: 'Tasa de Conversión', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campaña automatizada.', inProgress: "En Progreso", viewDeliverables: 'Ver Entregables', deliverablesTitle: 'Entregables de la Campaña', deliverablesDescription: 'Filtra por plataforma para ver el contenido generado y publicado en tus redes.', viewLivePost: 'Ver Publicación en Vivo', publishedOn: 'Publicado el', generateContent: 'Generar Parrilla de Contenido', generating: 'Generando...' },
+  en: { pageTitle: 'Customer Dashboard', welcome: 'Welcome', generatedLeads: 'Generated Leads', inLast6Months: 'In the last 6 months', conversionRate: 'Conversion Rate', fromLeadToSale: 'From lead to sale', newFollowers: 'New Followers', inAllWindows: 'On all networks', pendingActions: 'Pending Actions', pendingActionsDescription: 'Complete these forms to unlock your strategy and start growing.', complete: 'Complete', projectWorkflow: 'Project Workflow', projectWorkflowDescription: 'Follow the real-time progress of your automated campaign.', inProgress: "In Progress", viewDeliverables: 'View Deliverables', deliverablesTitle: 'Campaign Deliverables', deliverablesDescription: 'Filter by platform to see the content generated and published on your networks.', viewLivePost: 'View Live Post', publishedOn: 'Published on', generateContent: 'Generate Content Schedule', generating: 'Generating...' },
+  fr: { pageTitle: 'Tableau de Bord Client', welcome: 'Bienvenue', generatedLeads: 'Prospects Générés', inLast6Months: 'Au cours des 6 derniers mois', conversionRate: 'Taux de Conversion', fromLeadToSale: 'Du prospect à la vente', newFollowers: 'Nouveaux Abonnés', inAllWindows: 'Sur tous les réseaux', pendingActions: 'Actions en Attente', pendingActionsDescription: 'Remplissez ces formulaires pour débloquer votre stratégie et commencer à grandir.', complete: 'Compléter', projectWorkflow: 'Flux de Travail du Projet', projectWorkflowDescription: 'Suivez en temps réel l\'avancement de votre campagne automatisée.', inProgress: "En Cours", viewDeliverables: 'Voir les livrables', deliverablesTitle: 'Livrables de la campagne', deliverablesDescription: 'Filtrez par plateforme pour voir le contenu généré et publié sur vos réseaux.', viewLivePost: 'Voir la publication en direct', publishedOn: 'Publié le', generateContent: 'Générer la grille de contenu', generating: 'Génération en cours...' }
 };
-
-const mockDeliverables = [
-  { id: 'post-1', platform: 'instagram', title: 'Post IG 1: Tópico Branding', copy: "Este es el copy para Instagram. Es atractivo y usa hashtags relevantes. #MarketingDigital", imageUrl: `https://picsum.photos/seed/101/1080/1080`, liveUrl: 'https://instagram.com', publishDate: '2024-07-15', publishTime: '10:30 AM' },
-  { id: 'post-2', platform: 'facebook', title: 'Post FB 1: Venta Directa', copy: "Copy para Facebook, enfocado en la conversión y con un enlace claro a la web.", imageUrl: `https://picsum.photos/seed/102/1200/630`, liveUrl: 'https://facebook.com', publishDate: '2024-07-15', publishTime: '12:00 PM' },
-  { id: 'post-3', platform: 'instagram', title: 'Reel IG 2: Detrás de Cámaras', copy: "Un reel mostrando el proceso. Música en tendencia. #BehindTheScenes", imageUrl: `https://picsum.photos/seed/103/1080/1920`, liveUrl: 'https://instagram.com', publishDate: '2024-07-16', publishTime: '02:00 PM' },
-  { id: 'post-4', platform: 'tiktok', title: 'TikTok 1: Trend del Día', copy: "Participando en el último trend viral. #Trend #Viral", imageUrl: `https://picsum.photos/seed/104/1080/1920`, liveUrl: 'https://tiktok.com', publishDate: '2024-07-17', publishTime: '09:00 AM' },
-  { id: 'post-5', platform: 'facebook', title: 'Post FB 2: Artículo de Blog', copy: "Compartiendo nuestro último artículo del blog sobre las tendencias del sector.", imageUrl: `https://picsum.photos/seed/105/1200/630`, liveUrl: 'https://facebook.com', publishDate: '2024-07-17', publishTime: '04:00 PM' },
-  { id: 'post-6', platform: 'instagram', title: 'Carrusel IG 3: Tutorial', copy: "Tutorial de 5 pasos para usar nuestro producto. #HowTo #Tutorial", imageUrl: `https://picsum.photos/seed/106/1080/1080`, liveUrl: 'https://instagram.com', publishDate: '2024-07-18', publishTime: '11:00 AM' },
-];
 
 const platforms = ['instagram', 'facebook', 'tiktok'];
 
-const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) => {
-    const { language } = useLanguage();
-    const t = labels[language.code as keyof typeof labels] || labels.en;
+const DeliverablesDialog = ({ t }: { t: typeof labels['en'] }) => {
+    const [schedule, setSchedule] = useState<GenerateContentScheduleOutput | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+
+    const handleGenerateContent = async () => {
+        setIsLoading(true);
+        try {
+            const result = await generateContentSchedule({ 
+                clientBusiness: "Cliente: Cafetería de Especialidad. Análisis: Fuerte producto pero baja presencia de marca. Instrucciones: Aumentar brand awareness.",
+            });
+            setSchedule(result);
+        } catch (error) {
+            toast({ title: t.deliverablesTitle, description: "Error al generar la parrilla de contenido.", variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    
+    // Use simulated date
+    const getPublishDate = (index: number) => {
+        const date = new Date();
+        date.setDate(date.getDate() + index);
+        return date.toISOString().split('T')[0];
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className="mt-2" size="sm">
+                    <ArrowRight className="mr-2 h-4 w-4" />
+                    {t.viewDeliverables}
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl h-[90vh] flex flex-col">
+                <DialogHeader>
+                    <DialogTitle>{t.deliverablesTitle}</DialogTitle>
+                    <DialogDescription>{t.deliverablesDescription}</DialogDescription>
+                </DialogHeader>
+                 {!schedule ? (
+                    <div className="flex-1 flex flex-col items-center justify-center gap-4">
+                        <p className="text-muted-foreground">No se ha generado ninguna parrilla de contenido todavía.</p>
+                         <Button onClick={handleGenerateContent} disabled={isLoading}>
+                            {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> {t.generating}</> : t.generateContent}
+                        </Button>
+                    </div>
+                ) : (
+                    <Tabs defaultValue="instagram" className="flex-1 flex flex-col overflow-hidden">
+                        <TabsList>
+                            {platforms.map(p => <TabsTrigger key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</TabsTrigger>)}
+                        </TabsList>
+                        {platforms.map(p => (
+                             <TabsContent key={p} value={p} className="flex-1 overflow-hidden">
+                                <ScrollArea className="h-full pr-6">
+                                    <div className="space-y-6">
+                                        {schedule.posts.map((item, index) => (
+                                            <Card key={item.postNumber}>
+                                                <CardContent className="p-4 grid grid-cols-[150px_1fr] gap-4">
+                                                    <div className="relative aspect-square w-[150px] h-[150px]">
+                                                      <Image src={`https://picsum.photos/seed/${101 + index}/1080/1080`} alt={item.topic} fill className="rounded-md object-cover"/>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <h5 className="font-semibold">{item.format}: {item.topic}</h5>
+                                                        <p className="text-sm text-muted-foreground">{item.copyOut}</p>
+                                                         <p className="text-xs text-muted-foreground flex items-center gap-1.5 pt-1">
+                                                            <CalendarDays className="h-3 w-3" />
+                                                            {t.publishedOn} {getPublishDate(index)}
+                                                        </p>
+                                                        <Button asChild variant="outline" size="sm" className="mt-2">
+                                                            <Link href="https://instagram.com" target="_blank">
+                                                                <ExternalLink className="mr-2 h-4 w-4" />
+                                                                {t.viewLivePost}
+                                                            </Link>
+                                                        </Button>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </ScrollArea>
+                            </TabsContent>
+                        ))}
+                    </Tabs>
+                 )}
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+
+const PhaseCard = ({ phase, isLast, t }: { phase: ProjectPhase, isLast: boolean, t: typeof labels['en'] }) => {
     
     const getIcon = () => {
         if(phase.status === 'completed') return <CheckCircle className="h-6 w-6 text-green-500" />;
@@ -76,57 +156,8 @@ const PhaseCard = ({ phase, isLast }: { phase: ProjectPhase, isLast: boolean }) 
                         <Progress value={50} className="h-1 [&>*]:bg-orange-500" />
                     </div>
                 )}
-                 {phase.status === 'completed' && phase.id === 'execution' && (
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button className="mt-2" size="sm">
-                                <ArrowRight className="mr-2 h-4 w-4" />
-                                {t.viewDeliverables}
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-4xl h-[90vh] flex flex-col">
-                             <DialogHeader>
-                                <DialogTitle>{t.deliverablesTitle}</DialogTitle>
-                                <DialogDescription>{t.deliverablesDescription}</DialogDescription>
-                            </DialogHeader>
-                             <Tabs defaultValue="instagram" className="flex-1 flex flex-col overflow-hidden">
-                                <TabsList>
-                                    {platforms.map(p => <TabsTrigger key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</TabsTrigger>)}
-                                </TabsList>
-                                {platforms.map(p => (
-                                     <TabsContent key={p} value={p} className="flex-1 overflow-hidden">
-                                        <ScrollArea className="h-full pr-6">
-                                            <div className="space-y-6">
-                                                {mockDeliverables.filter(item => item.platform === p).map(item => (
-                                                    <Card key={item.id}>
-                                                        <CardContent className="p-4 grid grid-cols-[150px_1fr] gap-4">
-                                                            <div className="relative aspect-square w-[150px] h-[150px]">
-                                                              <Image src={item.imageUrl} alt={item.title} fill className="rounded-md object-cover"/>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <h5 className="font-semibold">{item.title}</h5>
-                                                                <p className="text-sm text-muted-foreground">{item.copy}</p>
-                                                                 <p className="text-xs text-muted-foreground flex items-center gap-1.5 pt-1">
-                                                                    <CalendarDays className="h-3 w-3" />
-                                                                    {t.publishedOn} {item.publishDate} a las {item.publishTime}
-                                                                </p>
-                                                                <Button asChild variant="outline" size="sm" className="mt-2">
-                                                                    <Link href={item.liveUrl} target="_blank">
-                                                                        <ExternalLink className="mr-2 h-4 w-4" />
-                                                                        {t.viewLivePost}
-                                                                    </Link>
-                                                                </Button>
-                                                            </div>
-                                                        </CardContent>
-                                                    </Card>
-                                                ))}
-                                            </div>
-                                        </ScrollArea>
-                                    </TabsContent>
-                                ))}
-                            </Tabs>
-                        </DialogContent>
-                    </Dialog>
+                 {phase.id === 'execution' && (
+                    <DeliverablesDialog t={t} />
                 )}
             </div>
         </div>
@@ -177,6 +208,7 @@ export default function DashboardPage() {
                     key={phase.id} 
                     phase={phase} 
                     isLast={index === projectWorkflowData.phases.length - 1} 
+                    t={t}
                 />
             ))}
         </CardContent>
@@ -256,6 +288,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-    
-
-    

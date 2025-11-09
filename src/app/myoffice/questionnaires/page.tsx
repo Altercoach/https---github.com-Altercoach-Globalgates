@@ -13,25 +13,25 @@ const sampleTemplates = [
     id: 'business-evaluation-001',
     name: 'Cuestionario de Evaluación de Negocio',
     description: 'Para análisis de negocio (Doctor RX).',
-    href: '/questionnaire/business-evaluation-001'
+    href: '/myoffice/questionnaires/edit' // Corrected link
   },
   {
     id: 'brief-marketing',
     name: 'Brief de Marketing Profesional',
     description: 'Para clientes que contratan campañas de marketing.',
-    href: '/questionnaire/brief-marketing'
+    href: '/myoffice/questionnaires/edit' // Corrected link
   },
   {
     id: 'agent-training',
     name: 'Entrenamiento de Agente IA',
     description: 'Para configurar el asistente virtual del cliente.',
-    href: '/questionnaire/agent-training'
+    href: '/myoffice/questionnaires/edit' // Corrected link
   },
   {
     id: 'satisfaction-survey',
     name: 'Encuesta de Satisfacción',
     description: 'Para enviar al finalizar un proyecto o campaña.',
-    href: '/questionnaire/satisfaction-survey'
+    href: '/myoffice/questionnaires/edit' // Corrected link
   }
 ];
 
@@ -57,7 +57,7 @@ const labels = {
     templateListDesc: "These are the templates you can assign to your service plans.",
     name: "Template Name",
     description: "Description",
-    actions: "Actions",
+actions: "Actions",
     edit: "View / Edit",
     delete: "Delete"
   },
