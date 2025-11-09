@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -313,5 +312,3 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
     </div>
   );
 }
-
-    

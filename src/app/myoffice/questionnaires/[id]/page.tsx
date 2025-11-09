@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 const sampleAnswers = {
   eval: {
@@ -144,6 +144,7 @@ const labels = {
 
 
 export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const questionnaireId = params.id;
   const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001' || questionnaireId === 'business-evaluation-001';
   const isAgentTraining = questionnaireId === 'agent-training-001';
