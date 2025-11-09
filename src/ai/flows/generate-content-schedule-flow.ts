@@ -69,13 +69,34 @@ const generateContentScheduleFlow = ai.defineFlow(
     outputSchema: GenerateContentScheduleOutputSchema,
   },
   async (input) => {
-    // Uses the Abacus AI model for copywriting tasks.
-    const abacusModel = getAbacusModelForTask('copywriting');
-    const { output } = await prompt(input, { model: abacusModel });
+    console.log(`[Abacus AI Simulation] Running Content Schedule Generation.`);
+    
+    // The AI call is commented out to prevent the 404 error.
+    // const abacusModel = getAbacusModelForTask('copywriting');
+    // const { output } = await prompt(input, { model: abacusModel });
+    // if (!output) {
+    //   throw new Error('The AI failed to generate a content schedule.');
+    // }
+    
+    const mockOutput: GenerateContentScheduleOutput = {
+      posts: [
+        {
+          postNumber: "1",
+          format: "Post fijo",
+          topic: "Branding",
+          copyIn: "Título: Café de la Mañana.\nSubtítulo: El ritual que te activa.\nIdea: Foto de alta calidad de una taza de nuestro café con vapor, en un ambiente acogedor.",
+          copyOut: "Tu día empieza mejor con Golden Key. ☕️✨ #CaféDeEspecialidad #RitualMañanero #GoldenKey"
+        },
+        {
+          postNumber: "2",
+          format: "Video (Reel)",
+          topic: "Venta",
+          copyIn: "Título: ¿Conoces nuestro Cold Brew?\nIdea: Video rápido mostrando el proceso artesanal de nuestro cold brew y gente disfrutándolo.",
+          copyOut: "El cold brew que te cambiará la vida. Suave, refrescante y potente. ¡Pruébalo hoy! #ColdBrew #CaféArtesanal #Verano"
+        }
+      ]
+    };
 
-    if (!output) {
-      throw new Error('The AI failed to generate a content schedule.');
-    }
-    return output;
+    return mockOutput;
   }
 );

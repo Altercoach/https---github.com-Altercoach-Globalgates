@@ -65,19 +65,23 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async (input) => {
-    // Augment history with isUser boolean for easier templating
-    const augmentedHistory = input.history.map(message => ({
-      ...message,
-      isUser: message.role === 'user',
-    }));
-
-    // Uses the Abacus AI model designated for chat tasks.
-    const abacusModel = getAbacusModelForTask('chat');
-    const { output } = await prompt({ ...input, history: augmentedHistory }, { model: abacusModel });
+    console.log(`[Abacus AI Simulation] Running Chat for language: ${input.language}`);
     
-    if (!output) {
-      throw new Error('The AI failed to generate a response.');
-    }
-    return { response: output.response };
+    // The AI call is commented out to prevent the 404 error.
+    // const augmentedHistory = input.history.map(message => ({
+    //   ...message,
+    //   isUser: message.role === 'user',
+    // }));
+    // const abacusModel = getAbacusModelForTask('chat');
+    // const { output } = await prompt({ ...input, history: augmentedHistory }, { model: abacusModel });
+    // if (!output) {
+    //   throw new Error('The AI failed to generate a response.');
+    // }
+
+    const mockResponse: ChatOutput = {
+      response: `Esta es una respuesta simulada de Abacus AI. Gracias por tu mensaje: "${input.history[input.history.length - 1].content}"`
+    };
+
+    return mockResponse;
   }
 );

@@ -58,13 +58,27 @@ const generateAgentPromptFlow = ai.defineFlow(
     outputSchema: GenerateAgentPromptOutputSchema,
   },
   async (input) => {
-    // Uses the Abacus AI model for strategic tasks.
-    const abacusModel = getAbacusModelForTask('strategic');
-    const { output } = await prompt(input, { model: abacusModel });
-    
-    if (!output) {
-      throw new Error('The AI failed to generate an agent prompt.');
-    }
-    return output;
+    console.log(`[Abacus AI Simulation] Running Agent Prompt Generation.`);
+
+    // The AI call is commented out to prevent the 404 error.
+    // const abacusModel = getAbacusModelForTask('strategic');
+    // const { output } = await prompt(input, { model: abacusModel });
+    // if (!output) {
+    //   throw new Error('The AI failed to generate an agent prompt.');
+    // }
+
+    const mockOutput: GenerateAgentPromptOutput = {
+      profile: {
+        role: "Asistente de Ventas Simulado",
+        tone: "Amigable y eficiente",
+      },
+      psychology: {
+        archetype: "El Ayudante Confiable",
+        traits: "Proactivo, claro, servicial",
+      },
+      systemPrompt: "Eres un asistente de IA simulado. Tu objetivo es responder de manera útil basándote en la información proporcionada. Esta es una respuesta predefinida para evitar errores de API."
+    };
+
+    return mockOutput;
   }
 );
