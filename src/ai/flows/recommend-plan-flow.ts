@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   5.  Return your response in the requested JSON format.`,
 });
 
-const generateContentScheduleFlow = ai.defineFlow(
+const recommendPlanFlow = ai.defineFlow(
   {
     name: 'recommendPlanFlow',
     inputSchema: RecommendPlanInputSchema,
@@ -57,7 +57,6 @@ const generateContentScheduleFlow = ai.defineFlow(
   async (input) => {
     console.log(`[Abacus AI Simulation] Running Plan Recommendation.`);
 
-    // The AI call is commented out to prevent the 404 error.
     // const abacusModel = getAbacusModelForTask('chat');
     // const { output } = await prompt(input, { model: abacusModel });
     // if (!output) {

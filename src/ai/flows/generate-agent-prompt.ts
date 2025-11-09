@@ -60,7 +60,6 @@ const generateAgentPromptFlow = ai.defineFlow(
   async (input) => {
     console.log(`[Abacus AI Simulation] Running Agent Prompt Generation.`);
 
-    // The AI call is commented out to prevent the 404 error.
     // const abacusModel = getAbacusModelForTask('strategic');
     // const { output } = await prompt(input, { model: abacusModel });
     // if (!output) {

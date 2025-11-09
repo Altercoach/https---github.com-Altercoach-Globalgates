@@ -67,7 +67,6 @@ const chatFlow = ai.defineFlow(
   async (input) => {
     console.log(`[Abacus AI Simulation] Running Chat for language: ${input.language}`);
     
-    // The AI call is commented out to prevent the 404 error.
     // const augmentedHistory = input.history.map(message => ({
     //   ...message,
     //   isUser: message.role === 'user',

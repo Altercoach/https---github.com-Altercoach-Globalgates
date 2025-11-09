@@ -53,7 +53,6 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    // The AI call is commented out to prevent the 404 error.
     // const abacusModel = getAbacusModelForTask('onboarding');
     // const { output } = await prompt(input, { model: abacusModel });
     // return output || '{}';
