@@ -75,6 +75,8 @@ const questions = {
 
 export default function QuestionnaireFillPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
+  // Safe access to params.id
+  const questionnaireId = params.id;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

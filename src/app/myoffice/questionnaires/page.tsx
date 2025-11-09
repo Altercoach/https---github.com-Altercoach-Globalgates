@@ -4,105 +4,81 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { PlusCircle, FileText, CheckCircle, Clock } from 'lucide-react';
+import { PlusCircle, FileText, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { format } from 'date-fns';
-import { es, enUS, fr } from 'date-fns/locale';
 import { useLanguage } from '@/hooks/use-language';
 
-const sampleQuestionnaires = [
+const sampleTemplates = [
   {
-    id: 'brief-001',
-    clientEmail: 'cliente.a@example.com',
-    type: {
-      es: 'Evaluación de Negocio',
-      en: 'Business Evaluation',
-      fr: 'Évaluation d\'Entreprise',
-    },
-    status: 'Completado',
-    date: new Date('2024-05-10'),
+    id: 'business-evaluation-001',
+    name: 'Cuestionario de Evaluación de Negocio',
+    description: 'Para análisis de negocio (Doctor RX).',
+    href: '/questionnaire/business-evaluation-001'
   },
   {
-    id: 'brief-marketing-002',
-    clientEmail: 'cliente.b@example.com',
-    type: {
-        es: 'Brief de Marketing Profesional',
-        en: 'Professional Marketing Brief',
-        fr: 'Brief de Marketing Professionnel',
-    },
-    status: 'Pendiente',
-    date: new Date('2024-05-15'),
+    id: 'brief-marketing',
+    name: 'Brief de Marketing Profesional',
+    description: 'Para clientes que contratan campañas de marketing.',
+    href: '/questionnaire/brief-marketing'
   },
   {
-    id: 'agent-training-001',
-    clientEmail: 'cliente.c@example.com',
-    type: {
-        es: 'Entrenamiento de Agente IA',
-        en: 'AI Agent Training',
-        fr: 'Formation d\'Agent IA',
-    },
-    status: 'Completado',
-    date: new Date('2024-05-18'),
+    id: 'agent-training',
+    name: 'Entrenamiento de Agente IA',
+    description: 'Para configurar el asistente virtual del cliente.',
+    href: '/questionnaire/agent-training'
+  },
+  {
+    id: 'satisfaction-survey',
+    name: 'Encuesta de Satisfacción',
+    description: 'Para enviar al finalizar un proyecto o campaña.',
+    href: '/questionnaire/satisfaction-survey'
   }
 ];
 
+
 const labels = {
   es: {
-    pageTitle: "Cuestionarios de Clientes",
-    pageSubtitle: "Crea, envía y revisa los cuestionarios de tus clientes.",
-    newQuestionnaire: "Nuevo Cuestionario",
-    recentSubmissions: "Envíos Recientes",
-    recentSubmissionsDesc: "Lista de cuestionarios generados y enviados a clientes.",
-    client: "Cliente",
-    type: "Tipo",
-    sentDate: "Fecha de Envío",
-    status: "Estado",
+    pageTitle: "Gestión de Plantillas de Cuestionarios",
+    pageSubtitle: "Crea, edita y gestiona las plantillas de cuestionarios que asignas a tus clientes.",
+    newQuestionnaire: "Crear Nueva Plantilla con IA",
+    templateList: "Plantillas Disponibles",
+    templateListDesc: "Estas son las plantillas que puedes asignar a tus planes de servicio.",
+    name: "Nombre de la Plantilla",
+    description: "Descripción",
     actions: "Acciones",
-    viewResponses: "Ver Respuestas",
-    viewSubmission: "Ver Envío",
-    completed: "Completado",
-    pending: "Pendiente",
+    edit: "Ver / Editar",
+    delete: "Eliminar"
   },
   en: {
-    pageTitle: "Customer Questionnaires",
-    pageSubtitle: "Create, send, and review your customers' questionnaires.",
-    newQuestionnaire: "New Questionnaire",
-    recentSubmissions: "Recent Submissions",
-    recentSubmissionsDesc: "List of questionnaires generated and sent to customers.",
-    client: "Client",
-    type: "Type",
-    sentDate: "Sent Date",
-    status: "Status",
+    pageTitle: "Questionnaire Template Management",
+    pageSubtitle: "Create, edit, and manage the questionnaire templates you assign to your clients.",
+    newQuestionnaire: "Create New Template with AI",
+    templateList: "Available Templates",
+    templateListDesc: "These are the templates you can assign to your service plans.",
+    name: "Template Name",
+    description: "Description",
     actions: "Actions",
-    viewResponses: "View Responses",
-    viewSubmission: "View Submission",
-    completed: "Completed",
-    pending: "Pending",
+    edit: "View / Edit",
+    delete: "Delete"
   },
   fr: {
-    pageTitle: "Questionnaires Clients",
-    pageSubtitle: "Créez, envoyez et examinez les questionnaires de vos clients.",
-    newQuestionnaire: "Nouveau Questionnaire",
-    recentSubmissions: "Soumissions Récentes",
-    recentSubmissionsDesc: "Liste des questionnaires générés et envoyés aux clients.",
-    client: "Client",
-    type: "Type",
-    sentDate: "Date d'envoi",
-    status: "Statut",
+    pageTitle: "Gestion des Modèles de Questionnaire",
+    pageSubtitle: "Créez, modifiez et gérez les modèles de questionnaire que vous assignez à vos clients.",
+    newQuestionnaire: "Créer un Nouveau Modèle avec l'IA",
+    templateList: "Modèles Disponibles",
+    templateListDesc: "Ce sont les modèles que vous pouvez assigner à vos plans de service.",
+    name: "Nom du Modèle",
+    description: "Description",
     actions: "Actions",
-    viewResponses: "Voir les Réponses",
-    viewSubmission: "Voir la Soumission",
-    completed: "Complété",
-    pending: "En attente",
+    edit: "Voir / Modifier",
+    delete: "Supprimer"
   }
 };
 
 
 export default function QuestionnairesPage() {
-  const { language, getTranslation } = useLanguage();
+  const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
-  const locale = { es, en: enUS, fr }[language.code] || enUS;
 
   return (
     <div className="space-y-6">
@@ -121,44 +97,40 @@ export default function QuestionnairesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t.recentSubmissions}</CardTitle>
-          <CardDescription>{t.recentSubmissionsDesc}</CardDescription>
+          <CardTitle>{t.templateList}</CardTitle>
+          <CardDescription>{t.templateListDesc}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t.client}</TableHead>
-                <TableHead>{t.type}</TableHead>
-                <TableHead>{t.sentDate}</TableHead>
-                <TableHead>{t.status}</TableHead>
+                <TableHead>{t.name}</TableHead>
+                <TableHead>{t.description}</TableHead>
                 <TableHead className="text-right">{t.actions}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sampleQuestionnaires.map((q) => {
-                const isCompleted = q.status === 'Completado';
-                return (
-                  <TableRow key={q.id}>
-                    <TableCell className="font-medium">{q.clientEmail}</TableCell>
-                    <TableCell>{getTranslation(q.type)}</TableCell>
-                    <TableCell>{format(q.date, "dd MMM, yyyy", { locale })}</TableCell>
-                    <TableCell>
-                      <Badge variant={isCompleted ? 'default' : 'secondary'} className={isCompleted ? 'bg-accent text-accent-foreground' : ''}>
-                        {isCompleted ? <CheckCircle className="mr-1 h-3 w-3" /> : <Clock className="mr-1 h-3 w-3" />}
-                        {isCompleted ? t.completed : t.pending}
-                      </Badge>
+              {sampleTemplates.map((template) => (
+                  <TableRow key={template.id}>
+                    <TableCell className="font-medium flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground"/>
+                        {template.name}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>{template.description}</TableCell>
+                    <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/myoffice/questionnaires/${q.id}`}>
-                          {isCompleted ? t.viewResponses : t.viewSubmission}
+                        <Link href={template.href}>
+                          <Edit className="mr-2 h-3 w-3" />
+                          {t.edit}
                         </Link>
                       </Button>
+                       <Button variant="destructive" size="sm" disabled>
+                          <Trash2 className="mr-2 h-3 w-3" />
+                          {t.delete}
+                        </Button>
                     </TableCell>
                   </TableRow>
-                )
-              })}
+              ))}
             </TableBody>
           </Table>
         </CardContent>

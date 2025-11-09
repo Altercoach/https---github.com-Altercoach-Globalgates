@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Send, Link as LinkIcon, Clipboard, ArrowLeft, Bot } from 'lucide-react';
+import { Send, Link as LinkIcon, Clipboard, ArrowLeft, Bot, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
@@ -16,93 +16,82 @@ import { Textarea } from '@/components/ui/textarea';
 const labels = {
   es: {
     back: "Volver a Cuestionarios",
-    pageTitle: "Generador de Cuestionario",
-    pageSubtitle: "Crea y asigna un nuevo cuestionario a un cliente.",
-    configTitle: "Configuración y Contenido",
-    configDesc: "Define el título, el cliente y pega las preguntas para generar un enlace.",
-    questionnaireTitle: "Título del Cuestionario",
-    questionnaireTitlePlaceholder: "Ej: Brief de Marketing Avanzado",
-    clientEmail: "Email del Cliente",
-    clientEmailPlaceholder: "cliente@email.com",
-    questionsLabel: "Preguntas (una por línea)",
-    questionsPlaceholder: "¿Cuál es tu objetivo principal?\n¿Quién es tu competencia directa?\n¿Cuál es tu presupuesto?",
-    generateLink: "Generar Enlace y Enviar",
-    linkGenerated: "¡Enlace Generado para el Cliente!",
+    pageTitle: "Generador de Plantillas de Cuestionario",
+    pageSubtitle: "Usa la IA para generar una nueva plantilla de cuestionario.",
+    configTitle: "Asistente de Creación de Plantillas",
+    configDesc: "Describe el propósito del cuestionario y la IA generará las preguntas por ti.",
+    questionnaireTitle: "Título de la Plantilla",
+    questionnaireTitlePlaceholder: "Ej: Cuestionario de Onboarding para Fotógrafos",
+    promptLabel: "Descripción del Cuestionario",
+    promptPlaceholder: "Ej: 'Genera un cuestionario para un cliente que contrató un plan de redes sociales. Necesito saber sus objetivos, público objetivo, competidores y qué tipo de contenido le gusta.'",
+    generateButton: "Generar Preguntas con IA",
+    saveButton: "Guardar Plantilla",
+    linkGenerated: "¡Plantilla Generada y Guardada!",
     linkCopied: "¡Enlace copiado!",
-    linkCopiedDesc: "Puedes compartirlo directamente con tu cliente.",
+    linkCopiedDesc: "Puedes verla y asignarla a tus planes de servicio.",
     emailRequired: "Por favor, introduce un email.",
-    sentToast: "¡Cuestionario \"enviado\"!",
-    sentToastDesc: "Se ha generado un enlace para tu cliente.",
-    createAnother: "Crear otro cuestionario"
+    sentToast: "¡Plantilla generada!",
+    sentToastDesc: "La nueva plantilla está lista para ser asignada.",
+    createAnother: "Crear otra plantilla"
   },
   en: {
     back: "Back to Questionnaires",
-    pageTitle: "Questionnaire Generator",
-    pageSubtitle: "Create and assign a new questionnaire to a client.",
-    configTitle: "Configuration & Content",
-    configDesc: "Set the title, client, and paste the questions to generate a link.",
-    questionnaireTitle: "Questionnaire Title",
-    questionnaireTitlePlaceholder: "e.g., Advanced Marketing Brief",
-    clientEmail: "Client's Email",
-    clientEmailPlaceholder: "client@email.com",
-    questionsLabel: "Questions (one per line)",
-    questionsPlaceholder: "What is your main goal?\nWho is your direct competition?\nWhat is your budget?",
-    generateLink: "Generate Link & Send",
-    linkGenerated: "Link Generated for Client!",
+    pageTitle: "Questionnaire Template Generator",
+    pageSubtitle: "Use AI to generate a new questionnaire template.",
+    configTitle: "Template Creation Assistant",
+    configDesc: "Describe the purpose of the questionnaire, and the AI will generate the questions for you.",
+    questionnaireTitle: "Template Title",
+    questionnaireTitlePlaceholder: "e.g., Onboarding Questionnaire for Photographers",
+    promptLabel: "Questionnaire Description",
+    promptPlaceholder: "e.g., 'Generate a questionnaire for a client who hired a social media plan. I need to know their goals, target audience, competitors, and what kind of content they like.'",
+    generateButton: "Generate Questions with AI",
+    saveButton: "Save Template",
+    linkGenerated: "Template Generated and Saved!",
     linkCopied: "Link copied!",
-    linkCopiedDesc: "You can share it directly with your client.",
+    linkCopiedDesc: "You can view it and assign it to your service plans.",
     emailRequired: "Please enter an email.",
-    sentToast: "Questionnaire \"sent\"!",
-    sentToastDesc: "A link has been generated for your client.",
-    createAnother: "Create another questionnaire"
+    sentToast: "Template generated!",
+    sentToastDesc: "The new template is ready to be assigned.",
+    createAnother: "Create another template"
   },
   fr: {
     back: "Retour aux Questionnaires",
-    pageTitle: "Générateur de Questionnaire",
-    pageSubtitle: "Créez et assignez un nouveau questionnaire à un client.",
-    configTitle: "Configuration et Contenu",
-    configDesc: "Définissez le titre, le client et collez les questions pour générer un lien.",
-    questionnaireTitle: "Titre du Questionnaire",
-    questionnaireTitlePlaceholder: "Ex: Brief Marketing Avancé",
-    clientEmail: "E-mail du Client",
-    clientEmailPlaceholder: "client@email.com",
-    questionsLabel: "Questions (une par ligne)",
-    questionsPlaceholder: "Quel est votre objectif principal ?\nQui est votre concurrence directe ?\nQuel est votre budget ?",
-    generateLink: "Générer le Lien et Envoyer",
-    linkGenerated: "Lien Généré pour le Client !",
+    pageTitle: "Générateur de Modèles de Questionnaire",
+    pageSubtitle: "Utilisez l'IA pour générer un nouveau modèle de questionnaire.",
+    configTitle: "Assistant de Création de Modèles",
+    configDesc: "Décrivez le but du questionnaire, et l'IA générera les questions pour vous.",
+    questionnaireTitle: "Titre du Modèle",
+    questionnaireTitlePlaceholder: "Ex: Questionnaire d'Onboarding pour Photographes",
+    promptLabel: "Description du Questionnaire",
+    promptPlaceholder: "Ex: 'Générez un questionnaire pour un client qui a engagé un plan de médias sociaux. J'ai besoin de connaître ses objectifs, son public cible, ses concurrents et le type de contenu qu'il aime.'",
+    generateButton: "Générer des Questions avec l'IA",
+    saveButton: "Enregistrer le Modèle",
+    linkGenerated: "Modèle Généré et Enregistré !",
     linkCopied: "Lien copié !",
-    linkCopiedDesc: "Vous pouvez le partager directement avec votre client.",
+    linkCopiedDesc: "Vous pouvez le voir et l'assigner à vos plans de service.",
     emailRequired: "Veuillez saisir un e-mail.",
-    sentToast: "Questionnaire \"envoyé\" !",
-    sentToastDesc: "Un lien a été généré pour votre client.",
-    createAnother: "Créer un autre questionnaire"
+    sentToast: "Modèle généré !",
+    sentToastDesc: "Le nouveau modèle est prêt à être assigné.",
+    createAnother: "Créer un autre modèle"
   }
 };
 
 export default function NewQuestionnairePage() {
-  const [clientEmail, setClientEmail] = useState('');
-  const [isSent, setIsSent] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
   const [questionnaireUrl, setQuestionnaireUrl] = useState('');
   const { toast } = useToast();
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleGenerate = (e: React.FormEvent) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const email = formData.get('client-email');
-
-    if (!email) {
-      toast({ title: t.emailRequired, variant: 'destructive' });
-      return;
-    }
     
-    const newId = `q-${Date.now()}`;
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/questionnaire/${newId}` : '';
-    setQuestionnaireUrl(url);
+    // Simulate AI generation and saving
+    const newId = `q-template-${Date.now()}`;
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/myoffice/questionnaires/edit` : '';
+    setQuestionnaireUrl(url); // Should be a unique URL for the new template
 
-    setIsSent(true);
+    setIsGenerated(true);
     toast({ title: t.sentToast, description: t.sentToastDesc });
   };
 
@@ -129,56 +118,46 @@ export default function NewQuestionnairePage() {
 
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Bot /> {t.configTitle}</CardTitle>
+          <CardTitle className="flex items-center gap-2"><Wand2 /> {t.configTitle}</CardTitle>
           <CardDescription>{t.configDesc}</CardDescription>
         </CardHeader>
         <CardContent>
-          {isSent ? (
+          {isGenerated ? (
              <div className="space-y-4">
                 <Alert>
                     <LinkIcon className="h-4 w-4" />
                     <AlertTitle>{t.linkGenerated}</AlertTitle>
                     <AlertDescription className="flex items-center justify-between">
                       <Link href={questionnaireUrl} target="_blank" className="text-sm underline truncate pr-4">
-                        {questionnaireUrl}
+                        Ver y editar nueva plantilla
                       </Link>
                       <Button variant="outline" size="icon" onClick={copyToClipboard} className="h-8 w-8">
                         <Clipboard className="h-4 w-4" />
                       </Button>
                     </AlertDescription>
                 </Alert>
-                 <Button onClick={() => setIsSent(false)} className="w-full">{t.createAnother}</Button>
+                 <Button onClick={() => setIsGenerated(false)} className="w-full">{t.createAnother}</Button>
             </div>
           ) : (
-             <form onSubmit={handleSend} className="space-y-4">
+             <form onSubmit={handleGenerate} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="questionnaire-title">{t.questionnaireTitle}</Label>
                     <Input id="questionnaire-title" name="questionnaire-title" placeholder={t.questionnaireTitlePlaceholder} required />
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="client-email">{t.clientEmail}</Label>
-                    <Input
-                        id="client-email"
-                        name="client-email"
-                        type="email"
-                        placeholder={t.clientEmailPlaceholder}
-                        required
-                    />
-                </div>
                  <div className="space-y-2">
-                    <Label htmlFor="questions">{t.questionsLabel}</Label>
+                    <Label htmlFor="prompt">{t.promptLabel}</Label>
                     <Textarea
-                        id="questions"
-                        name="questions"
-                        placeholder={t.questionsPlaceholder}
-                        rows={10}
+                        id="prompt"
+                        name="prompt"
+                        placeholder={t.promptPlaceholder}
+                        rows={6}
                         required
                     />
                  </div>
 
                 <Button type="submit" className="w-full">
-                    <Send className="mr-2" />
-                    {t.generateLink}
+                    <Bot className="mr-2" />
+                    {t.generateButton}
                 </Button>
             </form>
           )}
