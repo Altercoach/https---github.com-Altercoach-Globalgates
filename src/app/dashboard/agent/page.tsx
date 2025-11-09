@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, KeyRound, MessageSquare, Linkedin, Twitter, AlertTriangle } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, KeyRound, MessageSquare, Linkedin, Twitter, AlertTriangle, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
@@ -16,6 +16,13 @@ import { useSite } from '@/hooks/use-site';
 import { initialCustomers } from '@/lib/constants';
 import { useAuth } from '@/hooks/use-auth';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import Link from 'next/link';
 
 const labels = {
   es: {
@@ -40,7 +47,9 @@ const labels = {
     instagramApiKey: "Instagram API Key",
     messengerApiKey: "Facebook Messenger API Key",
     planInfo: "Tu plan actual es",
-    planUpgrade: "Actualiza tu plan para conectar más canales."
+    planUpgrade: "Actualiza tu plan para conectar más canales.",
+    getMetaKey: "Obtén tu clave de Meta for Developers",
+    getTelegramKey: "Habla con BotFather en Telegram",
   },
   en: {
     pageTitle: "Your AI Agent Configuration",
@@ -64,7 +73,9 @@ const labels = {
     instagramApiKey: "Instagram API Key",
     messengerApiKey: "Facebook Messenger API Key",
     planInfo: "Your current plan is",
-    planUpgrade: "Upgrade your plan to connect more channels."
+    planUpgrade: "Upgrade your plan to connect more channels.",
+    getMetaKey: "Get your key from Meta for Developers",
+    getTelegramKey: "Talk to BotFather on Telegram",
   },
   fr: {
     pageTitle: "Configuration de Votre Agent IA",
@@ -88,7 +99,9 @@ const labels = {
     instagramApiKey: "Clé API Instagram",
     messengerApiKey: "Clé API Facebook Messenger",
     planInfo: "Votre plan actuel est",
-    planUpgrade: "Mettez à niveau votre plan pour connecter plus de canaux."
+    planUpgrade: "Mettez à niveau votre plan pour connecter plus de canaux.",
+    getMetaKey: "Obtenez votre clé sur Meta for Developers",
+    getTelegramKey: "Parlez à BotFather sur Telegram",
   }
 };
 
@@ -135,9 +148,39 @@ export default function CustomerAgentConfigPage() {
     }
 
     // Logic to determine available channels based on the plan
-    const isVipPlan = planName.toLowerCase().includes('vip');
-    const isProPlan = planName.toLowerCase().includes('profesional');
+    const normalizedPlanName = planName.toLowerCase();
+    const isVipPlan = normalizedPlanName.includes('vip') || normalizedPlanName.includes('omni-channel');
+    const isProPlan = normalizedPlanName.includes('profesional') || normalizedPlanName.includes('dúo conexión');
+    
     const availableChannels = isVipPlan ? 3 : isProPlan ? 2 : 1;
+
+    const ApiKeyInput = ({ id, label, value, onChange, disabled, helpText, helpUrl }: { id: string; label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; disabled: boolean; helpText: string; helpUrl: string; }) => (
+        <div className={`space-y-2 ${disabled ? 'opacity-50' : ''}`}>
+            <div className="flex items-center gap-1.5">
+                <Label htmlFor={id} className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{label}</Label>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                           <Link href={helpUrl} target="_blank" tabIndex={-1}>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help"/>
+                           </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                           <p>{helpText}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+            <Input 
+                id={id} 
+                type="password" 
+                value={value} 
+                onChange={onChange} 
+                placeholder={disabled ? 'Actualiza tu plan' : 'Introduce tu clave...'}
+                disabled={disabled}
+            />
+        </div>
+    );
 
     return (
         <div className="space-y-6">
@@ -214,23 +257,34 @@ export default function CustomerAgentConfigPage() {
                         <AlertTitle>{t.planInfo}: <strong>{planName}</strong></AlertTitle>
                         <AlertDescription>{t.planUpgrade}</AlertDescription>
                     </Alert>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {availableChannels >= 1 && (
-                            <div className="space-y-2">
-                                <Label htmlFor="whatsapp-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.whatsappApiKey}</Label>
-                                <Input id="whatsapp-api" type="password" value={whatsappKey} onChange={(e) => setWhatsappKey(e.target.value)} placeholder="Introduce tu clave..."/>
-                            </div>
-                        )}
-                        {availableChannels >= 2 && (
-                            <div className="space-y-2">
-                                <Label htmlFor="instagram-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.instagramApiKey}</Label>
-                                <Input id="instagram-api" type="password" value={instagramKey} onChange={(e) => setInstagramKey(e.target.value)} placeholder="Introduce tu clave..."/>
-                            </div>
-                        )}
-                        <div className={`space-y-2 ${availableChannels < 3 ? 'opacity-50' : ''}`}>
-                            <Label htmlFor="messenger-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.messengerApiKey}</Label>
-                            <Input id="messenger-api" disabled={availableChannels < 3} placeholder={availableChannels < 3 ? 'Actualiza tu plan' : 'Introduce tu clave...'} value={messengerKey} onChange={e => setMessengerKey(e.target.value)}/>
-                        </div>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <ApiKeyInput
+                            id="whatsapp-api"
+                            label={t.whatsappApiKey}
+                            value={whatsappKey}
+                            onChange={(e) => setWhatsappKey(e.target.value)}
+                            disabled={availableChannels < 1}
+                            helpText={t.getMetaKey}
+                            helpUrl="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
+                        />
+                        <ApiKeyInput
+                            id="instagram-api"
+                            label={t.instagramApiKey}
+                            value={instagramKey}
+                            onChange={(e) => setInstagramKey(e.target.value)}
+                            disabled={availableChannels < 2}
+                            helpText={t.getMetaKey}
+                            helpUrl="https://developers.facebook.com/docs/instagram-basic-display-api"
+                        />
+                         <ApiKeyInput
+                            id="messenger-api"
+                            label={t.messengerApiKey}
+                            value={messengerKey}
+                            onChange={(e) => setMessengerKey(e.target.value)}
+                            disabled={availableChannels < 3}
+                            helpText={t.getMetaKey}
+                            helpUrl="https://developers.facebook.com/docs/messenger-platform/overview"
+                        />
                     </div>
                 </CardContent>
             </Card>
@@ -241,3 +295,5 @@ export default function CustomerAgentConfigPage() {
         </div>
     );
 }
+
+    
