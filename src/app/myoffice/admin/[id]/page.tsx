@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Edit, ArrowLeft, CheckCircle, Clock, BarChart, FileText } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import { Bar, BarChart as RechartsBarChart, CartesianGrid, XAxis } from "recharts";
@@ -134,7 +134,8 @@ const labels = {
 export default function CustomerDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { currency } = useCurrency();
-  const customerId = params.id;
+  const pathParams = useParams();
+  const customerId = pathParams.id as string;
   const [customerData, setCustomerData] = useState<Customer | undefined>(undefined);
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
