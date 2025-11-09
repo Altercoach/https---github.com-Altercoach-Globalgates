@@ -131,11 +131,11 @@ const labels = {
 };
 
 
-export default function CustomerDetailPage({ params }: { params: { id: string } }) {
+export default function CustomerDetailPage() {
   const router = useRouter();
+  const params = useParams();
   const { currency } = useCurrency();
-  const pathParams = useParams();
-  const customerId = pathParams.id as string;
+  const customerId = params.id as string;
   const [customerData, setCustomerData] = useState<Customer | undefined>(undefined);
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;

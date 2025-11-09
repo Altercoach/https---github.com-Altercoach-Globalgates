@@ -143,10 +143,10 @@ const labels = {
 };
 
 
-export default function QuestionnaireResponsePage({ params }: { params: { id: string } }) {
+export default function QuestionnaireResponsePage() {
   const router = useRouter();
-  const pathParams = useParams();
-  const questionnaireId = pathParams.id as string;
+  const params = useParams();
+  const questionnaireId = params.id as string;
   const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001' || questionnaireId === 'business-evaluation-001';
   const isAgentTraining = questionnaireId === 'agent-training-001';
   const { toast } = useToast();
