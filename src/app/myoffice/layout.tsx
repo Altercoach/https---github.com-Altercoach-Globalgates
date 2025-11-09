@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, Save, BookOpen, Beaker } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, Save, BookOpen, Beaker, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -94,7 +94,7 @@ export default function MyOfficeLayout({
 
 
   useEffect(() => {
-    if (auth.user?.role !== 'admin') {
+    if (auth.isMounted && auth.user?.role !== 'admin') {
       router.push('/login');
     }
   }, [auth, router]);
@@ -111,7 +111,7 @@ export default function MyOfficeLayout({
     { href: '/myoffice/instructions', label: t.instructions, icon: <BookOpen /> },
   ];
 
-  if (auth.user?.role !== 'admin') {
+  if (auth.isMounted && auth.user?.role !== 'admin') {
      return (
       <div className="flex h-screen w-full items-center justify-center">
         <p>{t.redirecting}</p>
@@ -170,7 +170,7 @@ export default function MyOfficeLayout({
         <header className="flex h-14 items-center justify-between border-b bg-background p-2">
           <SidebarTrigger />
            <div>
-            <span className="text-sm text-muted-foreground mr-4">{t.loggedInAs} {auth.user.email}</span>
+            <span className="text-sm text-muted-foreground mr-4">{t.loggedInAs} {auth.user?.email}</span>
             <Button onClick={logout} variant="outline" size="sm">{t.logout}</Button>
             <Button asChild variant="outline" size="sm" className="ml-2">
               <Link href="/">{t.viewSite}</Link>
