@@ -15,46 +15,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const labels = {
   es: {
-    pageTitle: "Centro de Supervisión (CRM)",
-    pageSubtitle: "Supervisa las conversaciones del equipo e interviene cuando sea necesario.",
+    pageTitle: "Bandeja de Entrada del Agente",
+    pageSubtitle: "Supervisa las conversaciones de tu agente y responde si es necesario.",
     searchPlaceholder: "Buscar conversaciones...",
     filterByChannel: "Filtrar por canal",
     allChannels: "Todos los Canales",
-    noConversation: "Selecciona una conversación para empezar.",
-    messagePlaceholder: "Escribe tu respuesta...",
-    agent: "Alex Rider",
-    you: "Tú (Supervisor)",
-    humanRequested: "Intervención Solicitada",
+    noConversation: "Selecciona una conversación de la lista.",
+    messagePlaceholder: "Escribe una respuesta...",
+    humanRequested: "Necesita Intervención",
     takeOver: "Tomar Control",
-    attentionNeeded: "Necesita Atención",
   },
   en: {
-    pageTitle: "Supervision Center (CRM)",
-    pageSubtitle: "Supervise team conversations and intervene when necessary.",
+    pageTitle: "Agent Inbox",
+    pageSubtitle: "Monitor your agent's conversations and reply if needed.",
     searchPlaceholder: "Search conversations...",
     filterByChannel: "Filter by channel",
     allChannels: "All Channels",
-    noConversation: "Select a conversation to start.",
-    messagePlaceholder: "Type your response...",
-    agent: "Alex Rider",
-    you: "You (Supervisor)",
-    humanRequested: "Intervention Requested",
+    noConversation: "Select a conversation from the list.",
+    messagePlaceholder: "Type a response...",
+    humanRequested: "Intervention Needed",
     takeOver: "Take Over",
-    attentionNeeded: "Attention Needed",
   },
   fr: {
-    pageTitle: "Centre de Supervision (CRM)",
-    pageSubtitle: "Supervisez les conversations de l'équipe et intervenez si nécessaire.",
+    pageTitle: "Boîte de Réception de l'Agent",
+    pageSubtitle: "Surveillez les conversations de votre agent et répondez si nécessaire.",
     searchPlaceholder: "Rechercher des conversations...",
     filterByChannel: "Filtrer par canal",
     allChannels: "Tous les Canaux",
-    noConversation: "Sélectionnez une conversation pour commencer.",
-    messagePlaceholder: "Écrivez votre réponse...",
-    agent: "Alex Rider",
-    you: "Vous (Superviseur)",
-    humanRequested: "Intervention Demandée",
-    takeOver: "Prendre le Contrôle",
-    attentionNeeded: "Attention Requise",
+    noConversation: "Sélectionnez une conversation dans la liste.",
+    messagePlaceholder: "Tapez une réponse...",
+    humanRequested: "Intervention requise",
+    takeOver: "Prendre le contrôle",
   }
 };
 
@@ -74,8 +65,6 @@ const conversations = [
     { id: 1, name: 'Ana García', lastMessage: 'Sí, me interesa el paquete VIP...', time: '10:42 AM', unread: 2, avatar: 'https://i.pravatar.cc/150?u=ana', needsAttention: false, channel: 'whatsapp' },
     { id: 2, name: 'Carlos Mendoza', lastMessage: 'No funciona el código de descuento.', time: '9:15 AM', unread: 0, avatar: 'https://i.pravatar.cc/150?u=carlos', needsAttention: true, channel: 'messenger' },
     { id: 3, name: 'Laura Petrova', lastMessage: 'Ok, gracias!', time: 'Ayer', unread: 0, avatar: 'https://i.pravatar.cc/150?u=laura', needsAttention: false, channel: 'instagram' },
-    { id: 4, name: 'John Doe', lastMessage: 'Interested in B2B services.', time: 'Ayer', unread: 1, avatar: 'https://i.pravatar.cc/150?u=john', needsAttention: false, channel: 'linkedin' },
-    { id: 5, name: 'Support Ticket #123', lastMessage: 'My account is locked.', time: '2h', unread: 0, avatar: 'https://i.pravatar.cc/150?u=support', needsAttention: false, channel: 'email' },
 ];
 
 const chatHistory = [
@@ -91,13 +80,15 @@ const chatHistory = [
 ];
 
 
-export default function CrmPage() {
+export default function CustomerCrmPage() {
     const [selectedConversation, setSelectedConversation] = useState(conversations[1]);
     const [channelFilter, setChannelFilter] = useState('all');
     const { language } = useLanguage();
-    const { site } = useSite();
+    const { site } = useSite(); // Using site context to get agent persona
     const t = labels[language.code as keyof typeof labels] || labels.en;
     
+    // NOTE: In a real app, the agent persona would be specific to the customer.
+    // Here we use the global one for demonstration.
     const agentName = `${site.agentPersona.firstName} ${site.agentPersona.lastName}`;
     const agentAvatar = site.agentPersona.avatar;
 
@@ -112,7 +103,7 @@ export default function CrmPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] lg:grid-cols-[350px_1fr] gap-4 flex-1 overflow-hidden">
                 {/* Conversation List */}
-                <div className="flex flex-col border rounded-lg overflow-hidden">
+                 <div className="flex flex-col border rounded-lg overflow-hidden">
                     <div className="p-4 border-b space-y-4">
                         <div className="relative">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -127,9 +118,6 @@ export default function CrmPage() {
                                 <SelectItem value="whatsapp">WhatsApp</SelectItem>
                                 <SelectItem value="messenger">Messenger</SelectItem>
                                 <SelectItem value="instagram">Instagram</SelectItem>
-                                <SelectItem value="linkedin">LinkedIn</SelectItem>
-                                <SelectItem value="twitter">X (Twitter)</SelectItem>
-                                <SelectItem value="email">Email</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -148,7 +136,7 @@ export default function CrmPage() {
                                         <AvatarImage src={convo.avatar} />
                                         <AvatarFallback>{convo.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
-                                    <div className="absolute -bottom-1 -right-1 bg-background p-0.5 rounded-full">
+                                     <div className="absolute -bottom-1 -right-1 bg-background p-0.5 rounded-full">
                                         {getChannelIcon(convo.channel)}
                                     </div>
                                 </div>
@@ -160,7 +148,7 @@ export default function CrmPage() {
                                     <div className="flex justify-between items-start mt-1">
                                        <p className="text-sm text-muted-foreground truncate">{convo.lastMessage}</p>
                                        {convo.unread > 0 && <Badge className="bg-accent text-accent-foreground">{convo.unread}</Badge>}
-                                       {convo.needsAttention && <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3"/> {t.attentionNeeded}</Badge>}
+                                       {convo.needsAttention && <Badge variant="destructive">{t.humanRequested}</Badge>}
                                     </div>
                                 </div>
                             </button>
@@ -170,29 +158,24 @@ export default function CrmPage() {
 
                 {/* Chat Window */}
                 <div className="flex flex-col border rounded-lg h-full">
-                    {selectedConversation ? (
+                     {selectedConversation ? (
                         <>
-                            <div className="p-4 border-b flex items-center gap-3">
+                            <div className="p-4 border-b flex items-center justify-between">
+                               <div className="flex items-center gap-3">
                                 <Avatar>
                                     <AvatarImage src={selectedConversation.avatar} />
                                     <AvatarFallback>{selectedConversation.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div>
                                     <p className="font-semibold">{selectedConversation.name}</p>
-                                    {selectedConversation.needsAttention && <p className="text-xs text-destructive font-semibold">{t.humanRequested}</p>}
                                 </div>
+                               </div>
+                               {selectedConversation.needsAttention && <Button size="sm"><AlertTriangle className="mr-2 h-4 w-4"/>{t.takeOver}</Button>}
                             </div>
                             <ScrollArea className="flex-1 p-4 space-y-4">
                                {chatHistory.map((msg, index) => {
                                    if (msg.from === 'human_request') {
-                                       return (
-                                           <div key={index} className="text-center my-4">
-                                               <p className="text-xs text-destructive-foreground bg-destructive/80 rounded-full px-3 py-1 inline-flex items-center gap-2">
-                                                   <AlertTriangle className="h-4 w-4"/> {msg.text}
-                                               </p>
-                                                <Button size="sm" className="mt-2">{t.takeOver}</Button>
-                                           </div>
-                                       )
+                                       return null; // Don't show the internal request message
                                    }
                                    
                                    const isUser = msg.from === 'user';
@@ -205,7 +188,7 @@ export default function CrmPage() {
                                          {!isUser && 
                                             <Avatar className="h-8 w-8">
                                                 <AvatarImage src={agentAvatar} alt={agentName} />
-                                                <AvatarFallback>{site.agentPersona.firstName.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback>{agentName.charAt(0)}</AvatarFallback>
                                             </Avatar>
                                          }
                                     </div>

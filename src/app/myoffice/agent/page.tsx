@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound, Linkedin, Twitter } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound, MessageSquare, Linkedin, Twitter } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
@@ -33,8 +33,8 @@ const labels = {
     systemPromptDesc: "Define el rol, reglas y cómo debe comportarse. La IA lo usará como su instrucción principal.",
     knowledgeBase: "Base de Conocimiento (Entrenamiento)",
     knowledgeBaseDesc: "Pega aquí URLs, FAQs, o cualquier información que el agente deba conocer como su 'memoria'.",
-    integrations: "Integraciones y Claves de API",
-    integrationsDesc: "Conecta tu agente a las APIs de mensajería y define los correos de tu equipo.",
+    integrations: "Claves de API de Canales",
+    integrationsDesc: "Conecta tu agente a las APIs de mensajería para que pueda operar. Estas claves son para el uso interno de tu agencia.",
     whatsappApiKey: "WhatsApp API Key",
     instagramApiKey: "Instagram API Key",
     messengerApiKey: "Facebook Messenger API Key",
@@ -62,8 +62,8 @@ const labels = {
     systemPromptDesc: "It defines its role, rules, and how it should behave. The AI will use this as its main instruction.",
     knowledgeBase: "Knowledge Base (Training)",
     knowledgeBaseDesc: "Paste URLs, FAQs, or any information the agent should know as its 'memory'.",
-    integrations: "Integrations & API Keys",
-    integrationsDesc: "Connect your agent to messaging APIs and define your team's emails.",
+    integrations: "Channel API Keys",
+    integrationsDesc: "Connect your agent to messaging APIs so it can operate. These keys are for your agency's internal use.",
     whatsappApiKey: "WhatsApp API Key",
     instagramApiKey: "Instagram API Key",
     messengerApiKey: "Facebook Messenger API Key",
@@ -91,8 +91,8 @@ const labels = {
     systemPromptDesc: "Définit son rôle, ses règles et son comportement. L'IA l'utilisera comme instruction principale.",
     knowledgeBase: "Base de Connaissances (Formation)",
     knowledgeBaseDesc: "Collez ici les URL, FAQ ou toute information que l'agent doit connaître comme sa 'mémoire'.",
-    integrations: "Intégrations & Clés API",
-    integrationsDesc: "Connectez votre agent aux API de messagerie et définissez les e-mails de votre équipe.",
+    integrations: "Clés API des Canaux",
+    integrationsDesc: "Connectez votre agent aux API de messagerie pour qu'il puisse fonctionner. Ces clés sont à l'usage interne de votre agence.",
     whatsappApiKey: "Clé API WhatsApp",
     instagramApiKey: "Clé API Instagram",
     messengerApiKey: "Clé API Facebook Messenger",
@@ -256,15 +256,15 @@ export default function AgentConfigPage() {
                 <CardContent className="space-y-4">
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="whatsapp-api">{t.whatsappApiKey}</Label>
+                            <Label htmlFor="whatsapp-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.whatsappApiKey}</Label>
                             <Input id="whatsapp-api" type="password" value={whatsappKey} onChange={(e) => setWhatsappKey(e.target.value)} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="instagram-api">{t.instagramApiKey}</Label>
+                            <Label htmlFor="instagram-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.instagramApiKey}</Label>
                             <Input id="instagram-api" type="password" value={instagramKey} onChange={(e) => setInstagramKey(e.target.value)} />
                         </div>
                          <div className="space-y-2">
-                            <Label htmlFor="messenger-api">{t.messengerApiKey}</Label>
+                            <Label htmlFor="messenger-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.messengerApiKey}</Label>
                             <Input id="messenger-api" type="password" value={messengerKey} onChange={(e) => setMessengerKey(e.target.value)} />
                         </div>
                         <div className="space-y-2">

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, MessageSquare, Linkedin, Twitter } from 'lucide-react';
+import { Bot, MessageSquare, Linkedin, Twitter, Mail, Rss, Globe } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import Image from 'next/image';
 
@@ -77,9 +77,9 @@ const channelIntegrations: { id: IntegrationId; icon: React.ReactNode }[] = [
     { id: 'whatsapp', icon: <MessageSquare /> },
     { id: 'messenger', icon: <MessageSquare /> },
     { id: 'instagram', icon: <MessageSquare /> },
-    { id: 'telegram', icon: <MessageSquare /> },
-    { id: 'webchat', icon: <MessageSquare /> },
-    { id: 'email', icon: <MessageSquare /> },
+    { id: 'telegram', icon: <Rss /> },
+    { id: 'webchat', icon: <Globe /> },
+    { id: 'email', icon: <Mail /> },
     { id: 'linkedin', icon: <Linkedin /> },
     { id: 'twitter', icon: <Twitter /> },
 ];

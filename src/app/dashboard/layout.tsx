@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BarChart, LogOut, Settings, User, Menu, Home, BookOpen } from 'lucide-react';
+import { BarChart, LogOut, Settings, User, Menu, Home, BookOpen, MessageSquare, Bot, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,9 @@ const labels = {
     title: "Panel de Cliente",
     home: "Página Principal",
     dashboard: "Dashboard",
+    crm: "CRM (Supervisión)",
+    agent: "Agente IA",
+    payments: "Pagos y Ventas",
     settings: "Configuración",
     instructions: "Instrucciones",
     logout: "Cerrar Sesión",
@@ -25,6 +28,9 @@ const labels = {
     title: "Customer Dashboard",
     home: "Main Page",
     dashboard: "Dashboard",
+    crm: "CRM (Supervision)",
+    agent: "AI Agent",
+    payments: "Payments & Sales",
     settings: "Settings",
     instructions: "Instructions",
     logout: "Logout",
@@ -35,6 +41,9 @@ const labels = {
     title: "Tableau de Bord Client",
     home: "Page d'accueil",
     dashboard: "Tableau de bord",
+    crm: "CRM (Supervision)",
+    agent: "Agent IA",
+    payments: "Paiements et Ventes",
     settings: "Paramètres",
     instructions: "Instructions",
     logout: "Se déconnecter",
@@ -64,6 +73,9 @@ export default function DashboardLayout({
   const navItems = [
     { href: '/', label: t.home, icon: Home },
     { href: '/dashboard', label: t.dashboard, icon: BarChart },
+    { href: '/dashboard/crm', label: t.crm, icon: MessageSquare },
+    { href: '/dashboard/agent', label: t.agent, icon: Bot },
+    { href: '/dashboard/payments', label: t.payments, icon: CreditCard },
     { href: '/dashboard/settings', label: t.settings, icon: Settings },
     { href: '/instructions', label: t.instructions, icon: BookOpen },
   ];
