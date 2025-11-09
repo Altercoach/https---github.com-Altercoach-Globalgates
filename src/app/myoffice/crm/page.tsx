@@ -6,20 +6,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, User, AlertTriangle, Search, MessageSquare, Linkedin, Twitter, Mail } from 'lucide-react';
+import { Bot, Send, User, AlertTriangle, Search, MessageSquare, Linkedin, Twitter, Mail, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/use-language';
 import { Badge } from '@/components/ui/badge';
 import { useSite } from '@/hooks/use-site';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const labels = {
   es: {
     pageTitle: "Centro de Supervisión (CRM)",
     pageSubtitle: "Supervisa las conversaciones del equipo e interviene cuando sea necesario.",
     searchPlaceholder: "Buscar conversaciones...",
-    filterByChannel: "Filtrar por canal",
-    allChannels: "Todos los Canales",
+    allChannels: "Todos",
     noConversation: "Selecciona una conversación para empezar.",
     messagePlaceholder: "Escribe tu respuesta...",
     agent: "Alex Rider",
@@ -32,8 +30,7 @@ const labels = {
     pageTitle: "Supervision Center (CRM)",
     pageSubtitle: "Supervise team conversations and intervene when necessary.",
     searchPlaceholder: "Search conversations...",
-    filterByChannel: "Filter by channel",
-    allChannels: "All Channels",
+    allChannels: "All",
     noConversation: "Select a conversation to start.",
     messagePlaceholder: "Type your response...",
     agent: "Alex Rider",
@@ -46,8 +43,7 @@ const labels = {
     pageTitle: "Centre de Supervision (CRM)",
     pageSubtitle: "Supervisez les conversations de l'équipe et intervenez si nécessaire.",
     searchPlaceholder: "Rechercher des conversations...",
-    filterByChannel: "Filtrer par canal",
-    allChannels: "Tous les Canaux",
+    allChannels: "Tous",
     noConversation: "Sélectionnez une conversation pour commencer.",
     messagePlaceholder: "Écrivez votre réponse...",
     agent: "Alex Rider",
@@ -58,16 +54,17 @@ const labels = {
   }
 };
 
+const channelIcons: { [key: string]: React.ReactNode } = {
+    whatsapp: <MessageSquare className="text-green-500"/>,
+    messenger: <MessageSquare className="text-blue-600"/>,
+    instagram: <MessageSquare className="text-pink-500"/>,
+    linkedin: <Linkedin className="text-sky-700"/>,
+    twitter: <Twitter className="text-blue-400"/>,
+    email: <Mail className="text-gray-500"/>,
+};
+
 const getChannelIcon = (channel: string) => {
-    switch (channel) {
-        case 'whatsapp': return <MessageSquare className="text-green-500"/>;
-        case 'messenger': return <MessageSquare className="text-blue-600"/>;
-        case 'instagram': return <MessageSquare className="text-pink-500"/>;
-        case 'linkedin': return <Linkedin className="text-sky-700"/>;
-        case 'twitter': return <Twitter className="text-blue-400"/>;
-        case 'email': return <Mail className="text-gray-500"/>;
-        default: return <MessageSquare />;
-    }
+    return channelIcons[channel] || <MessageSquare />;
 }
 
 const conversations = [
@@ -118,20 +115,29 @@ export default function CrmPage() {
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input placeholder={t.searchPlaceholder} className="pl-8" />
                         </div>
-                        <Select value={channelFilter} onValueChange={setChannelFilter}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder={t.filterByChannel} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">{t.allChannels}</SelectItem>
-                                <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                                <SelectItem value="messenger">Messenger</SelectItem>
-                                <SelectItem value="instagram">Instagram</SelectItem>
-                                <SelectItem value="linkedin">LinkedIn</SelectItem>
-                                <SelectItem value="twitter">X (Twitter)</SelectItem>
-                                <SelectItem value="email">Email</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="flex gap-2 flex-wrap">
+                             <Button 
+                                variant={channelFilter === 'all' ? 'secondary' : 'ghost'} 
+                                size="sm" 
+                                onClick={() => setChannelFilter('all')}
+                                className="flex items-center gap-2"
+                            >
+                                <Inbox className="h-4 w-4" />
+                                {t.allChannels}
+                            </Button>
+                            {Object.keys(channelIcons).map(channel => (
+                                <Button 
+                                    key={channel}
+                                    variant={channelFilter === channel ? 'secondary' : 'ghost'} 
+                                    size="sm" 
+                                    onClick={() => setChannelFilter(channel)}
+                                    className="flex items-center gap-2"
+                                >
+                                    {getChannelIcon(channel)}
+                                    {channel === 'twitter' ? 'X' : channel.charAt(0).toUpperCase() + channel.slice(1)}
+                                </Button>
+                            ))}
+                        </div>
                     </div>
                     <ScrollArea className="flex-1">
                         {filteredConversations.map(convo => (
