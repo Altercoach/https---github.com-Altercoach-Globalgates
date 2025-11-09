@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, MessageSquare } from 'lucide-react';
+import { Bot, MessageSquare, Linkedin, Twitter } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import Image from 'next/image';
 
@@ -26,6 +26,8 @@ const labels = {
       telegram: { name: 'Telegram', description: 'Implementa tu agente en un bot de Telegram.' },
       webchat: { name: 'Web Chat (Sitio Web)', description: 'Añade un widget de chat a tu página.' },
       email: { name: 'Email', description: 'Responde a correos de soporte o ventas.' },
+      linkedin: { name: 'LinkedIn', description: 'Gestiona mensajes y perfiles B2B.' },
+      twitter: { name: 'X (Twitter)', description: 'Interactúa en tiempo real con tu comunidad.' },
     }
   },
   en: {
@@ -43,6 +45,8 @@ const labels = {
       telegram: { name: 'Telegram', description: 'Deploy your agent in a Telegram bot.' },
       webchat: { name: 'Web Chat (Website)', description: 'Add a chat widget to your page.' },
       email: { name: 'Email', description: 'Respond to support or sales emails.' },
+      linkedin: { name: 'LinkedIn', description: 'Manage B2B messages and profiles.' },
+      twitter: { name: 'X (Twitter)', description: 'Interact in real-time with your community.' },
     }
   },
   fr: {
@@ -60,14 +64,25 @@ const labels = {
       telegram: { name: 'Telegram', description: 'Déployez votre agent dans un bot Telegram.' },
       webchat: { name: 'Web Chat (Site Web)', description: 'Ajoutez un widget de chat à votre page.' },
       email: { name: 'Email', description: 'Répondez aux e-mails de support ou de vente.' },
+      linkedin: { name: 'LinkedIn', description: 'Gérez les messages et profils B2B.' },
+      twitter: { name: 'X (Twitter)', description: 'Interagissez en temps réel avec votre communauté.' },
     }
   }
 };
 
 
-type IntegrationId = 'whatsapp' | 'messenger' | 'instagram' | 'telegram' | 'webchat' | 'email';
+type IntegrationId = 'whatsapp' | 'messenger' | 'instagram' | 'telegram' | 'webchat' | 'email' | 'linkedin' | 'twitter';
 
-const channelIntegrations: IntegrationId[] = ['whatsapp', 'messenger', 'instagram', 'telegram', 'webchat', 'email'];
+const channelIntegrations: { id: IntegrationId; icon: React.ReactNode }[] = [
+    { id: 'whatsapp', icon: <MessageSquare /> },
+    { id: 'messenger', icon: <MessageSquare /> },
+    { id: 'instagram', icon: <MessageSquare /> },
+    { id: 'telegram', icon: <MessageSquare /> },
+    { id: 'webchat', icon: <MessageSquare /> },
+    { id: 'email', icon: <MessageSquare /> },
+    { id: 'linkedin', icon: <Linkedin /> },
+    { id: 'twitter', icon: <Twitter /> },
+];
 
 export default function IntegrationsPage() {
     const { toast } = useToast();
@@ -99,11 +114,11 @@ export default function IntegrationsPage() {
                     <CardDescription>{t.channelsDescription}</CardDescription>
                 </CardHeader>
                 <CardContent className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {channelIntegrations.map(id => {
+                    {channelIntegrations.map(({id, icon}) => {
                         const intl = t.integrations[id];
                         return (
                             <div key={id} className="p-4 border rounded-lg flex items-start gap-4">
-                                <MessageSquare className="h-6 w-6 text-muted-foreground mt-1"/>
+                                <div className="text-muted-foreground mt-1">{icon}</div>
                                 <div className="flex-1">
                                     <div className="flex items-center justify-between">
                                         <h3 className="font-semibold">{intl.name}</h3>
@@ -119,5 +134,3 @@ export default function IntegrationsPage() {
         </div>
     );
 }
-
-    

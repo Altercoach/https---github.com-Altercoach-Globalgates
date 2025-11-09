@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, ShieldOff, KeyRound, Linkedin, Twitter } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
@@ -38,6 +38,8 @@ const labels = {
     whatsappApiKey: "WhatsApp API Key",
     instagramApiKey: "Instagram API Key",
     messengerApiKey: "Facebook Messenger API Key",
+    linkedinApiKey: "LinkedIn API Key",
+    twitterApiKey: "X (Twitter) API Key",
     supportEmail: "Email de Soporte/Ventas",
     exclusionTitle: "Reglas de Exclusión",
     exclusionDesc: "Añade emails o teléfonos (uno por línea) de contactos que el agente NUNCA debe atender (ej. proveedores, familia).",
@@ -65,6 +67,8 @@ const labels = {
     whatsappApiKey: "WhatsApp API Key",
     instagramApiKey: "Instagram API Key",
     messengerApiKey: "Facebook Messenger API Key",
+    linkedinApiKey: "LinkedIn API Key",
+    twitterApiKey: "X (Twitter) API Key",
     supportEmail: "Support/Sales Email",
     exclusionTitle: "Exclusion Rules",
     exclusionDesc: "Add emails or phone numbers (one per line) of contacts the agent should NEVER attend to (e.g., suppliers, family).",
@@ -92,6 +96,8 @@ const labels = {
     whatsappApiKey: "Clé API WhatsApp",
     instagramApiKey: "Clé API Instagram",
     messengerApiKey: "Clé API Facebook Messenger",
+    linkedinApiKey: "Clé API LinkedIn",
+    twitterApiKey: "Clé API X (Twitter)",
     supportEmail: "Email de Support/Ventes",
     exclusionTitle: "Règles d'Exclusion",
     exclusionDesc: "Ajoutez les e-mails ou numéros de téléphone (un par ligne) des contacts que l'agent ne doit JAMAIS prendre en charge (ex: fournisseurs, famille).",
@@ -128,6 +134,8 @@ export default function AgentConfigPage() {
     const [whatsappKey, setWhatsappKey] = useState('wh_xxxxxxxx');
     const [instagramKey, setInstagramKey] = useState('ig_xxxxxxxx');
     const [messengerKey, setMessengerKey] = useState('ms_xxxxxxxx');
+    const [linkedinKey, setLinkedinKey] = useState('li_xxxxxxxx');
+    const [twitterKey, setTwitterKey] = useState('tw_xxxxxxxx');
     const [supportEmail, setSupportEmail] = useState('atencion@goldenkey.website');
     const [exclusionList, setExclusionList] = useState('proveedor@email.com\n+1234567890');
 
@@ -246,7 +254,7 @@ export default function AgentConfigPage() {
                     <CardDescription>{t.integrationsDesc}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="whatsapp-api">{t.whatsappApiKey}</Label>
                             <Input id="whatsapp-api" type="password" value={whatsappKey} onChange={(e) => setWhatsappKey(e.target.value)} />
@@ -258,6 +266,14 @@ export default function AgentConfigPage() {
                          <div className="space-y-2">
                             <Label htmlFor="messenger-api">{t.messengerApiKey}</Label>
                             <Input id="messenger-api" type="password" value={messengerKey} onChange={(e) => setMessengerKey(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="linkedin-api" className="flex items-center gap-2"><Linkedin className="h-4 w-4" /> {t.linkedinApiKey}</Label>
+                            <Input id="linkedin-api" type="password" value={linkedinKey} onChange={(e) => setLinkedinKey(e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="twitter-api" className="flex items-center gap-2"><Twitter className="h-4 w-4" /> {t.twitterApiKey}</Label>
+                            <Input id="twitter-api" type="password" value={twitterKey} onChange={(e) => setTwitterKey(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="support-email">{t.supportEmail}</Label>
@@ -286,5 +302,3 @@ export default function AgentConfigPage() {
         </div>
     );
 }
-
-    

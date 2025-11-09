@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { KeyRound, Settings, Facebook, BarChart } from 'lucide-react';
+import { KeyRound, Settings, Facebook, BarChart3, LineChart } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/hooks/use-language';
 
@@ -19,8 +19,10 @@ const labels = {
     integrationsDescription: "Introduce tus claves de API para conectar tus plataformas y ver las métricas en tu dashboard. Estos datos son confidenciales y se almacenan de forma segura.",
     fbName: "Facebook / Meta Ads",
     fbDescription: "Conecta tu cuenta de Meta Ads para obtener métricas de tus campañas.",
-    gaName: "Google Analytics",
-    gaDescription: "Integra Google Analytics (GA4) para visualizar el tráfico y comportamiento.",
+    gaName: "Google Analytics 4",
+    gaDescription: "Integra GA4 para visualizar el tráfico y comportamiento.",
+    seoName: "Herramientas SEO (ej. SEMrush)",
+    seoDescription: "Conecta tu API de herramientas SEO para análisis de competencia.",
     apiKeyLabel: "API Key / ID de Medición",
     apiKeyPlaceholder: "Introduce tu clave aquí",
     accountSettingsTitle: "Configuración de la Cuenta",
@@ -39,8 +41,10 @@ const labels = {
     integrationsDescription: "Enter your API keys to connect your platforms and see metrics on your dashboard. This data is confidential and stored securely.",
     fbName: "Facebook / Meta Ads",
     fbDescription: "Connect your Meta Ads account to get metrics from your campaigns.",
-    gaName: "Google Analytics",
-    gaDescription: "Integrate Google Analytics (GA4) to visualize traffic and behavior.",
+    gaName: "Google Analytics 4",
+    gaDescription: "Integrate GA4 to visualize traffic and behavior.",
+    seoName: "SEO Tools (e.g., SEMrush)",
+    seoDescription: "Connect your SEO tool API for competitive analysis.",
     apiKeyLabel: "API Key / Measurement ID",
     apiKeyPlaceholder: "Enter your key here",
     accountSettingsTitle: "Account Settings",
@@ -59,8 +63,10 @@ const labels = {
     integrationsDescription: "Entrez vos clés API pour connecter vos plateformes et voir les métriques sur votre tableau de bord. Ces données sont confidentielles et stockées en toute sécurité.",
     fbName: "Facebook / Meta Ads",
     fbDescription: "Connectez votre compte Meta Ads pour obtenir les métriques de vos campagnes.",
-    gaName: "Google Analytics",
-    gaDescription: "Intégrez Google Analytics (GA4) pour visualiser le trafic et le comportement.",
+    gaName: "Google Analytics 4",
+    gaDescription: "Intégrez GA4 pour visualiser le trafic et le comportement.",
+    seoName: "Outils SEO (ex: SEMrush)",
+    seoDescription: "Connectez votre API d'outil SEO pour l'analyse concurrentielle.",
     apiKeyLabel: "Clé API / ID de Mesure",
     apiKeyPlaceholder: "Entrez votre clé ici",
     accountSettingsTitle: "Paramètres du Compte",
@@ -76,7 +82,7 @@ const labels = {
 
 
 type Integration = {
-    id: 'facebook' | 'google';
+    id: 'facebook' | 'google' | 'seo';
     name: string;
     description: string;
     apiKey: string;
@@ -90,7 +96,8 @@ export default function SettingsPage() {
 
     const initialIntegrations: Integration[] = [
         { id: 'facebook', name: t.fbName, description: t.fbDescription, apiKey: '', icon: <Facebook /> },
-        { id: 'google', name: t.gaName, description: t.gaDescription, apiKey: '', icon: <BarChart /> },
+        { id: 'google', name: t.gaName, description: t.gaDescription, apiKey: '', icon: <BarChart3 /> },
+        { id: 'seo', name: t.seoName, description: t.seoDescription, apiKey: '', icon: <LineChart /> },
     ];
 
     const [integrations, setIntegrations] = useState<Integration[]>(initialIntegrations);
