@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, Save, BookOpen, Beaker } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, Save, BookOpen, Beaker } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -24,12 +24,13 @@ import { useLanguage } from '@/hooks/use-language';
 
 const labels = {
   es: {
+    admin: "Admin del Negocio",
     brand: "Marca",
     solutions: "Soluciones",
     plans: "Planes y Servicios",
     questionnaires: "Cuestionarios",
+    teamLab: "Team Lab",
     integrations: "Integraciones",
-    admin: "Admin",
     crm: "CRM",
     instructions: "Instrucciones",
     customerView: "Vista Cliente",
@@ -39,15 +40,15 @@ const labels = {
     redirecting: "Redirigiendo...",
     loadingOffice: "Cargando Oficina...",
     reviewAndSave: "Revisar y Guardar Cambios",
-    teamLab: "Team Lab"
   },
   en: {
+    admin: "Business Admin",
     brand: "Brand",
     solutions: "Solutions",
     plans: "Plans & Services",
     questionnaires: "Questionnaires",
+    teamLab: "Team Lab",
     integrations: "Integrations",
-    admin: "Admin",
     crm: "CRM",
     instructions: "Instructions",
     customerView: "Customer View",
@@ -57,15 +58,15 @@ const labels = {
     redirecting: "Redirecting...",
     loadingOffice: "Loading Office...",
     reviewAndSave: "Review & Save Changes",
-    teamLab: "Team Lab"
   },
   fr: {
+    admin: "Admin d'Entreprise",
     brand: "Marque",
     solutions: "Solutions",
     plans: "Forfaits et Services",
     questionnaires: "Questionnaires",
+    teamLab: "Labo d'Équipe",
     integrations: "Intégrations",
-    admin: "Admin",
     crm: "CRM",
     instructions: "Instructions",
     customerView: "Vue Client",
@@ -75,7 +76,6 @@ const labels = {
     redirecting: "Redirection...",
     loadingOffice: "Chargement du bureau...",
     reviewAndSave: "Réviser et Enregistrer",
-    teamLab: "Labo d'Équipe"
   }
 };
 
@@ -100,13 +100,13 @@ export default function MyOfficeLayout({
   }, [auth, router]);
 
   const menuItems = [
+    { href: '/myoffice/admin', label: t.admin, icon: <Users />},
     { href: '/myoffice/brand', label: t.brand, icon: <Store /> },
     { href: '/myoffice/services', label: t.solutions, icon: <LayoutGrid /> },
     { href: '/myoffice/products', label: t.plans, icon: <ShoppingBag /> },
     { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
     { href: '/myoffice/team-lab', label: t.teamLab, icon: <Beaker /> },
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle />},
-    { href: '/myoffice/admin', label: t.admin, icon: <ShieldCheck />},
     { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
     { href: '/myoffice/instructions', label: t.instructions, icon: <BookOpen /> },
   ];
