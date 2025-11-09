@@ -313,3 +313,5 @@ export default function CustomerDetailPage({ params }: { params: { id: string } 
     </div>
   );
 }
+
+    
