@@ -7,7 +7,7 @@ import { ArrowLeft, Bot, Download, Loader2, EyeOff, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { generateAgentPrompt, GenerateAgentPromptOutput } from '@/ai/flows/generate-agent-prompt';
-import { useState, useEffect, useMemo, use } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/hooks/use-language';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -328,5 +328,3 @@ export default function QuestionnaireResponsePage({ params }: { params: { id: st
     </div>
   );
 }
-
-    
