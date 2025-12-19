@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2, Zap, Image as ImageIcon } from 'lucide-react';
+import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2, Zap, Image as ImageIcon, ExternalLink, ThumbsUp, RefreshCw, BarChart2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
@@ -20,7 +20,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import NextImage from 'next/image';
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 const initialProjects: Project[] = [
   {
@@ -67,7 +74,10 @@ const initialProjects: Project[] = [
   }
 ];
 
+// --- SIMULATOR DIALOGS ---
+
 const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
+    // ... (This component remains largely the same)
     const [isLoading, setIsLoading] = useState(false);
     const [analysis, setAnalysis] = useState<AnalyzeBusinessEvaluationOutput | null>(null);
     const { toast } = useToast();
@@ -82,6 +92,7 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
                 targetLanguage: language.code,
             });
             setAnalysis(result);
+            toast({ title: "Análisis completado", description: "La IA ha generado el análisis FODA y las recomendaciones." });
         } catch (error) {
             console.error("Analysis failed", error);
             toast({
@@ -102,14 +113,14 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-4xl">
-                <DialogHeader>
+                 <DialogHeader>
                     <DialogTitle>Simulador: {phase.name}</DialogTitle>
                     <DialogDescription>
                         Revisando el cliente: {project.customerName}. Aquí puedes simular la ejecución de la IA y auditar la calidad del resultado.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[60vh] overflow-y-auto">
-                    {/* Input Data */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[60vh] overflow-y-auto">
+                     {/* Input Data */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Entrada: Respuestas del Cuestionario (Ejemplo)</h4>
                         <Card className="bg-muted/50">
@@ -129,7 +140,7 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
                         </Card>
                     </div>
 
-                    {/* AI Output */}
+                     {/* AI Output */}
                     <div className="space-y-4">
                          <h4 className="font-semibold">Salida: Análisis de IA</h4>
                         <Card>
@@ -161,32 +172,22 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
 }
 
 const ContentScheduleDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
+    // ... (This component is now visually improved)
     const [isLoading, setIsLoading] = useState(false);
     const [schedule, setSchedule] = useState<GenerateContentScheduleOutput | null>(null);
     const { toast } = useToast();
 
-    const clientBusinessDescription = `
-    Cliente: ${project.customerName}
-    Plan Contratado: Dúo Conexión VIP
-    Análisis Estratégico (resumen): El cliente es una cafetería de especialidad con un producto estrella (cold brew) y una fuerte oportunidad en el mercado local, pero con baja presencia de marca.
-    Instrucciones del Equipo de Marketing: Crear una parrilla de contenido para Instagram y Facebook. El objetivo es aumentar el brand awareness y generar tráfico a la tienda física. Enfocarse en la calidad del café, el ambiente del local y promociones locales. El tono debe ser cercano y amigable.
-    `;
+    const clientBusinessDescription = `Cliente: ${project.customerName}, Plan: Dúo Conexión VIP. Resumen: Cafetería de especialidad con producto estrella (cold brew) pero baja presencia de marca. Objetivo: Aumentar brand awareness y tráfico a tienda física.`;
 
     const handleRunGenerator = async () => {
         setIsLoading(true);
         setSchedule(null);
         try {
-            const result = await generateContentSchedule({ 
-                clientBusiness: clientBusinessDescription,
-            });
+            const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
             setSchedule(result);
+            toast({ title: "Parrilla generada", description: "Se ha creado el calendario de contenido mensual." });
         } catch (error) {
-            console.error("Content schedule generation failed", error);
-            toast({
-              variant: "destructive",
-              title: "Error de Generación",
-              description: "La IA no pudo generar la parrilla de contenido.",
-            });
+            toast({ variant: "destructive", title: "Error de Generación" });
         } finally {
             setIsLoading(false);
         }
@@ -200,42 +201,51 @@ const ContentScheduleDialog = ({ project, phase }: { project: Project, phase: Pr
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-4xl">
-                <DialogHeader>
+                 <DialogHeader>
                     <DialogTitle>Simulador: {phase.name}</DialogTitle>
-                    <DialogDescription>
-                        Revisando el cliente: {project.customerName}. Simula la generación de la parrilla de contenido mensual.
-                    </DialogDescription>
+                    <DialogDescription>Revisando el cliente: {project.customerName}. Simula la generación de la parrilla de contenido mensual.</DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[70vh] overflow-y-auto">
-                    {/* Input Data */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Entrada: Perfil del Cliente e Instrucciones</h4>
-                        <Card className="bg-muted/50">
-                            <CardContent className="p-4 text-xs whitespace-pre-wrap font-mono">
-                                {clientBusinessDescription.trim()}
-                            </CardContent>
-                        </Card>
+                        <Card className="bg-muted/50"><CardContent className="p-4 text-xs font-mono">{clientBusinessDescription}</CardContent></Card>
                     </div>
-
-                    {/* AI Output */}
                     <div className="space-y-4">
-                        <h4 className="font-semibold">Salida: Parrilla de Contenido Generada por IA</h4>
+                        <h4 className="font-semibold">Salida: Parrilla de Contenido Generada</h4>
                         <Card>
                             <CardHeader>
                                 <Button onClick={handleRunGenerator} disabled={isLoading}>
-                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando Parrilla...</> : <><Bot className="mr-2 h-4 w-4" /> Ejecutar Generador de Contenido</>}
+                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando...</> : <><Bot className="mr-2 h-4 w-4" /> Generar Parrilla</>}
                                 </Button>
                             </CardHeader>
                             <CardContent>
-                                {isLoading && <p className="text-sm text-muted-foreground">La IA está creando el calendario...</p>}
+                                {isLoading && <p>La IA está creando el calendario...</p>}
                                 {schedule && (
-                                    <ScrollArea className="h-[400px] p-4 border rounded-md">
-                                        <pre className="text-xs whitespace-pre-wrap font-mono">
-                                            {JSON.stringify(schedule.posts, null, 2)}
-                                        </pre>
-                                    </ScrollArea>
+                                  <ScrollArea className="h-[400px] border rounded-md">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>#</TableHead>
+                                                <TableHead>Formato</TableHead>
+                                                <TableHead>Tema</TableHead>
+                                                <TableHead>Copy</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {schedule.posts.map(post => (
+                                                <TableRow key={post.postNumber}>
+                                                    <TableCell>{post.postNumber}</TableCell>
+                                                    <TableCell>{post.format}</TableCell>
+                                                    <TableCell>{post.topic}</TableCell>
+                                                    <TableCell className="text-xs">{post.copyOut}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                  </ScrollArea>
                                 )}
                             </CardContent>
+                            {schedule && <CardFooter><Button className="w-full"><ThumbsUp className="mr-2"/>Guardar Parrilla Aprobada</Button></CardFooter>}
                         </Card>
                     </div>
                 </div>
@@ -245,44 +255,41 @@ const ContentScheduleDialog = ({ project, phase }: { project: Project, phase: Pr
 }
 
 const ImageGenerationDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
-    const { toast } = useToast();
+    // ... (This is the new image generation simulator)
     const [isLoading, setIsLoading] = useState(false);
     const [schedule, setSchedule] = useState<GenerateContentScheduleOutput | null>(null);
+    const [selectedPost, setSelectedPost] = useState<ContentPost | null>(null);
     const [imageOutput, setImageOutput] = useState<GenerateImageOutput | null>(null);
-
-    const clientBusinessDescription = `Cliente: ${project.customerName}, cafetería de especialidad. Tono: cercano y amigable.`;
+    const { toast } = useToast();
 
     const getSchedule = async () => {
-        if(schedule) return; // Don't re-fetch if we already have it
+        if (schedule) return;
         setIsLoading(true);
         try {
-            const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
+            const result = await generateContentSchedule({ clientBusiness: `Cliente: ${project.customerName}` });
             setSchedule(result);
+            if (result.posts.length > 0) setSelectedPost(result.posts[0]);
         } catch (error) {
-            toast({ title: "Error al generar la parrilla", variant: "destructive" });
+            toast({ title: "Error al cargar la parrilla", variant: "destructive" });
         } finally {
             setIsLoading(false);
         }
     }
 
     const handleRunImageGenerator = async () => {
-        if (!schedule || !schedule.posts.length) {
-            toast({ title: "Primero genera una parrilla de contenido", variant: "destructive" });
-            return;
-        }
+        if (!selectedPost) return;
         setIsLoading(true);
         setImageOutput(null);
         try {
-            const firstPost = schedule.posts[0];
-            const result = await generateImageFromPrompt({ creativeBrief: firstPost.copyIn });
+            const result = await generateImageFromPrompt({ creativeBrief: selectedPost.copyIn, aspectRatio: '1:1' });
             setImageOutput(result);
+            toast({ title: "Imagen generada con éxito" });
         } catch (error) {
             toast({ title: "Error al generar la imagen", variant: "destructive" });
         } finally {
             setIsLoading(false);
         }
     }
-
 
     return (
         <Dialog onOpenChange={(open) => open && getSchedule()}>
@@ -294,44 +301,109 @@ const ImageGenerationDialog = ({ project, phase }: { project: Project, phase: Pr
             <DialogContent className="sm:max-w-4xl">
                  <DialogHeader>
                     <DialogTitle>Simulador: {phase.name}</DialogTitle>
-                    <DialogDescription>
-                        Generando una imagen para el primer post del cliente: {project.customerName}.
-                    </DialogDescription>
+                    <DialogDescription>Genera una imagen para un post del cliente: {project.customerName}.</DialogDescription>
                 </DialogHeader>
-
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4 max-h-[70vh] overflow-y-auto">
-                    {/* Input Data */}
                     <div className="space-y-4">
-                        <h4 className="font-semibold">Entrada: Brief Creativo del Post #1</h4>
+                        <h4 className="font-semibold">Entrada: Posts de la Parrilla</h4>
                         <Card className="bg-muted/50">
-                            <CardContent className="p-4 text-sm font-mono h-48">
-                                {isLoading && !schedule && "Cargando parrilla para obtener brief..."}
-                                {schedule ? schedule.posts[0].copyIn : "No se ha generado la parrilla de contenido."}
+                            <CardContent className="p-2">
+                                <ScrollArea className="h-64">
+                                    <div className="space-y-2 p-2">
+                                    {schedule?.posts.map(post => (
+                                        <Button key={post.postNumber} variant={selectedPost?.postNumber === post.postNumber ? 'secondary' : 'ghost'} onClick={() => setSelectedPost(post)} className="w-full justify-start h-auto text-left">
+                                            <div>
+                                                <p className="font-semibold">Post #{post.postNumber}: {post.topic}</p>
+                                                <p className="text-xs text-muted-foreground">{post.copyIn.substring(0, 50)}...</p>
+                                            </div>
+                                        </Button>
+                                    ))}
+                                    </div>
+                                </ScrollArea>
                             </CardContent>
                         </Card>
                     </div>
-
-                    {/* AI Output */}
                     <div className="space-y-4">
                         <h4 className="font-semibold">Salida: Imagen Generada por IA</h4>
                         <Card>
                             <CardHeader>
-                                <Button onClick={handleRunImageGenerator} disabled={isLoading || !schedule}>
-                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando Imagen...</> : <><Bot className="mr-2 h-4 w-4" /> Generar Imagen</>}
+                                <Button onClick={handleRunImageGenerator} disabled={isLoading || !selectedPost}>
+                                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generando...</> : <><Bot className="mr-2 h-4 w-4" /> Generar Imagen para Post #{selectedPost?.postNumber}</>}
                                 </Button>
                             </CardHeader>
-                            <CardContent className="min-h-48 flex items-center justify-center">
-                                {isLoading && <p className="text-sm text-muted-foreground">La IA está dibujando...</p>}
-                                {imageOutput?.imageUrl && (
-                                   <div className="space-y-2 text-center">
-                                      <NextImage src={imageOutput.imageUrl} alt="Generated image" width={256} height={256} className="rounded-lg border"/>
-                                      <p className="text-xs text-muted-foreground"><strong>Prompt usado:</strong> {imageOutput.refinedPrompt}</p>
+                            <CardContent className="min-h-64 flex flex-col items-center justify-center text-center">
+                                {isLoading ? <Loader2 className="h-8 w-8 animate-spin text-muted-foreground"/> :
+                                imageOutput?.imageUrl ? (
+                                   <div className="space-y-2">
+                                      <NextImage src={imageOutput.imageUrl || `https://picsum.photos/seed/${project.id}${selectedPost?.postNumber}/512`} alt="Generated image" width={256} height={256} className="rounded-lg border"/>
+                                      <p className="text-xs text-muted-foreground max-w-xs mx-auto"><strong>Prompt usado:</strong> {imageOutput.refinedPrompt}</p>
                                    </div>
-                                )}
+                                ) : <p className="text-sm text-muted-foreground">Selecciona un post y genera su imagen.</p>}
                             </CardContent>
+                             {imageOutput && <CardFooter className="flex justify-center gap-2"><Button><ThumbsUp className="mr-2"/>Aprobar</Button><Button variant="outline"><RefreshCw className="mr-2"/>Regenerar</Button></CardFooter>}
                         </Card>
                     </div>
                 </div>
+            </DialogContent>
+        </Dialog>
+    )
+};
+
+const OptimizationDialog = ({ project, phase }: { project: Project, phase: ProjectPhase }) => {
+    // ... (This is the new optimization simulator)
+    const chartData = [ { month: 'A', conversion: 4.5 }, { month: 'B', conversion: 5.2 } ];
+    const chartConfig = { conversion: { label: 'Conversión', color: 'hsl(var(--chart-1))' } } satisfies ChartConfig;
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="w-full text-xs justify-start">
+                    <BarChart2 className="mr-2 h-3 w-3" /> Ejecutar y Revisar
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl">
+                 <DialogHeader>
+                    <DialogTitle>Simulador: {phase.name}</DialogTitle>
+                    <DialogDescription>Simula el análisis de rendimiento de campaña y la generación de insights para {project.customerName}.</DialogDescription>
+                </DialogHeader>
+                 <div className="py-4 space-y-6">
+                    <Card>
+                        <CardHeader><CardTitle className="text-base">Análisis de Performance (Simulado)</CardTitle></CardHeader>
+                        <CardContent className="grid grid-cols-3 gap-4 text-center">
+                            <div><p className="text-2xl font-bold">120,450</p><p className="text-xs text-muted-foreground">Impresiones</p></div>
+                            <div><p className="text-2xl font-bold">3,612</p><p className="text-xs text-muted-foreground">Clics</p></div>
+                            <div><p className="text-2xl font-bold">3.0%</p><p className="text-xs text-muted-foreground">CTR</p></div>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader><CardTitle className="text-base">Simulación de Prueba A/B</CardTitle></CardHeader>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <p className="text-sm font-semibold">Copy A: "Descubre nuestro Cold Brew artesanal." - <Badge variant="destructive">Perdedor (4.5% CVR)</Badge></p>
+                                <p className="text-sm font-semibold">Copy B: "El Cold Brew que te cambiará la vida. ¡Pruébalo hoy!" - <Badge className="bg-green-500 text-white">Ganador (5.2% CVR)</Badge></p>
+                            </div>
+                            <ChartContainer config={chartConfig} className="h-[100px] w-full">
+                                <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ left: -20, right: 20 }}>
+                                    <XAxis type="number" dataKey="conversion" hide />
+                                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                                    <Bar dataKey="conversion" layout="vertical" radius={5}>
+                                         {chartData.map((_, index) => <NextImage key={index} fill={index === 0 ? "hsl(var(--chart-2))" : "hsl(var(--chart-1))"} />)}
+                                    </Bar>
+                                </BarChart>
+                            </ChartContainer>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader><CardTitle className="text-base">Insights y Recomendaciones de IA</CardTitle></CardHeader>
+                        <CardContent>
+                             <ul className="list-disc list-inside space-y-1 text-sm">
+                                <li>**Optimizar:** Incrementar presupuesto en campañas de video, mostraron 15% más engagement.</li>
+                                <li>**Enfocar:** El segmento de 25-34 años tuvo la tasa de conversión más alta. Crear audiencia lookalike.</li>
+                                <li>**Sugerencia:** Lanzar promoción de "2x1 en Cold Brew" los fines de semana para capitalizar el tráfico.</li>
+                            </ul>
+                        </CardContent>
+                    </Card>
+                 </div>
             </DialogContent>
         </Dialog>
     )
@@ -366,6 +438,8 @@ const PhaseCard = ({ project, phase, isCurrent, isCompleted }: { project: Projec
                 return <ContentScheduleDialog project={project} phase={phase} />;
             case 'execution':
                 return <ImageGenerationDialog project={project} phase={phase} />;
+             case 'closure':
+                return <OptimizationDialog project={project} phase={phase} />;
             default:
                  return (
                     <Button variant="ghost" size="sm" className="w-full text-xs justify-start text-muted-foreground" disabled>
@@ -487,3 +561,4 @@ export default function TeamLabPage() {
         </div>
     );
 }
+
