@@ -23,8 +23,6 @@ const labels = {
     fbDescription: "Conecta tu cuenta de Meta Ads para obtener métricas de tus campañas.",
     gaName: "Google Analytics 4",
     gaDescription: "Integra GA4 para visualizar el tráfico y comportamiento.",
-    seoName: "Herramientas SEO (ej. SEMrush)",
-    seoDescription: "Conecta tu API de herramientas SEO para análisis de competencia.",
     apiKeyLabel: "API Key / ID de Medición",
     apiKeyPlaceholder: "Introduce tu clave aquí",
     accountSettingsTitle: "Configuración de la Cuenta",
@@ -37,7 +35,6 @@ const labels = {
     toastSuccessDescription: "Tus cambios han sido guardados correctamente.",
     getMetaKeyHelp: "Obtén un token de acceso para la API de Marketing de Meta",
     getGA4KeyHelp: "Encuentra tu ID de Medición de Google Analytics",
-    getSeoKeyHelp: "Consulta la documentación de tu herramienta para la API Key"
   },
   en: {
     pageTitle: "Settings & Integrations",
@@ -48,8 +45,6 @@ const labels = {
     fbDescription: "Connect your Meta Ads account to get metrics from your campaigns.",
     gaName: "Google Analytics 4",
     gaDescription: "Integrate GA4 to visualize traffic and behavior.",
-    seoName: "SEO Tools (e.g., SEMrush)",
-    seoDescription: "Connect your SEO tool API for competitive analysis.",
     apiKeyLabel: "API Key / Measurement ID",
     apiKeyPlaceholder: "Enter your key here",
     accountSettingsTitle: "Account Settings",
@@ -62,7 +57,6 @@ const labels = {
     toastSuccessDescription: "Your changes have been saved successfully.",
     getMetaKeyHelp: "Get an access token for the Meta Marketing API",
     getGA4KeyHelp: "Find your Google Analytics Measurement ID",
-    getSeoKeyHelp: "Check your tool's documentation for the API Key"
   },
   fr: {
     pageTitle: "Paramètres et Intégrations",
@@ -73,8 +67,6 @@ const labels = {
     fbDescription: "Connectez votre compte Meta Ads pour obtenir les métriques de vos campagnes.",
     gaName: "Google Analytics 4",
     gaDescription: "Intégrez GA4 pour visualiser le trafic et le comportement.",
-    seoName: "Outils SEO (ex: SEMrush)",
-    seoDescription: "Connectez votre API d'outil SEO pour l'analyse concurrentielle.",
     apiKeyLabel: "Clé API / ID de Mesure",
     apiKeyPlaceholder: "Entrez votre clé ici",
     accountSettingsTitle: "Paramètres du Compte",
@@ -87,12 +79,11 @@ const labels = {
     toastSuccessDescription: "Vos modifications ont été enregistrées avec succès.",
     getMetaKeyHelp: "Obtenez un jeton d'accès pour l'API Marketing de Meta",
     getGA4KeyHelp: "Trouvez votre ID de mesure Google Analytics",
-    getSeoKeyHelp: "Consultez la documentation de votre outil pour la clé API"
   }
 };
 
 
-type IntegrationId = 'facebook' | 'google' | 'seo';
+type IntegrationId = 'facebook' | 'google';
 
 type Integration = {
     id: IntegrationId;
@@ -112,7 +103,6 @@ export default function SettingsPage() {
     const initialIntegrations: Integration[] = [
         { id: 'facebook', name: t.fbName, description: t.fbDescription, apiKey: '', icon: <Facebook />, helpText: t.getMetaKeyHelp, helpUrl: "https://developers.facebook.com/docs/marketing-api/tokens" },
         { id: 'google', name: t.gaName, description: t.gaDescription, apiKey: '', icon: <BarChart3 />, helpText: t.getGA4KeyHelp, helpUrl: "https://support.google.com/analytics/answer/10089681" },
-        { id: 'seo', name: t.seoName, description: t.seoDescription, apiKey: '', icon: <LineChart />, helpText: t.getSeoKeyHelp, helpUrl: "https://www.semrush.com/api-docs/" },
     ];
 
     const [integrations, setIntegrations] = useState<Integration[]>(initialIntegrations);
