@@ -23,7 +23,7 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       "en": "Hire marketing campaigns, sales funnels, automations, and AI agents at your service 24/7.",
       "fr": "Engagez des campagnes marketing, des entonnoirs de vente, des automatisations et des agents IA à votre service 24/7."
     },
-    "heroImage": "https://picsum.photos/seed/1/1200/800",
+    "heroImage": "https://i.pravatar.cc/150?u=a042581f4e29026704d",
     "colors": {
       "gold": "#d4af37",
       "ink": "#0f172a",
@@ -425,3 +425,5 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     }
   ]
 };
+
+  
