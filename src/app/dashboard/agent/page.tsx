@@ -156,12 +156,12 @@ export default function CustomerAgentConfigPage() {
 
     const ApiKeyInput = ({ id, label, value, onChange, disabled, helpText, helpUrl }: { id: string; label: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; disabled: boolean; helpText: string; helpUrl: string; }) => (
         <div className={`space-y-2 ${disabled ? 'opacity-50' : ''}`}>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between">
                 <Label htmlFor={id} className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{label}</Label>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                           <Link href={helpUrl} target="_blank" tabIndex={-1}>
+                           <Link href={helpUrl} target="_blank" tabIndex={-1} className={disabled ? 'pointer-events-none' : ''}>
                                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help"/>
                            </Link>
                         </TooltipTrigger>

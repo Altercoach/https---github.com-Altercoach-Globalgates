@@ -7,9 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { KeyRound, Settings, Facebook, BarChart3, LineChart } from 'lucide-react';
+import { KeyRound, Settings, Facebook, BarChart3, LineChart, HelpCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useLanguage } from '@/hooks/use-language';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import Link from 'next/link';
 
 const labels = {
   es: {
@@ -32,7 +34,10 @@ const labels = {
     newPasswordPlaceholder: "Dejar en blanco para no cambiar",
     saveButton: "Guardar Cambios",
     toastSuccessTitle: "¡Configuración guardada!",
-    toastSuccessDescription: "Tus cambios han sido guardados correctamente."
+    toastSuccessDescription: "Tus cambios han sido guardados correctamente.",
+    getMetaKeyHelp: "Obtén un token de acceso para la API de Marketing de Meta",
+    getGA4KeyHelp: "Encuentra tu ID de Medición de Google Analytics",
+    getSeoKeyHelp: "Consulta la documentación de tu herramienta para la API Key"
   },
   en: {
     pageTitle: "Settings & Integrations",
@@ -54,7 +59,10 @@ const labels = {
     newPasswordPlaceholder: "Leave blank to not change",
     saveButton: "Save Changes",
     toastSuccessTitle: "Settings saved!",
-    toastSuccessDescription: "Your changes have been saved successfully."
+    toastSuccessDescription: "Your changes have been saved successfully.",
+    getMetaKeyHelp: "Get an access token for the Meta Marketing API",
+    getGA4KeyHelp: "Find your Google Analytics Measurement ID",
+    getSeoKeyHelp: "Check your tool's documentation for the API Key"
   },
   fr: {
     pageTitle: "Paramètres et Intégrations",
@@ -76,17 +84,24 @@ const labels = {
     newPasswordPlaceholder: "Laisser vide pour ne pas changer",
     saveButton: "Enregistrer les Modifications",
     toastSuccessTitle: "Paramètres enregistrés !",
-    toastSuccessDescription: "Vos modifications ont été enregistrées avec succès."
+    toastSuccessDescription: "Vos modifications ont été enregistrées avec succès.",
+    getMetaKeyHelp: "Obtenez un jeton d'accès pour l'API Marketing de Meta",
+    getGA4KeyHelp: "Trouvez votre ID de mesure Google Analytics",
+    getSeoKeyHelp: "Consultez la documentation de votre outil pour la clé API"
   }
 };
 
 
+type IntegrationId = 'facebook' | 'google' | 'seo';
+
 type Integration = {
-    id: 'facebook' | 'google' | 'seo';
+    id: IntegrationId;
     name: string;
     description: string;
     apiKey: string;
     icon: React.ReactNode;
+    helpText: string;
+    helpUrl: string;
 };
 
 export default function SettingsPage() {
@@ -95,16 +110,16 @@ export default function SettingsPage() {
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
     const initialIntegrations: Integration[] = [
-        { id: 'facebook', name: t.fbName, description: t.fbDescription, apiKey: '', icon: <Facebook /> },
-        { id: 'google', name: t.gaName, description: t.gaDescription, apiKey: '', icon: <BarChart3 /> },
-        { id: 'seo', name: t.seoName, description: t.seoDescription, apiKey: '', icon: <LineChart /> },
+        { id: 'facebook', name: t.fbName, description: t.fbDescription, apiKey: '', icon: <Facebook />, helpText: t.getMetaKeyHelp, helpUrl: "https://developers.facebook.com/docs/marketing-api/tokens" },
+        { id: 'google', name: t.gaName, description: t.gaDescription, apiKey: '', icon: <BarChart3 />, helpText: t.getGA4KeyHelp, helpUrl: "https://support.google.com/analytics/answer/10089681" },
+        { id: 'seo', name: t.seoName, description: t.seoDescription, apiKey: '', icon: <LineChart />, helpText: t.getSeoKeyHelp, helpUrl: "https://www.semrush.com/api-docs/" },
     ];
 
     const [integrations, setIntegrations] = useState<Integration[]>(initialIntegrations);
     const [email, setEmail] = useState('demo@cliente.com');
     const [password, setPassword] = useState('');
 
-    const handleApiKeyChange = (id: Integration['id'], value: string) => {
+    const handleApiKeyChange = (id: IntegrationId, value: string) => {
         setIntegrations(prev => prev.map(int => int.id === id ? { ...int, apiKey: value } : int));
     };
 
@@ -133,7 +148,21 @@ export default function SettingsPage() {
                             </div>
                             <p className="text-sm text-muted-foreground mb-4">{integration.description}</p>
                              <div className="space-y-2">
-                                <Label htmlFor={`apikey-${integration.id}`}>{t.apiKeyLabel}</Label>
+                                <div className="flex items-center justify-between">
+                                  <Label htmlFor={`apikey-${integration.id}`}>{t.apiKeyLabel}</Label>
+                                  <TooltipProvider>
+                                      <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Link href={integration.helpUrl} target="_blank">
+                                                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help"/>
+                                            </Link>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>{integration.helpText}</p>
+                                          </TooltipContent>
+                                      </Tooltip>
+                                  </TooltipProvider>
+                                </div>
                                 <Input 
                                     id={`apikey-${integration.id}`}
                                     type="password"
