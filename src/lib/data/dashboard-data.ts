@@ -28,14 +28,14 @@ export const projectWorkflowData: Project = {
     id: 'proj_002',
     customerId: 'cus_002',
     customerName: 'Jane Smith',
-    currentPhase: 'execution', // Changed to execution
+    currentPhase: 'closure', // Changed to closure
     status: 'Active',
     phases: [
       { id: 'onboarding', status: 'completed', name: 'Onboarding y Evaluación', details: 'Formularios completados el 15/05/24' },
       { id: 'research', status: 'completed', name: 'Investigación y Estrategia', details: 'Análisis SWOT y de competencia finalizado.' },
       { id: 'planning', status: 'completed', name: 'Planificación y Calendario', details: 'Parrilla de contenido generada y aprobada.' },
-      { id: 'execution', status: 'in_progress', name: 'Generación y Ejecución', details: 'Generando posts y publicando en redes.' }, // Changed status
-      { id: 'closure', status: 'pending', name: 'Optimización y Cierre', details: 'Analizando métricas finales de la campaña.' },
+      { id: 'execution', status: 'completed', name: 'Generación y Ejecución', details: 'Posts generados y publicados.' }, // Changed status
+      { id: 'closure', status: 'in_progress', name: 'Optimización y Cierre', details: 'Analizando métricas finales de la campaña.' },
     ]
 };
 
