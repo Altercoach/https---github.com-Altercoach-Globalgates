@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, KeyRound, MessageSquare, Linkedin, Twitter, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Bot, Save, FileText, BrainCircuit, Upload, User, Image as ImageIcon, KeyRound, MessageSquare, Linkedin, Twitter, AlertTriangle, HelpCircle, Link as LinkIcon, Copy } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
@@ -50,6 +50,12 @@ const labels = {
     planUpgrade: "Actualiza tu plan para conectar más canales.",
     getMetaKey: "Obtén tu clave de Meta for Developers",
     getTelegramKey: "Habla con BotFather en Telegram",
+    shareAgentTitle: "Compartir Agente",
+    shareAgentDesc: "Usa esta URL para una página de chat dedicada o pega el código embed en tu sitio web.",
+    shareUrl: "URL del Agente",
+    embedCode: "Código de Inserción (Embed)",
+    copy: "Copiar",
+    copied: "¡Copiado!",
   },
   en: {
     pageTitle: "Your AI Agent Configuration",
@@ -76,6 +82,12 @@ const labels = {
     planUpgrade: "Upgrade your plan to connect more channels.",
     getMetaKey: "Get your key from Meta for Developers",
     getTelegramKey: "Talk to BotFather on Telegram",
+    shareAgentTitle: "Share Agent",
+    shareAgentDesc: "Use this URL for a dedicated chat page or paste the embed code on your website.",
+    shareUrl: "Agent URL",
+    embedCode: "Embed Code",
+    copy: "Copy",
+    copied: "Copied!",
   },
   fr: {
     pageTitle: "Configuration de Votre Agent IA",
@@ -102,6 +114,12 @@ const labels = {
     planUpgrade: "Mettez à niveau votre plan pour connecter plus de canaux.",
     getMetaKey: "Obtenez votre clé sur Meta for Developers",
     getTelegramKey: "Parlez à BotFather sur Telegram",
+    shareAgentTitle: "Partager l'Agent",
+    shareAgentDesc: "Utilisez cette URL pour une page de chat dédiée ou collez le code d'intégration sur votre site web.",
+    shareUrl: "URL de l'Agent",
+    embedCode: "Code d'Intégration",
+    copy: "Copier",
+    copied: "Copié !",
   }
 };
 
@@ -133,6 +151,12 @@ export default function CustomerAgentConfigPage() {
     const [whatsappKey, setWhatsappKey] = useState('');
     const [instagramKey, setInstagramKey] = useState('');
     const [messengerKey, setMessengerKey] = useState('');
+    
+    // Dynamic URL and embed code based on agent name
+    const agentSlug = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
+    const agentUrl = `https://goldenkey.website/chat/${agentSlug}`;
+    const embedCode = `<iframe src="${agentUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+
 
     const triggerFilePicker = () => document.getElementById('avatarPicker')?.click();
     const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,6 +170,11 @@ export default function CustomerAgentConfigPage() {
     const handleSave = () => {
         toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
     }
+
+    const copyToClipboard = (textToCopy: string) => {
+        navigator.clipboard.writeText(textToCopy);
+        toast({ title: t.copied });
+    };
 
     // Logic to determine available channels based on the plan
     const normalizedPlanName = planName.toLowerCase();
@@ -231,6 +260,33 @@ export default function CustomerAgentConfigPage() {
                 </CardContent>
             </Card>
 
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><LinkIcon /> {t.shareAgentTitle}</CardTitle>
+                    <CardDescription>{t.shareAgentDesc}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="agent-url">{t.shareUrl}</Label>
+                        <div className="flex gap-2">
+                            <Input id="agent-url" readOnly value={agentUrl} />
+                            <Button variant="outline" size="icon" onClick={() => copyToClipboard(agentUrl)}>
+                                <Copy />
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="embed-code">{t.embedCode}</Label>
+                        <div className="flex gap-2">
+                            <Textarea id="embed-code" readOnly value={embedCode} rows={3} className="font-mono text-xs" />
+                            <Button variant="outline" size="icon" onClick={() => copyToClipboard(embedCode)}>
+                                <Copy />
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
              <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><FileText /> {t.knowledgeBase}</CardTitle>
@@ -294,6 +350,5 @@ export default function CustomerAgentConfigPage() {
             </div>
         </div>
     );
-}
 
     
