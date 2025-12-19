@@ -379,8 +379,8 @@ const OptimizationDialog = ({ project, phase }: { project: Project, phase: Proje
                         <CardHeader><CardTitle className="text-base">Simulación de Prueba A/B</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <p className="text-sm font-semibold">Copy A: "Descubre nuestro Cold Brew artesanal." - <Badge variant="destructive">Perdedor (4.5% CVR)</Badge></p>
-                                <p className="text-sm font-semibold">Copy B: "El Cold Brew que te cambiará la vida. ¡Pruébalo hoy!" - <Badge className="bg-green-500 text-white">Ganador (5.2% CVR)</Badge></p>
+                                <div className="text-sm font-semibold">Copy A: "Descubre nuestro Cold Brew artesanal." - <Badge variant="destructive">Perdedor (4.5% CVR)</Badge></div>
+                                <div className="text-sm font-semibold">Copy B: "El Cold Brew que te cambiará la vida. ¡Pruébalo hoy!" - <Badge className="bg-green-500 text-white">Ganador (5.2% CVR)</Badge></div>
                             </div>
                             <ChartContainer config={chartConfig} className="h-[100px] w-full">
                                 <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ left: -20, right: 20 }}>
