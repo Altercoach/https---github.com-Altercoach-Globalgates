@@ -20,20 +20,20 @@ export const ai = genkit({
  */
 export const MODEL_BY_TASK = {
   // Text & Logic
-  onboarding: 'gemini-pro',
-  evaluation: 'gemini-pro', 
-  copywriting: 'gemini-pro',
-  chat: 'gemini-pro',
+  onboarding: 'gemini-1.5-pro-latest',
+  evaluation: 'gemini-1.5-pro-latest', 
+  copywriting: 'gemini-1.5-pro-latest',
+  chat: 'gemini-1.5-pro-latest',
 
   // Research & Strategy
-  research: 'gemini-pro',
-  strategic: 'gemini-pro',
+  research: 'gemini-1.5-pro-latest',
+  strategic: 'gemini-1.5-pro-latest',
 
   // Visuals
   imageGeneration: 'imagen-2', 
 
   // Analytics
-  analytics: 'gemini-pro',
+  analytics: 'gemini-1.5-pro-latest',
 };
 
 /**
