@@ -183,18 +183,89 @@ const featureNames = {
     'error_monitoring': 'Monitoreo de Errores',
   },
   en: {
+    // Forms
     'business-evaluation': 'Business Evaluation (Doctor RX)',
     'brief-marketing': 'Professional Marketing Brief',
     'agent-training': 'AI Agent Training',
     'satisfaction-survey': 'Satisfaction Survey',
+    // AI & Automation
+    'ai_content_generation': 'AI Content Generation',
+    'ai_campaign_planner': 'AI Campaign Planner',
+    'ai_marketing_assistant': 'AI Marketing Assistant',
+    'ai_business_diagnosis': 'AI Business Diagnosis',
+    'ai_form_auto_builder': 'AI Form Auto-Builder',
+    'ai_copywriting_longform': 'AI Long-form Copywriting',
+    'ai_multilingual_generation': 'AI Multilingual Generation',
+    'ai_image_generation': 'AI Image Generation',
+    'ai_content_scheduler': 'AI Content Scheduler',
+    'ai_insights_and_recommendations': 'AI Insights & Recommendations',
+    // Editor & UX
+    'visual_editor_v2': 'Visual Editor V2',
+    'drag_and_drop_sections': 'Drag & Drop Sections',
+    'block_based_content': 'Block-based Content',
+    'advanced_layout_controls': 'Advanced Layout Controls',
+    'dark_mode_editor': 'Dark Mode Editor',
+    'real_time_preview': 'Real-time Preview',
+    'inline_editing': 'Inline Editing',
+    'undo_redo_history': 'Undo/Redo History',
+    'content_versioning': 'Content Versioning',
+    'export_site_json': 'Export Site (JSON)',
+    // Web & Publishing
+    'custom_domains': 'Custom Domains',
+    'subdomain_mapping': 'Subdomain Mapping',
+    'seo_advanced_controls': 'Advanced SEO Controls',
+    'meta_tags_manager': 'Meta Tags Manager',
+    'analytics_integration': 'Analytics Integration',
+    'cookie_consent_manager': 'Cookie Consent Manager',
+    'cdn_optimization': 'CDN Optimization',
+    'performance_auto_optimize': 'Performance Auto-optimize',
+    // Marketing & Growth
+    'lead_capture_forms': 'Lead Capture Forms',
+    'funnels_builder': 'Funnels Builder',
+    'email_marketing_basic': 'Basic Email Marketing',
+    'email_marketing_advanced': 'Advanced Email Marketing',
+    'whatsapp_integration': 'WhatsApp Integration',
+    'crm_light': 'Light CRM',
+    'campaign_tracking': 'Campaign Tracking',
+    'utm_manager': 'UTM Manager',
+    'ab_testing': 'A/B Testing',
+    // Monetization & Payments
+    'pricing_pages': 'Pricing Pages',
+    'subscription_management': 'Subscription Management',
+    'one_time_payments': 'One-time Payments',
+    'payment_links': 'Payment Links',
+    'invoicing': 'Invoicing',
+    'discounts_coupons': 'Discounts & Coupons',
+    'affiliate_program': 'Affiliate Program',
+    'revenue_dashboard': 'Revenue Dashboard',
+    // Security & Control
+    'role_based_access': 'Role-based Access',
+    'multi_user_accounts': 'Multi-user Accounts',
+    'audit_logs': 'Audit Logs',
+    'activity_history': 'Activity History',
+    'feature_flag_admin_panel': 'Feature Flag Admin Panel',
+    'backup_restore': 'Backup & Restore',
+    'gdpr_tools': 'GDPR Tools',
+    // Infrastructure & Dev
+    'genkit_flow_guard': 'Genkit Flow Guard',
+    'dry_run_mode': 'Dry Run Mode',
+    'pre_change_snapshot': 'Pre-change Snapshot',
+    'ai_action_logging': 'AI Action Logging',
+    'rollback_manager': 'Rollback Manager',
+    'environment_switching': 'Environment Switching',
+    'staging_mode': 'Staging Mode',
+    'error_monitoring': 'Error Monitoring',
   },
   fr: {
+    // Forms
     'business-evaluation': 'Évaluation d\'Entreprise (Docteur RX)',
     'brief-marketing': 'Brief de Marketing Professionnel',
     'agent-training': 'Formation d\'Agent IA',
     'satisfaction-survey': 'Enquête de Satisfaction',
+    // Add other French translations if needed
   }
 }
+
 
 const SortableProductItem = ({ product, children }: { product: Product, children: React.ReactNode }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: product.id });
@@ -453,3 +524,5 @@ export default function ProductsEditorPage() {
     </div>
   );
 }
+
+    
