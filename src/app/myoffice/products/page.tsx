@@ -53,7 +53,7 @@ const labels = {
     noteLabel: "Nota (Descripción corta)",
     badgeLabel: "Etiqueta",
     fullDescLabel: "Descripción Completa",
-    includedFeaturesTitle: "Funcionalidades Incluidas (Feature Flags)",
+    includedFeaturesTitle: "Funcionalidades Incluidas (Formularios y Opciones)",
     saveChanges: "Guardar Cambios",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
     editingLanguage: "Estás editando el contenido en",
@@ -73,7 +73,7 @@ const labels = {
     noteLabel: "Note (Short description)",
     badgeLabel: "Badge",
     fullDescLabel: "Full Description",
-    includedFeaturesTitle: "Included Features (Feature Flags)",
+    includedFeaturesTitle: "Included Features (Forms & Options)",
     saveChanges: "Save Changes",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
     editingLanguage: "You are editing the content in",
@@ -93,13 +93,34 @@ const labels = {
     noteLabel: "Note (Description courte)",
     badgeLabel: "Badge",
     fullDescLabel: "Description Complète",
-    includedFeaturesTitle: "Fonctionnalités Incluses (Feature Flags)",
+    includedFeaturesTitle: "Fonctionnalités Incluses (Formulaires & Options)",
     saveChanges: "Enregistrer les Modifications",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
     editingLanguage: "Vous éditez le contenu en",
     visible: "Visible sur la page d'accueil"
   }
 };
+
+const featureNames = {
+  es: {
+    'business-evaluation': 'Evaluación de Negocio (Doctor RX)',
+    'brief-marketing': 'Brief de Marketing Profesional',
+    'agent-training': 'Entrenamiento de Agente IA',
+    'satisfaction-survey': 'Encuesta de Satisfacción',
+  },
+  en: {
+    'business-evaluation': 'Business Evaluation (Doctor RX)',
+    'brief-marketing': 'Professional Marketing Brief',
+    'agent-training': 'AI Agent Training',
+    'satisfaction-survey': 'Satisfaction Survey',
+  },
+  fr: {
+    'business-evaluation': 'Évaluation d\'Entreprise (Docteur RX)',
+    'brief-marketing': 'Brief de Marketing Professionnel',
+    'agent-training': 'Formation d\'Agent IA',
+    'satisfaction-survey': 'Enquête de Satisfaction',
+  }
+}
 
 const SortableProductItem = ({ product, children }: { product: Product, children: React.ReactNode }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: product.id });
@@ -126,6 +147,7 @@ export default function ProductsEditorPage() {
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
+  const featureTranslations = featureNames[langCode] || featureNames.en;
   const [openAccordionItem, setOpenAccordionItem] = useState<string | undefined>();
   
   const handleUpdate = (updater: (currentDraft: SiteData) => SiteData) => {
@@ -206,6 +228,8 @@ export default function ProductsEditorPage() {
   };
   
   const allFeatureFlags = Object.values(FEATURE_FLAGS);
+  const relevantFeatureFlags = allFeatureFlags.filter(flag => ['business-evaluation', 'brief-marketing', 'agent-training', 'satisfaction-survey'].includes(flag));
+
 
   return (
     <div className="space-y-6">
@@ -295,7 +319,7 @@ export default function ProductsEditorPage() {
                               <div>
                                   <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFeaturesTitle}</h4>
                                   <div className="space-y-4 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                      {allFeatureFlags.map(flag => (
+                                      {relevantFeatureFlags.map(flag => (
                                           <div key={flag} className="flex items-center space-x-2">
                                               <Checkbox
                                                   id={`feature-${product.id}-${flag}`}
@@ -304,9 +328,9 @@ export default function ProductsEditorPage() {
                                               />
                                               <label
                                                 htmlFor={`feature-${product.id}-${flag}`}
-                                                className="text-sm font-mono text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                                                className="text-sm font-medium text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
                                               >
-                                                {flag}
+                                                {featureTranslations[flag as keyof typeof featureTranslations] || flag}
                                               </label>
                                           </div>
                                       ))}
@@ -325,3 +349,5 @@ export default function ProductsEditorPage() {
     </div>
   );
 }
+
+    
