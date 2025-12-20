@@ -42,17 +42,26 @@ const chatFlow = ai.defineFlow(
   async (input) => {
     const abacusModel = getAbacusModelForTask('chat');
     
-    const { output } = await ai.generate({
-      model: abacusModel,
-      prompt: {
-        system: `${input.systemPrompt}
+    // Construct a single string prompt
+    const historyString = input.history
+      .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+      .join('\n');
+      
+    const constructedPrompt = `${input.systemPrompt}
 You MUST respond in the following language: ${input.language}
+
 Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
 --- KNOWLEDGE BASE ---
 ${input.knowledgeBase}
---- END KNOWLEDGE BASE ---`,
-        history: input.history,
-      },
+--- END KNOWLEDGE BASE ---
+
+Conversation History:
+${historyString}
+Assistant:`;
+
+    const { output } = await ai.generate({
+      model: abacusModel,
+      prompt: constructedPrompt,
       output: { schema: ChatOutputSchema },
     });
     
