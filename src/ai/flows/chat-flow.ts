@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
 
   Here is the conversation history (the last message is the user's current message):
   {{#each history}}
-    {{#if isUser}}
+    {{#if (eq role 'user')}}
       User: {{{content}}}
     {{else}}
       Assistant: {{{content}}}
@@ -65,22 +65,13 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async (input) => {
-    console.log(`[Abacus AI Simulation] Running Chat for language: ${input.language}`);
+    const abacusModel = getAbacusModelForTask('chat');
+    const { output } = await prompt(input, { model: abacusModel });
     
-    // const augmentedHistory = input.history.map(message => ({
-    //   ...message,
-    //   isUser: message.role === 'user',
-    // }));
-    // const abacusModel = getAbacusModelForTask('chat');
-    // const { output } = await prompt({ ...input, history: augmentedHistory }, { model: abacusModel });
-    // if (!output) {
-    //   throw new Error('The AI failed to generate a response.');
-    // }
+    if (!output) {
+      throw new Error('The AI failed to generate a response.');
+    }
 
-    const mockResponse: ChatOutput = {
-      response: `Esta es una respuesta simulada de Abacus AI. Gracias por tu mensaje: "${input.history[input.history.length - 1].content}"`
-    };
-
-    return mockResponse;
+    return output;
   }
 );

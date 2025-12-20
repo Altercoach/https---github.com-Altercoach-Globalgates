@@ -46,28 +46,13 @@ const translateSiteContentFlow = ai.defineFlow(
     outputSchema: TranslateSiteContentOutputSchema.nullable(),
   },
   async input => {
-    console.log(`[Abacus AI Simulation] Running Translation for language: ${input.targetLanguage}`);
-
     // If the target is Spanish, just return the original content as it's already in Spanish.
     if (input.targetLanguage === 'es') {
       return input.siteContent;
     }
     
-    // const abacusModel = getAbacusModelForTask('onboarding');
-    // const { output } = await prompt(input, { model: abacusModel });
-    // return output || '{}';
-
-    // Mock response: We just add a suffix to show it was "translated".
-    // A real implementation would require a full translation.
-    try {
-      const parsedContent = JSON.parse(input.siteContent);
-      const translatedContent = { ...parsedContent };
-      // This is a very basic mock translation, just appending the lang code.
-      translatedContent.brand.name = `${translatedContent.brand.name} (${input.targetLanguage})`;
-      translatedContent.brand.tagline = `${translatedContent.brand.tagline} (${input.targetLanguage})`;
-      return JSON.stringify(translatedContent);
-    } catch {
-      return input.siteContent; // Return original if parsing fails
-    }
+    const abacusModel = getAbacusModelForTask('onboarding');
+    const { output } = await prompt(input, { model: abacusModel });
+    return output || '{}';
   }
 );

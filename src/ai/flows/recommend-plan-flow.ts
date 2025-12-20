@@ -55,20 +55,13 @@ const recommendPlanFlow = ai.defineFlow(
     outputSchema: RecommendPlanOutputSchema,
   },
   async (input) => {
-    console.log(`[Abacus AI Simulation] Running Plan Recommendation.`);
+    const abacusModel = getAbacusModelForTask('chat');
+    const { output } = await prompt(input, { model: abacusModel });
 
-    // const abacusModel = getAbacusModelForTask('chat');
-    // const { output } = await prompt(input, { model: abacusModel });
-    // if (!output) {
-    //   throw new Error('Failed to recommend a plan.');
-    // }
-
-    // Mock response based on a sample input
-    const mockOutput: RecommendPlanOutput = {
-      productIds: ['prod_sm_1'],
-      reasoning: "Basado en tu descripción, para empezar a construir tu presencia online, te recomiendo el plan 'Impulso Esencial (1 Red)'. Es ideal para arrancar y generar visibilidad."
-    };
+    if (!output) {
+      throw new Error('Failed to recommend a plan.');
+    }
     
-    return mockOutput;
+    return output;
   }
 );
