@@ -33,31 +33,6 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
   return chatFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'chatPrompt',
-  input: { schema: ChatInputSchema },
-  output: { schema: ChatOutputSchema },
-  prompt: `You MUST respond in the following language: {{{language}}}
-
-  {{{systemPrompt}}}
-
-  Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
-  --- KNOWLEDGE BASE ---
-  {{{knowledgeBase}}}
-  --- END KNOWLEDGE BASE ---
-
-  Here is the conversation history (the last message is the user's current message):
-  {{#each history}}
-    {{#if (eq role "user")}}
-      User: {{{content}}}
-    {{else}}
-      Assistant: {{{content}}}
-    {{/if}}
-  {{/each}}
-  
-  Assistant:`,
-});
-
 const chatFlow = ai.defineFlow(
   {
     name: 'chatFlow',
