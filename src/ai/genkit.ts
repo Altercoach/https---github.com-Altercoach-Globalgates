@@ -1,12 +1,12 @@
 import { genkit, Model } from 'genkit';
-import { replicate } from '@genkit-ai/replicate';
+import { googleAI } from '@genkit-ai/google-genai';
 
 // ============================================
 // CONFIGURACIÓN DE GENKIT 
 // ============================================
 
 export const ai = genkit({
-  plugins: [replicate()], // Usamos el plugin de Replicate
+  plugins: [googleAI()], // Usamos el plugin de Google AI
 });
 
 // ============================================
@@ -14,25 +14,22 @@ export const ai = genkit({
 // ============================================
 
 /**
- * Mapea tareas a modelos reales y estables de Replicate.
+ * Mapea tareas a modelos reales y estables de Google AI.
  * Esta es la fuente de verdad para la selección de modelos en la app.
  */
 export const MODEL_BY_TASK = {
   // Text & Logic
-  onboarding: 'meta/llama-2-70b-chat',
-  evaluation: 'meta/llama-2-70b-chat', 
-  copywriting: 'meta/llama-2-70b-chat',
-  chat: 'meta/llama-2-70b-chat',
-
-  // Research & Strategy
-  research: 'meta/llama-2-70b-chat',
-  strategic: 'meta/llama-2-70b-chat',
+  onboarding: 'gemini-1.5-flash-latest',
+  evaluation: 'gemini-1.5-flash-latest', 
+  copywriting: 'gemini-1.5-flash-latest',
+  chat: 'gemini-1.5-flash-latest',
+  strategic: 'gemini-1.5-pro-latest', // Usamos un modelo más potente para estrategia
 
   // Visuals
-  imageGeneration: 'stability-ai/sdxl', 
+  imageGeneration: 'imagen-3.0-fast-generate-001', 
 
   // Analytics
-  analytics: 'meta/llama-2-70b-chat',
+  analytics: 'gemini-1.5-flash-latest',
 };
 
 /**
@@ -42,7 +39,7 @@ export const MODEL_BY_TASK = {
  */
 export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): Model {
   const modelId = MODEL_BY_TASK[task];
-  return replicate.model(modelId);
+  return googleAI.model(modelId);
 }
 
 // ============================================
@@ -50,7 +47,7 @@ export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): Model {
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with Abacus AI model abstraction (using Replicate).');
+  console.log('🤖 Genkit configured with Abacus AI model abstraction (using Google AI).');
   console.log(`   Default Text Model (Abacus): ${MODEL_BY_TASK.chat}`);
   console.log(`   Image Model (Abacus): ${MODEL_BY_TASK.imageGeneration}`);
 }

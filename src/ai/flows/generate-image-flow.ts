@@ -29,7 +29,7 @@ export const generateImageFlow = ai.defineFlow(
       
       const abacusModel = getAbacusModelForTask('imageGeneration');
       
-      const { media } = await ai.generate({
+      const { output } = await ai.generate({
         model: abacusModel,
         prompt: input.creativeBrief,
         config: {
@@ -38,7 +38,8 @@ export const generateImageFlow = ai.defineFlow(
         },
       });
 
-      const imageUrl = media?.url;
+      const imageUrl = Array.isArray(output) && (output[0] as any).url;
+
       if (!imageUrl) {
         throw new Error('La IA no devolvió una URL de imagen válida.');
       }
@@ -49,7 +50,7 @@ export const generateImageFlow = ai.defineFlow(
         imageUrl: imageUrl,
         refinedPrompt: input.creativeBrief,
         cost: 0, // Assuming cost is handled elsewhere or is 0 for this model.
-        model: abacusModel.name,
+        model: 'replicate/stability-ai/sdxl',
       };
 
     } catch (error: any) {
