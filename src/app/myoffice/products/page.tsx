@@ -109,10 +109,12 @@ const labels = {
 
 const featureNames = {
   es: {
+    // Formularios
     'business-evaluation': 'Evaluación de Negocio (Doctor RX)',
     'brief-marketing': 'Brief de Marketing Profesional',
     'agent-training': 'Entrenamiento de Agente IA',
     'satisfaction-survey': 'Encuesta de Satisfacción',
+    // IA & Automatización
     'ai_content_generation': 'Generación de Contenido IA',
     'ai_campaign_planner': 'Planificador de Campañas IA',
     'ai_marketing_assistant': 'Asistente de Marketing IA',
@@ -123,6 +125,7 @@ const featureNames = {
     'ai_image_generation': 'Generación de Imágenes IA',
     'ai_content_scheduler': 'Programador de Contenido IA',
     'ai_insights_and_recommendations': 'Insights y Recomendaciones IA',
+    // Editor & UX
     'visual_editor_v2': 'Editor Visual V2',
     'drag_and_drop_sections': 'Arrastrar y Soltar Secciones',
     'block_based_content': 'Contenido Basado en Bloques',
@@ -133,6 +136,7 @@ const featureNames = {
     'undo_redo_history': 'Historial de Deshacer/Rehacer',
     'content_versioning': 'Versionado de Contenido',
     'export_site_json': 'Exportar Sitio (JSON)',
+    // Web & Publicación
     'custom_domains': 'Dominios Personalizados',
     'subdomain_mapping': 'Mapeo de Subdominios',
     'seo_advanced_controls': 'Controles SEO Avanzados',
@@ -141,6 +145,7 @@ const featureNames = {
     'cookie_consent_manager': 'Gestor de Consentimiento de Cookies',
     'cdn_optimization': 'Optimización de CDN',
     'performance_auto_optimize': 'Auto-optimización de Rendimiento',
+    // Marketing & Growth
     'lead_capture_forms': 'Formularios de Captura de Leads',
     'funnels_builder': 'Constructor de Embudos (Funnels)',
     'email_marketing_basic': 'Email Marketing Básico',
@@ -150,6 +155,7 @@ const featureNames = {
     'campaign_tracking': 'Seguimiento de Campañas',
     'utm_manager': 'Gestor de UTMs',
     'ab_testing': 'Pruebas A/B',
+    // Monetización & Pagos
     'pricing_pages': 'Páginas de Precios',
     'subscription_management': 'Gestión de Suscripciones',
     'one_time_payments': 'Pagos Únicos',
@@ -158,6 +164,7 @@ const featureNames = {
     'discounts_coupons': 'Descuentos y Cupones',
     'affiliate_program': 'Programa de Afiliados',
     'revenue_dashboard': 'Panel de Ingresos',
+    // Seguridad & Control
     'role_based_access': 'Acceso Basado en Roles',
     'multi_user_accounts': 'Cuentas Multi-usuario',
     'audit_logs': 'Registros de Auditoría',
@@ -165,6 +172,7 @@ const featureNames = {
     'feature_flag_admin_panel': 'Panel de Admin de Feature Flags',
     'backup_restore': 'Copia de Seguridad y Restauración',
     'gdpr_tools': 'Herramientas GDPR',
+    // Infraestructura & Dev
     'genkit_flow_guard': 'Guardián de Flujos Genkit',
     'dry_run_mode': 'Modo de Prueba (Dry Run)',
     'pre_change_snapshot': 'Snapshot Pre-cambio',
@@ -445,6 +453,3 @@ export default function ProductsEditorPage() {
     </div>
   );
 }
-
-
-    
