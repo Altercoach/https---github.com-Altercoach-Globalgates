@@ -54,6 +54,8 @@ const labels = {
     badgeLabel: "Etiqueta",
     fullDescLabel: "Descripción Completa",
     includedFeaturesTitle: "Funcionalidades Incluidas (Formularios y Opciones)",
+    formFeaturesTitle: "Formularios de Onboarding",
+    platformFeaturesTitle: "Funcionalidades de la Plataforma",
     saveChanges: "Guardar Cambios",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
     editingLanguage: "Estás editando el contenido en",
@@ -74,6 +76,8 @@ const labels = {
     badgeLabel: "Badge",
     fullDescLabel: "Full Description",
     includedFeaturesTitle: "Included Features (Forms & Options)",
+    formFeaturesTitle: "Onboarding Forms",
+    platformFeaturesTitle: "Platform Features",
     saveChanges: "Save Changes",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
     editingLanguage: "You are editing the content in",
@@ -94,6 +98,8 @@ const labels = {
     badgeLabel: "Badge",
     fullDescLabel: "Description Complète",
     includedFeaturesTitle: "Fonctionnalités Incluses (Formulaires & Options)",
+    formFeaturesTitle: "Formulaires d'Onboarding",
+    platformFeaturesTitle: "Fonctionnalités de la Plateforme",
     saveChanges: "Enregistrer les Modifications",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
     editingLanguage: "Vous éditez le contenu en",
@@ -107,6 +113,66 @@ const featureNames = {
     'brief-marketing': 'Brief de Marketing Profesional',
     'agent-training': 'Entrenamiento de Agente IA',
     'satisfaction-survey': 'Encuesta de Satisfacción',
+    'ai_content_generation': 'Generación de Contenido IA',
+    'ai_campaign_planner': 'Planificador de Campañas IA',
+    'ai_marketing_assistant': 'Asistente de Marketing IA',
+    'ai_business_diagnosis': 'Diagnóstico de Negocio IA',
+    'ai_form_auto_builder': 'Autoconstructor de Formularios IA',
+    'ai_copywriting_longform': 'Copywriting Extenso con IA',
+    'ai_multilingual_generation': 'Generación Multilingüe IA',
+    'ai_image_generation': 'Generación de Imágenes IA',
+    'ai_content_scheduler': 'Programador de Contenido IA',
+    'ai_insights_and_recommendations': 'Insights y Recomendaciones IA',
+    'visual_editor_v2': 'Editor Visual V2',
+    'drag_and_drop_sections': 'Arrastrar y Soltar Secciones',
+    'block_based_content': 'Contenido Basado en Bloques',
+    'advanced_layout_controls': 'Controles de Diseño Avanzados',
+    'dark_mode_editor': 'Editor en Modo Oscuro',
+    'real_time_preview': 'Vista Previa en Tiempo Real',
+    'inline_editing': 'Edición en Línea',
+    'undo_redo_history': 'Historial de Deshacer/Rehacer',
+    'content_versioning': 'Versionado de Contenido',
+    'export_site_json': 'Exportar Sitio (JSON)',
+    'custom_domains': 'Dominios Personalizados',
+    'subdomain_mapping': 'Mapeo de Subdominios',
+    'seo_advanced_controls': 'Controles SEO Avanzados',
+    'meta_tags_manager': 'Gestor de Meta Tags',
+    'analytics_integration': 'Integración de Analíticas',
+    'cookie_consent_manager': 'Gestor de Consentimiento de Cookies',
+    'cdn_optimization': 'Optimización de CDN',
+    'performance_auto_optimize': 'Auto-optimización de Rendimiento',
+    'lead_capture_forms': 'Formularios de Captura de Leads',
+    'funnels_builder': 'Constructor de Embudos (Funnels)',
+    'email_marketing_basic': 'Email Marketing Básico',
+    'email_marketing_advanced': 'Email Marketing Avanzado',
+    'whatsapp_integration': 'Integración con WhatsApp',
+    'crm_light': 'CRM Ligero',
+    'campaign_tracking': 'Seguimiento de Campañas',
+    'utm_manager': 'Gestor de UTMs',
+    'ab_testing': 'Pruebas A/B',
+    'pricing_pages': 'Páginas de Precios',
+    'subscription_management': 'Gestión de Suscripciones',
+    'one_time_payments': 'Pagos Únicos',
+    'payment_links': 'Enlaces de Pago',
+    'invoicing': 'Facturación',
+    'discounts_coupons': 'Descuentos y Cupones',
+    'affiliate_program': 'Programa de Afiliados',
+    'revenue_dashboard': 'Panel de Ingresos',
+    'role_based_access': 'Acceso Basado en Roles',
+    'multi_user_accounts': 'Cuentas Multi-usuario',
+    'audit_logs': 'Registros de Auditoría',
+    'activity_history': 'Historial de Actividad',
+    'feature_flag_admin_panel': 'Panel de Admin de Feature Flags',
+    'backup_restore': 'Copia de Seguridad y Restauración',
+    'gdpr_tools': 'Herramientas GDPR',
+    'genkit_flow_guard': 'Guardián de Flujos Genkit',
+    'dry_run_mode': 'Modo de Prueba (Dry Run)',
+    'pre_change_snapshot': 'Snapshot Pre-cambio',
+    'ai_action_logging': 'Registro de Acciones de IA',
+    'rollback_manager': 'Gestor de Reversiones',
+    'environment_switching': 'Cambio de Entorno',
+    'staging_mode': 'Modo de Staging',
+    'error_monitoring': 'Monitoreo de Errores',
   },
   en: {
     'business-evaluation': 'Business Evaluation (Doctor RX)',
@@ -227,7 +293,9 @@ export default function ProductsEditorPage() {
     }
   };
   
-  const allFeatureFlags = Object.values(FEATURE_FLAGS);
+  const allFeatureFlags = Object.keys(FEATURE_FLAGS);
+  const formFeatures = allFeatureFlags.filter(flag => ['business-evaluation', 'brief-marketing', 'agent-training', 'satisfaction-survey'].includes(flag));
+  const platformFeatures = allFeatureFlags.filter(flag => !formFeatures.includes(flag));
 
   return (
     <div className="space-y-6">
@@ -315,24 +383,54 @@ export default function ProductsEditorPage() {
                               <Separator className="my-6 bg-border" />
 
                               <div>
-                                  <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFeaturesTitle}</h4>
-                                  <div className="space-y-2 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                      {allFeatureFlags.map(flag => (
-                                          <div key={flag} className="flex items-center space-x-2">
-                                              <Checkbox
-                                                  id={`feature-${product.id}-${flag}`}
-                                                  checked={product.features.includes(flag)}
-                                                  onCheckedChange={(checked) => handleFeatureToggle(product.id, flag, !!checked)}
-                                              />
-                                              <label
-                                                htmlFor={`feature-${product.id}-${flag}`}
-                                                className="text-sm font-medium text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
-                                              >
-                                                {featureTranslations[flag as keyof typeof featureTranslations] || flag}
-                                              </label>
-                                          </div>
-                                      ))}
-                                  </div>
+                                <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFeaturesTitle}</h4>
+                                
+                                {formFeatures.length > 0 && (
+                                    <div className='mb-4'>
+                                        <h5 className="font-medium text-sm text-muted-foreground mb-2">{t.formFeaturesTitle}</h5>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                            {formFeatures.map(flag => (
+                                                <div key={flag} className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id={`feature-${product.id}-${flag}`}
+                                                        checked={product.features.includes(flag)}
+                                                        onCheckedChange={(checked) => handleFeatureToggle(product.id, flag, !!checked)}
+                                                    />
+                                                    <label
+                                                      htmlFor={`feature-${product.id}-${flag}`}
+                                                      className="text-sm font-medium text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                                                    >
+                                                      {featureTranslations[flag as keyof typeof featureTranslations] || flag}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {platformFeatures.length > 0 && (
+                                     <div>
+                                        <h5 className="font-medium text-sm text-muted-foreground mb-2">{t.platformFeaturesTitle}</h5>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                            {platformFeatures.map(flag => (
+                                                <div key={flag} className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id={`feature-${product.id}-${flag}`}
+                                                        checked={product.features.includes(flag)}
+                                                        onCheckedChange={(checked) => handleFeatureToggle(product.id, flag, !!checked)}
+                                                    />
+                                                    <label
+                                                      htmlFor={`feature-${product.id}-${flag}`}
+                                                      className="text-sm font-medium text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                                                    >
+                                                      {featureTranslations[flag as keyof typeof featureTranslations] || flag}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                               </div>
                           </div>
                         </AccordionContent>
@@ -348,3 +446,5 @@ export default function ProductsEditorPage() {
   );
 }
 
+
+    
