@@ -5,7 +5,7 @@
  */
 
 export const FEATURE_FLAGS = {
-  // IA & Automation
+  // 🧠 IA & Automation
   AI_CONTENT_GENERATION: 'ai_content_generation',
   AI_CAMPAIGN_PLANNER: 'ai_campaign_planner',
   AI_MARKETING_ASSISTANT: 'ai_marketing_assistant',
@@ -17,7 +17,7 @@ export const FEATURE_FLAGS = {
   AI_CONTENT_SCHEDULER: 'ai_content_scheduler',
   AI_INSIGHTS_AND_RECOMMENDATIONS: 'ai_insights_and_recommendations',
 
-  // Editor & UX
+  // 🧩 Editor & UX
   VISUAL_EDITOR_V2: 'visual_editor_v2',
   DRAG_AND_DROP_SECTIONS: 'drag_and_drop_sections',
   BLOCK_BASED_CONTENT: 'block_based_content',
@@ -29,7 +29,7 @@ export const FEATURE_FLAGS = {
   CONTENT_VERSIONING: 'content_versioning',
   EXPORT_SITE_JSON: 'export_site_json',
 
-  // Web & Publishing
+  // 🌐 Web & Publishing
   CUSTOM_DOMAINS: 'custom_domains',
   SUBDOMAIN_MAPPING: 'subdomain_mapping',
   SEO_ADVANCED_CONTROLS: 'seo_advanced_controls',
@@ -39,7 +39,7 @@ export const FEATURE_FLAGS = {
   CDN_OPTIMIZATION: 'cdn_optimization',
   PERFORMANCE_AUTO_OPTIMIZE: 'performance_auto_optimize',
 
-  // Marketing & Growth
+  // 📊 Marketing & Growth
   LEAD_CAPTURE_FORMS: 'lead_capture_forms',
   FUNNELS_BUILDER: 'funnels_builder',
   EMAIL_MARKETING_BASIC: 'email_marketing_basic',
@@ -50,7 +50,7 @@ export const FEATURE_FLAGS = {
   UTM_MANAGER: 'utm_manager',
   AB_TESTING: 'ab_testing',
 
-  // Monetization & Payments
+  // 🧾 Monetization & Payments
   PRICING_PAGES: 'pricing_pages',
   SUBSCRIPTION_MANAGEMENT: 'subscription_management',
   ONE_TIME_PAYMENTS: 'one_time_payments',
@@ -60,7 +60,7 @@ export const FEATURE_FLAGS = {
   AFFILIATE_PROGRAM: 'affiliate_program',
   REVENUE_DASHBOARD: 'revenue_dashboard',
 
-  // Security & Control
+  // 🔐 Security & Control
   ROLE_BASED_ACCESS: 'role_based_access',
   MULTI_USER_ACCOUNTS: 'multi_user_accounts',
   AUDIT_LOGS: 'audit_logs',
@@ -69,7 +69,7 @@ export const FEATURE_FLAGS = {
   BACKUP_RESTORE: 'backup_restore',
   GDPR_TOOLS: 'gdpr_tools',
 
-  // Infrastructure & Dev
+  // ⚙️ Infrastructure & Dev
   GENKIT_FLOW_GUARD: 'genkit_flow_guard',
   DRY_RUN_MODE: 'dry_run_mode',
   PRE_CHANGE_SNAPSHOT: 'pre_change_snapshot',
@@ -78,4 +78,10 @@ export const FEATURE_FLAGS = {
   ENVIRONMENT_SWITCHING: 'environment_switching',
   STAGING_MODE: 'staging_mode',
   ERROR_MONITORING: 'error_monitoring',
+
+  // Specific Questionnaire Flags
+  'business-evaluation': 'business-evaluation',
+  'brief-marketing': 'brief-marketing',
+  'agent-training': 'agent-training',
+  'satisfaction-survey': 'satisfaction-survey',
 };
