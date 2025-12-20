@@ -1,7 +1,8 @@
 
 'use client';
 
-import { Hero } from '@/components/sections/hero';
+import { HeroBanner } from '@/components/sections/herobanner';
+import { HeroText } from '@/components/sections/herotext';
 import { Services } from '@/components/sections/services';
 import { Products } from '@/components/sections/products';
 import { Contact } from '@/components/sections/contact';
@@ -9,7 +10,8 @@ import { Contact } from '@/components/sections/contact';
 export default function HomePage() {
   return (
     <>
-      <Hero />
+      <HeroBanner />
+      <HeroText />
       <Services />
       <Products />
       <Contact />
