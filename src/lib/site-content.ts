@@ -59,34 +59,14 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       ]
     },
     {
-      "id": "solution-marketing",
-      "visible": true,
-      "title": { "es": "Marketing Digital y Funnels", "en": "Digital Marketing & Funnels", "fr": "Marketing Numérique et Entonnoirs" },
-      "bullets": [
-        { "es": "Diseño de embudos de conversión.", "en": "Conversion funnel design.", "fr": "Conception d'entonnoirs de conversion." },
-        { "es": "Automatización de marketing con IA.", "en": "AI-powered marketing automation.", "fr": "Automatisation du marketing par l'IA." },
-        { "es": "Integración con CRM y WhatsApp.", "en": "CRM and WhatsApp integration.", "fr": "Intégration CRM et WhatsApp." }
-      ]
-    },
-    {
-      "id": "solution-web",
-      "visible": true,
-      "title": { "es": "Web y Tecnología", "en": "Web & Technology", "fr": "Web et Technologie" },
-      "bullets": [
-        { "es": "Desarrollo de sitios web y SaaS a medida.", "en": "Custom website and SaaS development.", "fr": "Développement de sites web et de SaaS sur mesure." },
-        { "es": "Integración de IA y sistemas de pago.", "en": "AI and payment systems integration.", "fr": "Intégration de l'IA et des systèmes de paiement." },
-        { "es": "Optimización de rendimiento y seguridad.", "en": "Performance and security optimization.", "fr": "Optimisation des performances et de la sécurité." }
-      ]
-    },
-    {
-      "id": "solution-legal",
-      "visible": true,
-      "title": { "es": "Servicios Corporativos", "en": "Corporate Services", "fr": "Services aux Entreprises" },
-      "bullets": [
-        { "es": "Creación de empresas y asociaciones.", "en": "Company and association formation.", "fr": "Création d'entreprises et d'associations." },
-        { "es": "Asesoría legal y fiscal para ONGs.", "en": "Legal and tax advisory for NGOs.", "fr": "Conseil juridique et fiscal pour les ONG." },
-        { "es": "Gestión de cumplimiento normativo (compliance).", "en": "Regulatory compliance management.", "fr": "Gestion de la conformité réglementaire." }
-      ]
+        "id": "solution-marketing",
+        "visible": true,
+        "title": { "es": "Marketing Digital y Funnels", "en": "Digital Marketing & Funnels", "fr": "Marketing Numérique et Entonnoirs" },
+        "bullets": [
+            { "es": "Diseño de embudos de conversión.", "en": "Conversion funnel design.", "fr": "Conception d'entonnoirs de conversion." },
+            { "es": "Automatización de marketing con IA.", "en": "AI-powered marketing automation.", "fr": "Automatisation du marketing par l'IA." },
+            { "es": "Integración con CRM y WhatsApp.", "en": "CRM and WhatsApp integration.", "fr": "Intégration CRM et WhatsApp." }
+        ]
     },
     {
       "id": "solution-seo",
@@ -140,31 +120,9 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       "type": "one",
       "price": 500,
       "badge": { "es": "Lanzamiento", "en": "Launch", "fr": "Lancement" },
-      "note": { "es": "Todo lo básico para lanzar tu marca: logo, landing page y redes.", "en": "All the basics to launch your brand: logo, landing page, and social media.", "fr": "Tous les basiques pour lancer votre marque : logo, landing page et réseaux sociaux." },
+      "note": { "es": "Lo básico para lanzar tu marca: logo, landing page y redes.", "en": "The basics to launch your brand: logo, landing page, and social media.", "fr": "Les bases pour lancer votre marque : logo, landing page et réseaux sociaux." },
       "description": { "es": "Incluye identidad de marca básica, logo simple, una landing page, configuración de 1 red social y 5 publicaciones de lanzamiento.", "en": "Includes basic brand identity, simple logo, a landing page, setup of 1 social network, and 5 launch posts.", "fr": "Comprend une identité de marque de base, un logo simple, une page de destination, la configuration d'un réseau social et 5 publications de lancement." },
       "features": [FEATURE_FLAGS.LEAD_CAPTURE_FORMS]
-    },
-    {
-      "id": "prod_launch_2",
-      "visible": true,
-      "name": { "es": "Paquete Marca Profesional", "en": "Professional Brand Package", "fr": "Pack Marque Professionnelle" },
-      "type": "one",
-      "price": 1500,
-      "badge": { "es": "Completo", "en": "Complete", "fr": "Complet" },
-      "note": { "es": "Branding completo, sitio web de 5 secciones y SEO básico.", "en": "Full branding, 5-section website, and basic SEO.", "fr": "Branding complet, site web de 5 sections et SEO de base." },
-      "description": { "es": "Incluye branding completo con manual básico, sitio web de 5 secciones, configuración de 2 redes, 10 publicaciones y SEO básico con Pixel & Analytics.", "en": "Includes full branding with a basic manual, a 5-section website, setup of 2 social networks, 10 posts, and basic SEO with Pixel & Analytics.", "fr": "Comprend un branding complet avec un manuel de base, un site web de 5 sections, la configuration de 2 réseaux sociaux, 10 publications et un SEO de base avec Pixel & Analytics." },
-      "features": [FEATURE_FLAGS.SEO_ADVANCED_CONTROLS, FEATURE_FLAGS.ANALYTICS_INTEGRATION]
-    },
-    {
-      "id": "prod_legal_1",
-      "visible": true,
-      "name": { "es": "Creación de Empresa (México)", "en": "Company Formation (Mexico)", "fr": "Création d'Entreprise (Mexique)" },
-      "type": "one",
-      "price": 1200,
-      "badge": { "es": "Corporativo", "en": "Corporate", "fr": "Entreprise" },
-      "note": { "es": "Constitución legal de tu empresa en México.", "en": "Legal incorporation of your company in Mexico.", "fr": "Constitution légale de votre entreprise au Mexique." },
-      "description": { "es": "Asesoría sobre el tipo de sociedad, redacción de acta constitutiva, obtención de RFC, alta en el SAT y asistencia para apertura de cuenta bancaria. No incluye derechos notariales.", "en": "Advice on the type of company, drafting of the articles of incorporation, obtaining RFC, registration with the SAT, and assistance with opening a bank account. Notary fees not included.", "fr": "Conseils sur le type d'entreprise, rédaction des statuts, obtention du RFC, inscription au SAT et aide à l'ouverture d'un compte bancaire. Frais de notaire non inclus." },
-      "features": []
     },
     {
       "id": "prod_seo_sub",
@@ -180,6 +138,21 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         FEATURE_FLAGS.AI_CONTENT_GENERATION, 
         FEATURE_FLAGS.ANALYTICS_INTEGRATION,
         FEATURE_FLAGS.AI_INSIGHTS_AND_RECOMMENDATIONS
+      ]
+    },
+    {
+      "id": "prod_info",
+      "visible": true,
+      "name": { "es": "Plan Informativo", "en": "Informational Plan", "fr": "Plan d'Information" },
+      "type": "info",
+      "price": 0,
+      "badge": { "es": "Consulta", "en": "Consult", "fr": "Consulter" },
+      "note": { "es": "Plan personalizado para grandes empresas. Contáctanos.", "en": "Custom plan for large companies. Contact us.", "fr": "Plan personnalisé pour les grandes entreprises. Contactez-nous." },
+      "description": { "es": "Ofrecemos soluciones a la medida para corporaciones, incluyendo desarrollo de software, consultoría avanzada de IA y soporte dedicado. Contáctanos para una propuesta personalizada.", "en": "We offer tailored solutions for corporations, including software development, advanced AI consulting, and dedicated support. Contact us for a custom proposal.", "fr": "Nous proposons des solutions sur mesure pour les entreprises, y compris le développement de logiciels, le conseil avancé en IA et un support dédié. Contactez-nous pour une proposition personnalisée." },
+      "features": [
+        FEATURE_FLAGS.MULTI_USER_ACCOUNTS,
+        FEATURE_FLAGS.ROLE_BASED_ACCESS,
+        FEATURE_FLAGS.CUSTOM_DOMAINS
       ]
     }
   ]
