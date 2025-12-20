@@ -228,8 +228,6 @@ export default function ProductsEditorPage() {
   };
   
   const allFeatureFlags = Object.values(FEATURE_FLAGS);
-  const relevantFeatureFlags = allFeatureFlags.filter(flag => ['business-evaluation', 'brief-marketing', 'agent-training', 'satisfaction-survey'].includes(flag));
-
 
   return (
     <div className="space-y-6">
@@ -318,8 +316,8 @@ export default function ProductsEditorPage() {
 
                               <div>
                                   <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFeaturesTitle}</h4>
-                                  <div className="space-y-4 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                      {relevantFeatureFlags.map(flag => (
+                                  <div className="space-y-2 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                      {allFeatureFlags.map(flag => (
                                           <div key={flag} className="flex items-center space-x-2">
                                               <Checkbox
                                                   id={`feature-${product.id}-${flag}`}
@@ -350,4 +348,3 @@ export default function ProductsEditorPage() {
   );
 }
 
-    
