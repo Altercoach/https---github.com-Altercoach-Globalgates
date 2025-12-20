@@ -1,5 +1,6 @@
 
 import type { SiteData } from '@/lib/types';
+import { FEATURE_FLAGS } from './feature-flags';
 
 export const DEFAULT_SITE_CONTENT: SiteData = {
   "brand": {
@@ -169,34 +170,9 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Ce forfait vous donne tout ce dont vous avez besoin pour démarrer sur un réseau social. Il comprend une stratégie de contenu, 12 publications par mois et un rapport de performance mensuel."
       },
       "features": [
-        {
-          "id": "business-evaluation",
-          "name": "Business Evaluation (Doctor RX)",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/business-evaluation-001"
-        },
-        {
-          "id": "brief-marketing",
-          "name": "Professional Marketing Brief",
-          "stage": "onboarding",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "agent-training",
-          "name": "AI Agent Training",
-          "stage": "onboarding",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "satisfaction-survey",
-          "name": "Satisfaction Survey",
-          "stage": "campaign_end",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        }
+        FEATURE_FLAGS.AI_BUSINESS_DIAGNOSIS,
+        FEATURE_FLAGS.AI_MARKETING_ASSISTANT,
+        FEATURE_FLAGS.LEAD_CAPTURE_FORMS
       ]
     },
     {
@@ -225,34 +201,11 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Couvre deux réseaux sociaux de votre choix, avec 16 publications par mois (8 par réseau), une gestion de communauté de base et un rapport bimensuel."
       },
       "features": [
-        {
-          "id": "business-evaluation",
-          "name": "Business Evaluation (Doctor RX)",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/business-evaluation-001"
-        },
-        {
-          "id": "brief-marketing",
-          "name": "Professional Marketing Brief",
-          "stage": "onboarding",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "agent-training",
-          "name": "AI Agent Training",
-          "stage": "onboarding",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "satisfaction-survey",
-          "name": "Satisfaction Survey",
-          "stage": "campaign_end",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        }
+        FEATURE_FLAGS.AI_BUSINESS_DIAGNOSIS,
+        FEATURE_FLAGS.AI_MARKETING_ASSISTANT,
+        FEATURE_FLAGS.LEAD_CAPTURE_FORMS,
+        FEATURE_FLAGS.AI_CONTENT_GENERATION,
+        FEATURE_FLAGS.CRM_LIGHT
       ]
     },
     {
@@ -281,34 +234,13 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Le forfait ultime. 24 publications par mois, gestion complète de la communauté, rapports hebdomadaires, une session de stratégie mensuelle et un support prioritaire."
       },
       "features": [
-        {
-          "id": "business-evaluation",
-          "name": "Business Evaluation (Doctor RX)",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/business-evaluation-001"
-        },
-        {
-          "id": "brief-marketing",
-          "name": "Professional Marketing Brief",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "agent-training",
-          "name": "AI Agent Training",
-          "stage": "onboarding",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "satisfaction-survey",
-          "name": "Satisfaction Survey",
-          "stage": "campaign_end",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        }
+        FEATURE_FLAGS.AI_BUSINESS_DIAGNOSIS,
+        FEATURE_FLAGS.AI_MARKETING_ASSISTANT,
+        FEATURE_FLAGS.LEAD_CAPTURE_FORMS,
+        FEATURE_FLAGS.AI_CONTENT_GENERATION,
+        FEATURE_FLAGS.CRM_LIGHT,
+        FEATURE_FLAGS.FUNNELS_BUILDER,
+        FEATURE_FLAGS.AI_CAMPAIGN_PLANNER
       ]
     },
     {
@@ -337,34 +269,10 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Comprend la conception de la stratégie de l'entonnoir, la création de jusqu'à 3 pages de destination, la configuration de formulaires et l'intégration d'un agent IA de base pour la qualification des prospects."
       },
       "features": [
-        {
-          "id": "business-evaluation",
-          "name": "Business Evaluation (Doctor RX)",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/business-evaluation-001"
-        },
-        {
-          "id": "brief-marketing",
-          "name": "Professional Marketing Brief",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "agent-training",
-          "name": "AI Agent Training",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "satisfaction-survey",
-          "name": "Satisfaction Survey",
-          "stage": "campaign_end",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        }
+        FEATURE_FLAGS.AI_BUSINESS_DIAGNOSIS,
+        FEATURE_FLAGS.FUNNELS_BUILDER,
+        FEATURE_FLAGS.AI_MARKETING_ASSISTANT,
+        FEATURE_FLAGS.LEAD_CAPTURE_FORMS
       ]
     },
     {
@@ -393,37 +301,10 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         "fr": "Notre plan SEO le plus complet. Comprend un audit SEO initial, une recherche de mots-clés, une optimisation on-page, la création de 4 articles de blog optimisés par mois et un suivi du classement."
       },
       "features": [
-        {
-          "id": "business-evaluation",
-          "name": "Business Evaluation (Doctor RX)",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/business-evaluation-001"
-        },
-        {
-          "id": "brief-marketing",
-          "name": "Professional Marketing Brief",
-          "stage": "onboarding",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "agent-training",
-          "name": "AI Agent Training",
-          "stage": "onboarding",
-          "enabled": false,
-          "href": "/myoffice/questionnaires/edit"
-        },
-        {
-          "id": "satisfaction-survey",
-          "name": "Satisfaction Survey",
-          "stage": "campaign_end",
-          "enabled": true,
-          "href": "/myoffice/questionnaires/edit"
-        }
+        FEATURE_FLAGS.SEO_ADVANCED_CONTROLS,
+        FEATURE_FLAGS.AI_CONTENT_GENERATION,
+        FEATURE_FLAGS.ANALYTICS_INTEGRATION
       ]
     }
   ]
 };
-
-    

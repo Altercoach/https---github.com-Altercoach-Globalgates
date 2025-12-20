@@ -4,7 +4,7 @@
 import React, { createContext, useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AuthState, AuthRole, User } from '@/lib/types';
-import { LS_KEYS } from '@/lib/constants';
+import { LS_KEYS, initialCustomers } from '@/lib/constants';
 
 interface AuthContextType {
   auth: {
@@ -49,8 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [auth]);
 
   const login = (email: string, role: AuthRole) => {
-    const newState = { isMounted: true, loggedIn: true, user: { email, role } };
+    const customerData = initialCustomers.find(c => c.email === email);
+    const plan = customerData ? customerData.plan : 'Free';
+
+    const newState = { isMounted: true, loggedIn: true, user: { email, role, plan } };
     setAuth(newState);
+
     if (role === 'admin') {
       router.push('/myoffice');
     } else {

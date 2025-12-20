@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, Facebook, BarChart3, HelpCircle } from 'lucide-react';
+import { Settings, BarChart3, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';
@@ -17,8 +18,6 @@ const labels = {
     pageSubtitle: "Gestiona tu cuenta y conecta tus fuentes de datos.",
     integrationsTitle: "Integraciones de Datos",
     integrationsDescription: "Introduce tus claves de API para conectar tus plataformas y ver las métricas en tu dashboard. Estos datos son confidenciales y se almacenan de forma segura.",
-    fbName: "Facebook / Meta Ads",
-    fbDescription: "Conecta tu cuenta de Meta Ads para obtener métricas de tus campañas.",
     gaName: "Google Analytics 4",
     gaDescription: "Integra GA4 para visualizar el tráfico y comportamiento.",
     apiKeyLabel: "API Key / ID de Medición",
@@ -31,7 +30,6 @@ const labels = {
     saveButton: "Guardar Cambios",
     toastSuccessTitle: "¡Configuración guardada!",
     toastSuccessDescription: "Tus cambios han sido guardados correctamente.",
-    getMetaKeyHelp: "Obtén un token de acceso para la API de Marketing de Meta",
     getGA4KeyHelp: "Encuentra tu ID de Medición de Google Analytics",
   },
   en: {
@@ -39,8 +37,6 @@ const labels = {
     pageSubtitle: "Manage your account and connect your data sources.",
     integrationsTitle: "Data Integrations",
     integrationsDescription: "Enter your API keys to connect your platforms and see metrics on your dashboard. This data is confidential and stored securely.",
-    fbName: "Facebook / Meta Ads",
-    fbDescription: "Connect your Meta Ads account to get metrics from your campaigns.",
     gaName: "Google Analytics 4",
     gaDescription: "Integrate GA4 to visualize traffic and behavior.",
     apiKeyLabel: "API Key / Measurement ID",
@@ -53,7 +49,6 @@ const labels = {
     saveButton: "Save Changes",
     toastSuccessTitle: "Settings saved!",
     toastSuccessDescription: "Your changes have been saved successfully.",
-    getMetaKeyHelp: "Get an access token for the Meta Marketing API",
     getGA4KeyHelp: "Find your Google Analytics Measurement ID",
   },
   fr: {
@@ -61,8 +56,6 @@ const labels = {
     pageSubtitle: "Gérez votre compte et connectez vos sources de données.",
     integrationsTitle: "Intégrations de Données",
     integrationsDescription: "Entrez vos clés API pour connecter vos plateformes et voir les métriques sur votre tableau de bord. Ces données sont confidentielles et stockées en toute sécurité.",
-    fbName: "Facebook / Meta Ads",
-    fbDescription: "Connectez votre compte Meta Ads pour obtenir les métriques de vos campagnes.",
     gaName: "Google Analytics 4",
     gaDescription: "Intégrez GA4 pour visualiser le trafic et le comportement.",
     apiKeyLabel: "Clé API / ID de Mesure",
@@ -75,13 +68,12 @@ const labels = {
     saveButton: "Enregistrer les Modifications",
     toastSuccessTitle: "Paramètres enregistrés !",
     toastSuccessDescription: "Vos modifications ont été enregistrées avec succès.",
-    getMetaKeyHelp: "Obtenez un jeton d'accès pour l'API Marketing de Meta",
     getGA4KeyHelp: "Trouvez votre ID de mesure Google Analytics",
   }
 };
 
 
-type IntegrationId = 'facebook' | 'google';
+type IntegrationId = 'google';
 
 type Integration = {
     id: IntegrationId;
@@ -99,12 +91,10 @@ export default function SettingsPage() {
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
     const initialIntegrations: Omit<Integration, 'apiKey'>[] = [
-        { id: 'facebook', name: t.fbName, description: t.fbDescription, icon: <Facebook />, helpText: t.getMetaKeyHelp, helpUrl: "https://developers.facebook.com/docs/marketing-api/tokens" },
         { id: 'google', name: t.gaName, description: t.gaDescription, icon: <BarChart3 />, helpText: t.getGA4KeyHelp, helpUrl: "https://support.google.com/analytics/answer/10089681" },
     ];
 
     const [apiKeys, setApiKeys] = useState<Record<IntegrationId, string>>({
-        facebook: '',
         google: ''
     });
 
@@ -191,5 +181,3 @@ export default function SettingsPage() {
         </div>
     );
 }
-
-    

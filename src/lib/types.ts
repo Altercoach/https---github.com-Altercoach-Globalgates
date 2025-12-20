@@ -24,7 +24,7 @@ export type Product = {
   badge: MultilingualString;
   note: MultilingualString;
   description: MultilingualString;
-  features?: ProductFeature[];
+  features: string[]; // List of feature flags enabled for this product
   longDescription?: MultilingualString;
   whatIncludes?: MultilingualString;
   whatFor?: MultilingualString;
@@ -77,7 +77,8 @@ export type AuthRole = 'admin' | 'customer';
 
 export type User = { 
   email: string, 
-  role: AuthRole 
+  role: AuthRole,
+  plan?: string, // Added to know which plan the customer has.
 }
 
 export type AuthState = {

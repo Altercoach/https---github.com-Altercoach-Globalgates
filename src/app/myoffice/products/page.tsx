@@ -11,9 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import type { SiteData, Product, ProductFeature, MultilingualString } from '@/lib/types';
+import type { SiteData, Product, MultilingualString } from '@/lib/types';
 import { PlusCircle, Trash2, FileText, Info, Eye, EyeOff, GripVertical, Save, ExternalLink } from 'lucide-react';
-import { defaultFeatures } from '@/lib/constants';
+import { FEATURE_FLAGS } from '@/lib/feature-flags';
 import { useLanguage } from '@/hooks/use-language';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -35,6 +35,8 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Link from 'next/link';
+import { Checkbox } from '@/components/ui/checkbox';
+
 
 const labels = {
   es: {
@@ -51,11 +53,9 @@ const labels = {
     noteLabel: "Nota (Descripción corta)",
     badgeLabel: "Etiqueta",
     fullDescLabel: "Descripción Completa",
-    includedFormsTitle: "Formularios Incluidos y Disparadores",
-    activationStage: "Etapa de activación",
+    includedFeaturesTitle: "Funcionalidades Incluidas (Feature Flags)",
     saveChanges: "Guardar Cambios",
     productTypes: { one: 'Pago Único', sub: 'Suscripción', info: 'Informativo' },
-    stageOptions: { onboarding: 'Al contratar', campaign_start: 'Al iniciar campaña', campaign_end: 'Al finalizar campaña', on_demand: 'Bajo demanda' },
     editingLanguage: "Estás editando el contenido en",
     visible: "Visible en la página principal"
   },
@@ -73,11 +73,9 @@ const labels = {
     noteLabel: "Note (Short description)",
     badgeLabel: "Badge",
     fullDescLabel: "Full Description",
-    includedFormsTitle: "Included Forms & Triggers",
-    activationStage: "Activation Stage",
+    includedFeaturesTitle: "Included Features (Feature Flags)",
     saveChanges: "Save Changes",
     productTypes: { one: 'One-time Payment', sub: 'Subscription', info: 'Informational' },
-    stageOptions: { onboarding: 'Onboarding', campaign_start: 'On campaign start', campaign_end: 'On campaign end', on_demand: 'On demand' },
     editingLanguage: "You are editing the content in",
     visible: "Visible on homepage"
   },
@@ -95,11 +93,9 @@ const labels = {
     noteLabel: "Note (Description courte)",
     badgeLabel: "Badge",
     fullDescLabel: "Description Complète",
-    includedFormsTitle: "Formulaires et Déclencheurs Inclus",
-    activationStage: "Étape d'activation",
+    includedFeaturesTitle: "Fonctionnalités Incluses (Feature Flags)",
     saveChanges: "Enregistrer les Modifications",
     productTypes: { one: 'Paiement Unique', sub: 'Abonnement', info: 'Informationnel' },
-    stageOptions: { onboarding: 'À l\'intégration', campaign_start: 'Au début de la campagne', campaign_end: 'À la fin de la campagne', on_demand: 'À la demande' },
     editingLanguage: "Vous éditez le contenu en",
     visible: "Visible sur la page d'accueil"
   }
@@ -131,8 +127,6 @@ export default function ProductsEditorPage() {
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
   const [openAccordionItem, setOpenAccordionItem] = useState<string | undefined>();
-
-  const stageOptions = Object.entries(t.stageOptions).map(([value, label]) => ({ value, label }));
   
   const handleUpdate = (updater: (currentDraft: SiteData) => SiteData) => {
     setSite(updater);
@@ -155,35 +149,20 @@ export default function ProductsEditorPage() {
     }));
   };
 
-  const handleFeatureToggle = (productId: string, featureId: string, enabled: boolean) => {
+  const handleFeatureToggle = (productId: string, featureFlag: string, enabled: boolean) => {
     handleUpdate(prev => ({
-      ...prev,
-      products: prev.products.map(p => {
-          if (p.id === productId && p.features) {
-              const newFeatures = p.features.map(f => 
-                  f.id === featureId ? { ...f, enabled } : f
-              );
-              return { ...p, features: newFeatures };
-          }
-          return p;
-      })
-    }));
-  };
-
-  const handleFeatureStageChange = (productId: string, featureId: string, stage: ProductFeature['stage']) => {
-     handleUpdate(prev => ({
         ...prev,
         products: prev.products.map(p => {
-            if (p.id === productId && p.features) {
-                const newFeatures = p.features.map(f => 
-                    f.id === featureId ? { ...f, stage } : f
-                );
+            if (p.id === productId) {
+                const newFeatures = enabled
+                    ? [...p.features, featureFlag]
+                    : p.features.filter(f => f !== featureFlag);
                 return { ...p, features: newFeatures };
             }
             return p;
         })
     }));
-  }
+  };
 
   const addNewProduct = () => {
     const newId = `prod_${Date.now()}`;
@@ -196,7 +175,7 @@ export default function ProductsEditorPage() {
         badge: { en: 'New', es: 'Nuevo', fr: 'Nouveau' },
         note: { en: 'A short description.', es: 'Una breve descripción.', fr: 'Une courte description.' },
         description: { en: 'Detailed description of the new plan.', es: 'Descripción detallada del nuevo plan.', fr: 'Description détaillée du nouveau forfait.' },
-        features: JSON.parse(JSON.stringify(defaultFeatures))
+        features: []
     };
     handleUpdate(prev => ({ ...prev, products: [newProduct, ...prev.products] }));
     setOpenAccordionItem(newId);
@@ -226,6 +205,8 @@ export default function ProductsEditorPage() {
       });
     }
   };
+  
+  const allFeatureFlags = Object.values(FEATURE_FLAGS);
 
   return (
     <div className="space-y-6">
@@ -313,33 +294,21 @@ export default function ProductsEditorPage() {
                               <Separator className="my-6 bg-border" />
 
                               <div>
-                                  <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFormsTitle}</h4>
-                                  <div className="space-y-4">
-                                      {(product.features || []).map(feature => (
-                                          <div key={feature.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-4 rounded-md border bg-background p-4">
-                                              <Link href={feature.href} className="font-normal flex items-center gap-2 text-primary underline-offset-4 hover:underline" target="_blank">
-                                                  {feature.name}
-                                                  <ExternalLink className="h-3 w-3" />
-                                              </Link>
-                                              <Switch
-                                                  id={`switch-${product.id}-${feature.id}`}
-                                                  checked={feature.enabled}
-                                                  onCheckedChange={(checked) => handleFeatureToggle(product.id, feature.id, checked)}
+                                  <h4 className="font-semibold text-md mb-4 flex items-center gap-2"><FileText className="h-5 w-5 text-accent"/> {t.includedFeaturesTitle}</h4>
+                                  <div className="space-y-4 max-h-60 overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                      {allFeatureFlags.map(flag => (
+                                          <div key={flag} className="flex items-center space-x-2">
+                                              <Checkbox
+                                                  id={`feature-${product.id}-${flag}`}
+                                                  checked={product.features.includes(flag)}
+                                                  onCheckedChange={(checked) => handleFeatureToggle(product.id, flag, !!checked)}
                                               />
-                                              <Select
-                                                  value={feature.stage}
-                                                  onValueChange={(value: ProductFeature['stage']) => handleFeatureStageChange(product.id, feature.id, value)}
-                                                  disabled={!feature.enabled}
+                                              <label
+                                                htmlFor={`feature-${product.id}-${flag}`}
+                                                className="text-sm font-mono text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
                                               >
-                                                  <SelectTrigger className="w-[180px]">
-                                                      <SelectValue placeholder={t.activationStage} />
-                                                  </SelectTrigger>
-                                                  <SelectContent>
-                                                      {stageOptions.map(opt => (
-                                                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                                                      ))}
-                                                  </SelectContent>
-                                              </Select>
+                                                {flag}
+                                              </label>
                                           </div>
                                       ))}
                                   </div>
