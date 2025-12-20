@@ -6,8 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { KeyRound, Settings, Facebook, BarChart3, LineChart, HelpCircle } from 'lucide-react';
-import Image from 'next/image';
+import { KeyRound, Settings, Facebook, BarChart3, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';
@@ -99,17 +98,21 @@ export default function SettingsPage() {
     const { language } = useLanguage();
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
-    const initialIntegrations: Integration[] = [
-        { id: 'facebook', name: t.fbName, description: t.fbDescription, apiKey: '', icon: <Facebook />, helpText: t.getMetaKeyHelp, helpUrl: "https://developers.facebook.com/docs/marketing-api/tokens" },
-        { id: 'google', name: t.gaName, description: t.gaDescription, apiKey: '', icon: <BarChart3 />, helpText: t.getGA4KeyHelp, helpUrl: "https://support.google.com/analytics/answer/10089681" },
+    const initialIntegrations: Omit<Integration, 'apiKey'>[] = [
+        { id: 'facebook', name: t.fbName, description: t.fbDescription, icon: <Facebook />, helpText: t.getMetaKeyHelp, helpUrl: "https://developers.facebook.com/docs/marketing-api/tokens" },
+        { id: 'google', name: t.gaName, description: t.gaDescription, icon: <BarChart3 />, helpText: t.getGA4KeyHelp, helpUrl: "https://support.google.com/analytics/answer/10089681" },
     ];
 
-    const [integrations, setIntegrations] = useState<Integration[]>(initialIntegrations);
+    const [apiKeys, setApiKeys] = useState<Record<IntegrationId, string>>({
+        facebook: '',
+        google: ''
+    });
+
     const [email, setEmail] = useState('demo@cliente.com');
     const [password, setPassword] = useState('');
 
     const handleApiKeyChange = (id: IntegrationId, value: string) => {
-        setIntegrations(prev => prev.map(int => int.id === id ? { ...int, apiKey: value } : int));
+        setApiKeys(prev => ({ ...prev, [id]: value }));
     };
 
     const saveChanges = () => {
@@ -129,7 +132,7 @@ export default function SettingsPage() {
                     <CardDescription>{t.integrationsDescription}</CardDescription>
                 </CardHeader>
                 <CardContent className="grid md:grid-cols-2 gap-6">
-                    {integrations.map(integration => (
+                    {initialIntegrations.map(integration => (
                         <div key={integration.id} className="p-4 border rounded-lg">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="text-primary">{integration.icon}</div>
@@ -142,7 +145,7 @@ export default function SettingsPage() {
                                   <TooltipProvider>
                                       <Tooltip>
                                           <TooltipTrigger asChild>
-                                            <Link href={integration.helpUrl} target="_blank">
+                                            <Link href={integration.helpUrl} target="_blank" tabIndex={-1}>
                                                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help"/>
                                             </Link>
                                           </TooltipTrigger>
@@ -156,7 +159,7 @@ export default function SettingsPage() {
                                     id={`apikey-${integration.id}`}
                                     type="password"
                                     placeholder={t.apiKeyPlaceholder}
-                                    value={integration.apiKey}
+                                    value={apiKeys[integration.id]}
                                     onChange={(e) => handleApiKeyChange(integration.id, e.target.value)}
                                 />
                             </div>
