@@ -350,5 +350,5 @@ export default function CustomerAgentConfigPage() {
             </div>
         </div>
     );
-
+}
     

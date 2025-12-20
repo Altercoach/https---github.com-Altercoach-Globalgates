@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { KeyRound, Settings, Facebook, BarChart3, HelpCircle } from 'lucide-react';
+import { Settings, Facebook, BarChart3, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';
@@ -191,3 +191,5 @@ export default function SettingsPage() {
         </div>
     );
 }
+
+    
