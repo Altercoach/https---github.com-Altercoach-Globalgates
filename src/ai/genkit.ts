@@ -1,3 +1,4 @@
+
 import { genkit, Model } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
@@ -19,17 +20,17 @@ export const ai = genkit({
  */
 export const MODEL_BY_TASK = {
   // Text & Logic
-  onboarding: 'gemini-1.5-flash-latest',
-  evaluation: 'gemini-1.5-flash-latest', 
-  copywriting: 'gemini-1.5-flash-latest',
-  chat: 'gemini-1.5-flash-latest',
-  strategic: 'gemini-1.5-pro-latest', // Usamos un modelo más potente para estrategia
+  onboarding: 'gemini-1.5-pro-latest',
+  evaluation: 'gemini-1.5-pro-latest', 
+  copywriting: 'gemini-1.5-pro-latest',
+  chat: 'gemini-1.5-pro-latest',
+  strategic: 'gemini-1.5-pro-latest',
 
   // Visuals
   imageGeneration: 'imagen-3.0-fast-generate-001', 
 
   // Analytics
-  analytics: 'gemini-1.5-flash-latest',
+  analytics: 'gemini-1.5-pro-latest',
 };
 
 /**
