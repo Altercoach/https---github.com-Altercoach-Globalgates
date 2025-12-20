@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
 
   Here is the conversation history (the last message is the user's current message):
   {{#each history}}
-    {{#if (eq role 'user')}}
+    {{#if (eq role "user")}}
       User: {{{content}}}
     {{else}}
       Assistant: {{{content}}}
@@ -66,7 +66,32 @@ const chatFlow = ai.defineFlow(
   },
   async (input) => {
     const abacusModel = getAbacusModelForTask('chat');
-    const { output } = await prompt(input, { model: abacusModel });
+    
+    // Create a simplified prompt history without complex helpers
+    const simpleHistory = input.history
+      .map(h => `${h.role === 'user' ? 'User' : 'Assistant'}: ${h.content}`)
+      .join('\n');
+
+    // Manually construct the prompt string
+    const constructedPrompt = `You MUST respond in the following language: ${input.language}
+
+${input.systemPrompt}
+
+Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
+--- KNOWLEDGE BASE ---
+${input.knowledgeBase}
+--- END KNOWLEDGE BASE ---
+
+Here is the conversation history (the last message is the user's current message):
+${simpleHistory}
+
+Assistant:`;
+
+    const { output } = await ai.generate({
+      model: abacusModel,
+      prompt: constructedPrompt,
+      output: { schema: ChatOutputSchema },
+    });
     
     if (!output) {
       throw new Error('The AI failed to generate a response.');
