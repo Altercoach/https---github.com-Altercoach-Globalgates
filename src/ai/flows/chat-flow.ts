@@ -1,14 +1,14 @@
 
 'use server';
 /**
- * @fileOverview A simple chat flow for the AI Agent, using Abacus AI.
+ * @fileOverview A simple chat flow for the AI Agent, using Abacus AI (Replicate).
  *
  * - chat - A function that handles the chat interaction.
  * - ChatInput - The input type for the chat function.
  * - ChatOutput - The return type for the chat function.
  */
 
-import { ai, getAbacusModelForTask } from '@/ai/genkit';
+import { ai, runReplicateText } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const ChatHistorySchema = z.object({
@@ -33,6 +33,7 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
   return chatFlow(input);
 }
 
+// Este flow ahora construye el prompt y llama a la función de Replicate
 const chatFlow = ai.defineFlow(
   {
     name: 'chatFlow',
@@ -40,35 +41,39 @@ const chatFlow = ai.defineFlow(
     outputSchema: ChatOutputSchema,
   },
   async (input) => {
-    const abacusModel = getAbacusModelForTask('chat');
     
-    // Construct a single string prompt
+    // Construimos el historial de chat para Llama-2
     const historyString = input.history
-      .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+      .map(msg => {
+          if (msg.role === 'user') return `[INST] ${msg.content} [/INST]`;
+          return msg.content;
+      })
       .join('\n');
       
-    const constructedPrompt = `${input.systemPrompt}
+    // Construimos el prompt final que se enviará a Replicate
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${input.systemPrompt}
 You MUST respond in the following language: ${input.language}
 
 Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
 --- KNOWLEDGE BASE ---
 ${input.knowledgeBase}
 --- END KNOWLEDGE BASE ---
+<</SYS>>
 
-Conversation History:
 ${historyString}
-Assistant:`;
+</s>
+`;
 
-    const { output } = await ai.generate({
-      model: abacusModel,
-      prompt: constructedPrompt,
-      output: { schema: ChatOutputSchema },
-    });
+    // Llamamos a nuestra función wrapper de Replicate
+    const responseText = await runReplicateText(constructedPrompt, 'chat');
     
-    if (!output) {
-      throw new Error('The AI failed to generate a response.');
+    if (!responseText) {
+      throw new Error('The AI (Replicate) failed to generate a response.');
     }
 
-    return output;
+    // Devolvemos la respuesta en el formato esperado.
+    // No necesitamos parsear JSON si Replicate devuelve texto plano.
+    return { response: responseText };
   }
 );
