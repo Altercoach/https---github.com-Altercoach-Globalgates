@@ -15,7 +15,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { sampleAnswers } from '@/lib/data/dashboard-data';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { generateContentSchedule, GenerateContentScheduleOutput, ContentPost } from '@/ai/flows/generate-content-schedule-flow';
-import { generateImageFromPrompt, GenerateImageOutput } from '@/ai/flows/generate-image-flow';
+import { generateImageFromPrompt } from '@/ai/flows/generate-image-flow';
+import type { GenerateImageOutput } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/use-language';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -561,4 +562,3 @@ export default function TeamLabPage() {
         </div>
     );
 }
-

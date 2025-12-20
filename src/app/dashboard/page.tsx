@@ -26,7 +26,8 @@ import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { generateContentSchedule, GenerateContentScheduleOutput } from '@/ai/flows/generate-content-schedule-flow';
-import { generateImageFromPrompt, GenerateImageOutput } from '@/ai/flows/generate-image-flow';
+import { generateImageFromPrompt } from '@/ai/flows/generate-image-flow';
+import type { GenerateImageOutput } from '@/lib/types';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
 import { Loader2 } from 'lucide-react';
 
@@ -356,4 +357,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

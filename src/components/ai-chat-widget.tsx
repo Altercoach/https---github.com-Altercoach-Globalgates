@@ -71,7 +71,7 @@ export function AIChatWidget() {
   const agentName = `${agentPersona.firstName} ${agentPersona.lastName}`;
 
   const knowledgeBase = useMemo(() => {
-    let base = `SITE_PRODUCTS:\n${JSON.stringify(site.products)}\n\nSITE_SOLUTIONS:\n${JSON.stringify(site.services)}`;
+    let base = `SITE_PRODUCTS:\n${JSON.stringify(site.products.map(p => ({...p, name: getTranslation(p.name)})))}\n\nSITE_SOLUTIONS:\n${JSON.stringify(site.services.map(s => ({...s, title: getTranslation(s.title)})))}`;
     if(isPayingCustomer && auth.user) {
         const customerData = initialCustomers.find(c => c.email === auth.user!.email);
         const kpis = {
@@ -86,7 +86,7 @@ export function AIChatWidget() {
         base += `CUSTOMER_BUSINESS_ANALYSIS: ${JSON.stringify(customerAnalyses)}\n`;
     }
     return base;
-  }, [site, isPayingCustomer, auth.user, language.code]);
+  }, [site, isPayingCustomer, auth.user, language.code, getTranslation]);
   
   const systemPrompt = useMemo(() => {
     const isRegisteredButNotPaying = auth.loggedIn && auth.user?.role === 'customer' && !isPayingCustomer;
@@ -268,5 +268,3 @@ export function AIChatWidget() {
     </>
   );
 }
-
-    
