@@ -122,7 +122,7 @@ const SortableProductItem = ({ product, children }: { product: Product, children
 };
 
 export default function ProductsEditorPage() {
-  const { site, setSite, setHasUnsavedChanges } = useSite();
+  const { site, setSite } = useSite();
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
@@ -130,7 +130,6 @@ export default function ProductsEditorPage() {
   
   const handleUpdate = (updater: (currentDraft: SiteData) => SiteData) => {
     setSite(updater);
-    setHasUnsavedChanges(true);
   };
   
   const handleProductUpdate = (id: string, field: keyof Product, value: any, isMultilingual: boolean) => {

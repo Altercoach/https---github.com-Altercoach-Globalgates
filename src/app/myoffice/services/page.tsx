@@ -50,14 +50,13 @@ const labels = {
 };
 
 export default function ServicesEditorPage() {
-  const { site, setSite, setHasUnsavedChanges } = useSite();
+  const { site, setSite } = useSite();
   const { language } = useLanguage();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode] || labels.en;
 
   const handleUpdate = (updater: (prevSite: SiteData) => SiteData) => {
     setSite(updater);
-    setHasUnsavedChanges(true);
   };
   
   const handleTextUpdate = (serviceId: string, field: 'title', value: any) => {

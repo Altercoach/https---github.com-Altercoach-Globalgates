@@ -79,27 +79,18 @@ const labels = {
 
 
 export default function BrandEditorPage() {
-  const { site, setSite, setHasUnsavedChanges } = useSite();
-  const [draft, setDraft] = useState<SiteData>(() => JSON.parse(JSON.stringify(site)));
+  const { site, setSite } = useSite();
   const { language } = useLanguage();
   const langCode = language.code;
   const t = labels[langCode] || labels.en;
 
-  useEffect(() => {
-    setDraft(JSON.parse(JSON.stringify(site)));
-  }, [site]);
-  
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        const url = event.target?.result as string;
-        setSite(prev => ({ ...prev, brand: { ...prev.brand, heroImage: url } }));
-        setHasUnsavedChanges(true);
-    };
-    reader.readAsDataURL(file);
+    // Create a temporary URL for the image to avoid storing large Base64 strings in the state
+    const url = URL.createObjectURL(file);
+    setSite(prev => ({ ...prev, brand: { ...prev.brand, heroImage: url } }));
   };
   
   const triggerFilePicker = () => {
@@ -117,7 +108,6 @@ export default function BrandEditorPage() {
             }
         }
     }));
-    setHasUnsavedChanges(true);
   };
 
   return (

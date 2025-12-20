@@ -16,18 +16,29 @@ interface SiteContextType {
 export const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export function SiteProvider({ children }: { children: React.ReactNode }) {
-  // The state is now initialized directly from the imported object.
-  // This ensures that when the file is updated, a page reload will show the new content.
+  // Initialize state from the imported object. This allows for hot-reloading of content.
   const [site, setSite] = useState<SiteData>(DEFAULT_SITE_CONTENT);
   const [isMounted, setIsMounted] = useState(false);
+  // The concept of "unsaved changes" is removed as we move back to a real-time update model.
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
-    // The main purpose of this effect is just to confirm the component has mounted on the client.
     setIsMounted(true);
   }, []);
-  
-  const value = useMemo(() => ({ site, setSite, isMounted, hasUnsavedChanges, setHasUnsavedChanges }), [site, isMounted, hasUnsavedChanges]);
+
+  const handleSetSite = useCallback((updater: React.SetStateAction<SiteData>) => {
+    // We set a flag for unsaved changes whenever the site data is modified.
+    setHasUnsavedChanges(true);
+    setSite(updater);
+  }, []);
+
+  const value = useMemo(() => ({ 
+    site, 
+    setSite: handleSetSite, 
+    isMounted,
+    hasUnsavedChanges,
+    setHasUnsavedChanges // Still provide this for now to avoid breaking components that use it
+  }), [site, isMounted, hasUnsavedChanges, handleSetSite]);
 
   if (!isMounted) {
     return null; 

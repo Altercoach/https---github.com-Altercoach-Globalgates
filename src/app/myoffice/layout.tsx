@@ -87,7 +87,7 @@ export default function MyOfficeLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { site, hasUnsavedChanges } = useSite();
+  const { site } = useSite();
   const { auth, logout } = useAuth();
   const { language, getTranslation } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
@@ -179,16 +179,6 @@ export default function MyOfficeLayout({
         </header>
         <main className="relative flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-muted/20">
           {children}
-          {hasUnsavedChanges && (
-            <div className="fixed bottom-6 right-6 z-50 animate-in fade-in-50 slide-in-from-bottom-5">
-              <Button size="lg" asChild>
-                <Link href="/myoffice/review-and-save">
-                  <Save className="mr-2" />
-                  {t.reviewAndSave}
-                </Link>
-              </Button>
-            </div>
-          )}
         </main>
       </SidebarInset>
     </SidebarProvider>
