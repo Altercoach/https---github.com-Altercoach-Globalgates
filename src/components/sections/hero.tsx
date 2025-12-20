@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -43,50 +42,50 @@ export function Hero() {
   };
 
   return (
-    <section id="hero" className="w-full py-12 md:py-24 lg:py-32 bg-primary/5">
-      <div className="container px-4 md:px-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-          <div className="flex flex-col justify-center space-y-4">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                {getTranslation(site.brand.heroTitle)}
-              </h1>
-              <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                {getTranslation(site.brand.heroSubtitle)}
-              </p>
-            </div>
-            <ul className="grid gap-2 text-lg">
-                <li className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>{t.bullet1}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>{t.bullet2}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-accent" />
-                    <span>{t.bullet3}</span>
-                </li>
-            </ul>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button asChild size="lg">
-                <Link href="/signup">{t.signupFree}</Link>
-              </Button>
-              <Button onClick={scrollToPlans} size="lg" variant="secondary">
-                {t.explorePlans}
-              </Button>
-            </div>
+    <section id="hero" className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center text-white">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={site.brand.heroImage || '/hero-default.jpg'}
+          alt="Hero Image"
+          fill
+          className="object-cover"
+          data-ai-hint="business marketing"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+      <div className="relative z-10 container px-4 md:px-6">
+        <div className="flex flex-col justify-center space-y-4 max-w-2xl">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
+              {getTranslation(site.brand.heroTitle)}
+            </h1>
+            <p className="max-w-[600px] text-gray-200 md:text-xl">
+              {getTranslation(site.brand.heroSubtitle)}
+            </p>
           </div>
-          <Image
-            src={site.brand.heroImage || '/hero-default.jpg'}
-            alt="Hero Image"
-            width={600}
-            height={400}
-            className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-            data-ai-hint="business marketing"
-            priority
-          />
+          <ul className="grid gap-2 py-4 text-lg">
+              <li className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent" />
+                  <span>{t.bullet1}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent" />
+                  <span>{t.bullet2}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-accent" />
+                  <span>{t.bullet3}</span>
+              </li>
+          </ul>
+          <div className="flex flex-col gap-2 min-[400px]:flex-row">
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/signup">{t.signupFree}</Link>
+            </Button>
+            <Button onClick={scrollToPlans} size="lg" variant="outline">
+              {t.explorePlans}
+            </Button>
+          </div>
         </div>
       </div>
     </section>
