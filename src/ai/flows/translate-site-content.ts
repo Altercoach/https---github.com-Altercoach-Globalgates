@@ -28,21 +28,27 @@ export async function translateSiteContent(input: TranslateSiteContentInput): Pr
       return input.siteContent;
     }
 
-    const prompt = `You are a professional translator specializing in marketing content. Translate the provided Spanish JSON content into the target language, preserving the JSON structure and keys perfectly.
+    const systemPrompt = `You are a professional translator specializing in marketing content. Translate the provided Spanish JSON content into the target language, preserving the JSON structure and keys perfectly.
 
 **IMPORTANT**: Respond only with the translated JSON object as a string. Do not add any extra explanations, comments, or markdown formatting. The JSON structure must remain identical to the input.
 
 The target language is: **${input.targetLanguage}**.
+`;
 
-Here is the website content to translate from Spanish:
+    const userPrompt = `Here is the website content to translate from Spanish:
 ${input.siteContent}
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
-`;
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+    
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${systemPrompt}
+<</SYS>>
+
+${userPrompt} [/INST]`;
 
     let responseText = '';
     try {
-        responseText = await runReplicateText(prompt);
+        responseText = await runReplicateText(constructedPrompt);
 
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {

@@ -31,24 +31,29 @@ export type AnalyzeBusinessEvaluationOutput = z.infer<typeof AnalyzeBusinessEval
 
 
 export async function analyzeBusinessEvaluation(input: AnalyzeBusinessEvaluationInput): Promise<AnalyzeBusinessEvaluationOutput> {
-  const prompt = `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
+  const systemPrompt = `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
 
 **Rules:**
 1.  **Analyze the Answers:** Review all responses to understand the business, goals, and challenges.
 2.  **Language**: The entire output MUST be in the target language: ${input.targetLanguage}.
 3.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text, explanations, or markdown formatting before or after the JSON object.
+`;
 
-**Client's Questionnaire Answers (JSON format):**
+    const userPrompt = `**Client's Questionnaire Answers (JSON format):**
 ${input.answersJson}
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
-`;
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${systemPrompt}
+<</SYS>>
+
+${userPrompt} [/INST]`;
 
     let responseText = '';
     try {
-        responseText = await runReplicateText(prompt);
+        responseText = await runReplicateText(constructedPrompt);
 
-        // Robust JSON parsing
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
             throw new Error('No JSON object found in the AI response.');
@@ -56,7 +61,6 @@ ${input.answersJson}
         const jsonString = jsonMatch[0];
         const parsedOutput = JSON.parse(jsonString);
 
-        // Validate the parsed object against the Zod schema
         const validatedOutput = AnalyzeBusinessEvaluationOutputSchema.parse(parsedOutput);
         
         return validatedOutput;
@@ -68,7 +72,6 @@ ${input.answersJson}
         console.error(responseText);
         console.error("================================ END OF AI RESPONSE ERROR ================================");
         
-        // Fallback to a safe, informative error object instead of throwing
         return {
             swot: {
                 strengths: "Información insuficiente para determinar.",

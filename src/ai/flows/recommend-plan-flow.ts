@@ -25,7 +25,7 @@ const RecommendPlanOutputSchema = z.object({
 export type RecommendPlanOutput = z.infer<typeof RecommendPlanOutputSchema>;
 
 export async function recommendPlan(input: RecommendPlanInput): Promise<RecommendPlanOutput> {
-  const prompt = `You are an expert business consultant. Your task is to analyze a business description and recommend the best plan(s) from the available products.
+  const systemPrompt = `You are an expert business consultant. Your task is to analyze a business description and recommend the best plan(s) from the available products.
 
 **Instructions:**
 1.  Analyze the business description to understand its needs.
@@ -33,19 +33,25 @@ export async function recommendPlan(input: RecommendPlanInput): Promise<Recommen
 3.  **If the description is clear:** Select one or more product IDs that are the best fit. Provide a clear reasoning in Spanish. Do not recommend 'info' type products.
 4.  **If the description is vague:** Do not select any products (leave 'productIds' empty). Instead, ask a specific, friendly question in Spanish in the 'reasoning' field to get the necessary information.
 5.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
+`;
 
-**Business Description:**
+    const userPrompt = `**Business Description:**
 ${input.businessDescription}
 
 **Available Products (JSON):**
 ${input.products}
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
-`;
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${systemPrompt}
+<</SYS>>
+
+${userPrompt} [/INST]`;
 
     let responseText = '';
     try {
-        responseText = await runReplicateText(prompt);
+        responseText = await runReplicateText(constructedPrompt);
 
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {

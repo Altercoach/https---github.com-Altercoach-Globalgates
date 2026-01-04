@@ -33,22 +33,28 @@ export type GenerateAgentPromptOutput = z.infer<typeof GenerateAgentPromptOutput
 
 export async function generateAgentPrompt(input: GenerateAgentPromptInput): Promise<GenerateAgentPromptOutput> {
   
-  const prompt = `You are an expert in organizational psychology and AI personality design. Your task is to analyze the client's questionnaire answers to create a complete profile and a detailed system prompt for their new AI Agent.
+  const systemPrompt = `You are an expert in organizational psychology and AI personality design. Your task is to analyze the client's questionnaire answers to create a complete profile and a detailed system prompt for their new AI Agent.
 
 **Rules:**
 1.  **Analyze and Create Profile:** Define the agent's role, tone, psychological archetype, and key personality traits based on the client's answers.
 2.  **Build the System Prompt:** Construct a comprehensive system prompt that defines the AI's persona, main objective, process rules (leads, sales, support), knowledge base instructions, and escalation protocols. Use clear, actionable language.
 3.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text, explanations, or markdown formatting before or after the JSON object.
+`;
 
-**Client's Questionnaire Answers (JSON format):**
+    const userPrompt = `**Client's Questionnaire Answers (JSON format):**
 ${input.answersJson}
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
-`;
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${systemPrompt}
+<</SYS>>
+
+${userPrompt} [/INST]`;
     
     let responseText = '';
     try {
-        responseText = await runReplicateText(prompt);
+        responseText = await runReplicateText(constructedPrompt);
 
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {

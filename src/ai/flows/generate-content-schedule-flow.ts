@@ -33,7 +33,7 @@ export type GenerateContentScheduleOutput = z.infer<typeof GenerateContentSchedu
 
 
 export async function generateContentSchedule(input: GenerateContentScheduleInput): Promise<GenerateContentScheduleOutput> {
-  const prompt = `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
+  const systemPrompt = `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
 
 **Your Task:**
 Create a diverse content schedule of 10-12 posts. For each post, define:
@@ -44,16 +44,22 @@ Create a diverse content schedule of 10-12 posts. For each post, define:
 5.  **copyOut**: Final, public-facing caption with 3-4 relevant hashtags.
 
 **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
-
-**Client Information & Instructions:**
-${input.clientBusiness}
-
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
 `;
     
+    const userPrompt = `**Client Information & Instructions:**
+${input.clientBusiness}
+
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${systemPrompt}
+<</SYS>>
+
+${userPrompt} [/INST]`;
+
     let responseText = '';
     try {
-        responseText = await runReplicateText(prompt);
+        responseText = await runReplicateText(constructedPrompt);
 
         const jsonMatch = responseText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
