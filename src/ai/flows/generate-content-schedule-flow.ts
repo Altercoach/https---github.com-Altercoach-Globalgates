@@ -2,15 +2,15 @@
 'use server';
 
 /**
- * @fileOverview Generates a monthly content schedule for a client using Google AI.
+ * @fileOverview Generates a monthly content schedule for a client using Replicate.
  *
  * - generateContentSchedule - A function that creates the content schedule.
  * - GenerateContentScheduleInput - The input type for the function.
  * - GenerateContentScheduleOutput - The return type for the function.
  */
 
-import { ai, MODEL_BY_TASK } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
+import { runReplicateText } from '@/ai/genkit';
 
 const GenerateContentScheduleInputSchema = z.object({
   clientBusiness: z.string().describe("A description of the client's business, their purchased plan, and any specific instructions from the marketing team."),
@@ -33,14 +33,7 @@ export type GenerateContentScheduleOutput = z.infer<typeof GenerateContentSchedu
 
 
 export async function generateContentSchedule(input: GenerateContentScheduleInput): Promise<GenerateContentScheduleOutput> {
-  return generateContentScheduleFlow(input);
-}
-
-const generateContentSchedulePrompt = ai.definePrompt({
-    name: 'generateContentSchedulePrompt',
-    input: { schema: GenerateContentScheduleInputSchema },
-    output: { schema: GenerateContentScheduleOutputSchema },
-    prompt: `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
+  const prompt = `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
 
 **Your Task:**
 Create a diverse content schedule of 10-12 posts. For each post, define:
@@ -53,24 +46,28 @@ Create a diverse content schedule of 10-12 posts. For each post, define:
 **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
 
 **Client Information & Instructions:**
-{{{clientBusiness}}}
-`,
-});
+${input.clientBusiness}
 
-const generateContentScheduleFlow = ai.defineFlow(
-  {
-    name: 'generateContentScheduleFlow',
-    inputSchema: GenerateContentScheduleInputSchema,
-    outputSchema: GenerateContentScheduleOutputSchema,
-  },
-  async (input) => {
-    const { output } = await generateContentSchedulePrompt(input, { model: MODEL_BY_TASK.copywriting });
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
+`;
     
-    if (!output) {
-      console.error("AI failed to generate a content schedule.");
-      throw new Error('The AI failed to generate a valid content schedule.');
+    let responseText = '';
+    try {
+        responseText = await runReplicateText(prompt);
+
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('No JSON object found in the AI response.');
+        }
+        const jsonString = jsonMatch[0];
+        const parsedOutput = JSON.parse(jsonString);
+        
+        const validatedOutput = GenerateContentScheduleOutputSchema.parse(parsedOutput);
+        
+        return validatedOutput;
+
+    } catch (error) {
+        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        throw new Error('The AI returned an invalid response format.');
     }
-    
-    return output;
-  }
-);
+}

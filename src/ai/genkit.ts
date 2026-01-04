@@ -1,49 +1,69 @@
 
-import { genkit } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
-
-// ============================================
-// CONFIGURACIÓN DE GENKIT Y CLIENTES
-// ============================================
-
-export const ai = genkit({
-  plugins: [
-    googleAI({
-      apiVersion: "v1beta",
-    }),
-  ],
-});
-
-// ============================================
-// MAPEO DE MODELOS (Lógica Abstraída)
-// ============================================
+'use server';
 
 /**
- * Mapea tareas a modelos de Google.
- * Esta es la fuente de verdad para la selección de modelos en la app.
+ * @fileOverview Centralized AI configuration for the application.
+ * This file configures the AI provider (Replicate) and exports a utility
+ * function to run text generation models.
  */
-export const MODEL_BY_TASK = {
-  // Text & Logic (usando Google)
-  onboarding: 'gemini-1.5-pro-latest',
-  evaluation: 'gemini-1.5-pro-latest',
-  copywriting: 'gemini-1.5-pro-latest',
-  chat: 'gemini-1.5-pro-latest',
-  strategic: 'gemini-1.5-pro-latest',
 
-  // Visuals (usando Google)
-  imageGeneration: 'imagen-3.0-fast-generate-001', 
+import Replicate from 'replicate';
 
-  // Analytics (usando Google)
-  analytics: 'gemini-1.5-pro-latest',
+// Initialize the Replicate client with the API token from environment variables.
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
+
+// Define the models to be used for different tasks.
+// We are standardizing on meta-llama-3-8b-instruct for its reliability and performance.
+const REPLICATE_MODELS = {
+    text: 'meta/meta-llama-3-8b-instruct',
+    image: 'stability-ai/sdxl' // A reliable model for image generation
 };
 
 
-// ============================================
-// LOGS PARA DEBUGGING
-// ============================================
+/**
+ * Runs a text generation model on Replicate.
+ * @param prompt The complete prompt to send to the model.
+ * @returns The generated text as a string.
+ */
+export async function runReplicateText(prompt: string): Promise<string> {
+    console.log(`Running Replicate with model: ${REPLICATE_MODELS.text}`);
+    
+    const output = await replicate.run(REPLICATE_MODELS.text, {
+        input: { prompt }
+    });
 
-if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with Google AI model abstraction.');
-  console.log(`   Default Text Model: ${MODEL_BY_TASK.chat}`);
-  console.log(`   Image Model: ${MODEL_BY_TASK.imageGeneration}`);
+    // The output is an array of strings; we join them to get the full response.
+    return Array.isArray(output) ? output.join('') : String(output);
+}
+
+/**
+ * Runs an image generation model on Replicate.
+ * @param prompt The prompt for the image generation.
+ * @param aspectRatio The desired aspect ratio for the image.
+ * @returns The URL of the generated image.
+ */
+export async function runReplicateImage(prompt: string, aspectRatio: string): Promise<string> {
+    console.log(`Running Replicate image generation with model: ${REPLICATE_MODELS.image}`);
+    
+    // Note: Aspect ratio handling might need to be adjusted based on the specific model's input format.
+    // For sdxl, it's width/height. We'll derive it from the aspect ratio.
+    const [width, height] = aspectRatio === '1:1' ? [1024, 1024] :
+                           aspectRatio === '16:9' ? [1344, 768] :
+                           [768, 1344]; // 9:16 or other vertical
+
+    const output = await replicate.run(REPLICATE_MODELS.image, {
+        input: { 
+            prompt,
+            width,
+            height
+        }
+    });
+
+    if (Array.isArray(output) && output.length > 0) {
+        return output[0];
+    }
+    
+    throw new Error('Image generation failed to return a valid URL.');
 }

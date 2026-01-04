@@ -2,15 +2,15 @@
 'use server';
 
 /**
- * @fileOverview Analyzes a business evaluation questionnaire using Google AI.
+ * @fileOverview Analyzes a business evaluation questionnaire using Replicate.
  *
  * - analyzeBusinessEvaluation - A function that analyzes the questionnaire answers.
  * - AnalyzeBusinessEvaluationInput - The input type for the function.
  * - AnalyzeBusinessEvaluationOutput - The return type for the function.
  */
 
-import { ai, MODEL_BY_TASK } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
+import { runReplicateText } from '@/ai/genkit';
 
 const AnalyzeBusinessEvaluationInputSchema = z.object({
   answersJson: z.string().describe('The JSON string representing the questionnaire answers.'),
@@ -31,40 +31,38 @@ export type AnalyzeBusinessEvaluationOutput = z.infer<typeof AnalyzeBusinessEval
 
 
 export async function analyzeBusinessEvaluation(input: AnalyzeBusinessEvaluationInput): Promise<AnalyzeBusinessEvaluationOutput> {
-  return analyzeBusinessEvaluationFlow(input);
-}
-
-const analyzeBusinessEvaluationPrompt = ai.definePrompt({
-    name: 'analyzeBusinessEvaluationPrompt',
-    input: { schema: AnalyzeBusinessEvaluationInputSchema },
-    output: { schema: AnalyzeBusinessEvaluationOutputSchema },
-    prompt: `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
+  const prompt = `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
 
 **Rules:**
 1.  **Analyze the Answers:** Review all responses to understand the business, goals, and challenges.
-2.  **Language**: The entire output MUST be in the target language: {{{targetLanguage}}}.
+2.  **Language**: The entire output MUST be in the target language: ${input.targetLanguage}.
 3.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text, explanations, or markdown formatting before or after the JSON object.
 
 **Client's Questionnaire Answers (JSON format):**
-{{{answersJson}}}
-`,
-});
+${input.answersJson}
 
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
+`;
 
-const analyzeBusinessEvaluationFlow = ai.defineFlow(
-  {
-    name: 'analyzeBusinessEvaluationFlow',
-    inputSchema: AnalyzeBusinessEvaluationInputSchema,
-    outputSchema: AnalyzeBusinessEvaluationOutputSchema,
-  },
-  async (input) => {
-    const { output } = await analyzeBusinessEvaluationPrompt(input, { model: MODEL_BY_TASK.evaluation });
-    
-    if (!output) {
-      console.error("AI failed to generate a business evaluation.", output);
-      throw new Error('The AI failed to generate a valid business evaluation.');
+    let responseText = '';
+    try {
+        responseText = await runReplicateText(prompt);
+
+        // Robust JSON parsing
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('No JSON object found in the AI response.');
+        }
+        const jsonString = jsonMatch[0];
+        const parsedOutput = JSON.parse(jsonString);
+
+        // Validate the parsed object against the Zod schema
+        const validatedOutput = AnalyzeBusinessEvaluationOutputSchema.parse(parsedOutput);
+        
+        return validatedOutput;
+
+    } catch (error) {
+        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        throw new Error('The AI returned an invalid response format.');
     }
-    
-    return output;
-  }
-);
+}

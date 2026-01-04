@@ -1,15 +1,15 @@
 
 'use server';
 /**
- * @fileOverview A simple chat flow for the AI Agent, using Google AI.
+ * @fileOverview A simple chat flow for the AI Agent, using Replicate.
  *
  * - chat - A function that handles the chat interaction.
  * - ChatInput - The input type for the chat function.
  * - ChatOutput - The return type for the chat function.
  */
 
-import { ai, MODEL_BY_TASK } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
+import { runReplicateText } from '@/ai/genkit';
 
 const ChatHistorySchema = z.object({
   role: z.enum(['user', 'model']),
@@ -30,19 +30,11 @@ const ChatOutputSchema = z.object({
 export type ChatOutput = z.infer<typeof ChatOutputSchema>;
 
 export async function chat(input: ChatInput): Promise<ChatOutput> {
-  return chatFlow(input);
-}
-
-// This flow now builds the prompt and calls the Google AI function
-const chatFlow = ai.defineFlow(
-  {
-    name: 'chatFlow',
-    inputSchema: ChatInputSchema,
-    outputSchema: ChatOutputSchema,
-  },
-  async (input) => {
+    const lastUserMessage = input.history.slice(-1)[0]?.content || '';
     
-    const constructedPrompt = `${input.systemPrompt}
+    // LLaMA3 prompt format
+    const constructedPrompt = `<s>[INST] <<SYS>>
+${input.systemPrompt}
 
 You MUST respond in the following language: ${input.language}.
 
@@ -50,19 +42,21 @@ Here is some additional information to use as your knowledge base. Use it as the
 --- KNOWLEDGE BASE ---
 ${input.knowledgeBase}
 --- END KNOWLEDGE BASE ---
-`;
+<</SYS>>
 
-    const { text } = await ai.generate({
-      model: MODEL_BY_TASK.chat,
-      history: input.history,
-      prompt: constructedPrompt,
-    });
-    
-    if (!text) {
-      throw new Error('The AI (Google) failed to generate a response.');
+${lastUserMessage} [/INST]`;
+
+    try {
+        const text = await runReplicateText(constructedPrompt);
+        
+        if (!text) {
+            throw new Error('The AI (Replicate) failed to generate a response.');
+        }
+
+        return { response: text };
+
+    } catch (error) {
+        console.error("Error in chat flow:", error);
+        throw new Error('Failed to get a response from the AI.');
     }
-
-    // Return the response in the expected format.
-    return { response: text };
-  }
-);
+}

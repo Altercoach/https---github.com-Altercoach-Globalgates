@@ -2,15 +2,15 @@
 'use server';
 
 /**
- * @fileOverview Generates an AI Agent's persona and system prompt using Google AI.
+ * @fileOverview Generates an AI Agent's persona and system prompt using Replicate.
  * 
  * - generateAgentPrompt - A function that creates the agent's profile.
  * - GenerateAgentPromptInput - The input type for the function.
  * - GenerateAgentPromptOutput - The return type for the function.
  */
 
-import { ai, MODEL_BY_TASK } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
+import { runReplicateText } from '@/ai/genkit';
 
 const GenerateAgentPromptInputSchema = z.object({
   answersJson: z.string().describe('The JSON string representing the agent training questionnaire answers.'),
@@ -32,14 +32,8 @@ export type GenerateAgentPromptOutput = z.infer<typeof GenerateAgentPromptOutput
 
 
 export async function generateAgentPrompt(input: GenerateAgentPromptInput): Promise<GenerateAgentPromptOutput> {
-  return generateAgentPromptFlow(input);
-}
-
-const generateAgentPromptGenkit = ai.definePrompt({
-    name: 'generateAgentPromptPrompt',
-    input: { schema: GenerateAgentPromptInputSchema },
-    output: { schema: GenerateAgentPromptOutputSchema },
-    prompt: `You are an expert in organizational psychology and AI personality design. Your task is to analyze the client's questionnaire answers to create a complete profile and a detailed system prompt for their new AI Agent.
+  
+  const prompt = `You are an expert in organizational psychology and AI personality design. Your task is to analyze the client's questionnaire answers to create a complete profile and a detailed system prompt for their new AI Agent.
 
 **Rules:**
 1.  **Analyze and Create Profile:** Define the agent's role, tone, psychological archetype, and key personality traits based on the client's answers.
@@ -47,25 +41,28 @@ const generateAgentPromptGenkit = ai.definePrompt({
 3.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text, explanations, or markdown formatting before or after the JSON object.
 
 **Client's Questionnaire Answers (JSON format):**
-{{{answersJson}}}
-`,
-});
+${input.answersJson}
 
-
-const generateAgentPromptFlow = ai.defineFlow(
-  {
-    name: 'generateAgentPromptFlow',
-    inputSchema: GenerateAgentPromptInputSchema,
-    outputSchema: GenerateAgentPromptOutputSchema,
-  },
-  async (input) => {
-    const { output } = await generateAgentPromptGenkit(input, { model: MODEL_BY_TASK.strategic });
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
+`;
     
-    if (!output) {
-      console.error("AI failed to generate an agent prompt.");
-      throw new Error('The AI failed to generate a valid agent prompt.');
+    let responseText = '';
+    try {
+        responseText = await runReplicateText(prompt);
+
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('No JSON object found in the AI response.');
+        }
+        const jsonString = jsonMatch[0];
+        const parsedOutput = JSON.parse(jsonString);
+        
+        const validatedOutput = GenerateAgentPromptOutputSchema.parse(parsedOutput);
+        
+        return validatedOutput;
+
+    } catch (error) {
+        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        throw new Error('The AI returned an invalid response format.');
     }
-    
-    return output;
-  }
-);
+}

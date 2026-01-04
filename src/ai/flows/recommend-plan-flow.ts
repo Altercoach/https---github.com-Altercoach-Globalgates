@@ -2,15 +2,15 @@
 'use server';
 
 /**
- * @fileOverview Recommends a marketing plan based on the user's business description, using Google AI.
+ * @fileOverview Recommends a marketing plan based on the user's business description, using Replicate.
  *
  * - recommendPlan - A function that recommends a plan.
  * - RecommendPlanInput - The input type for the function.
  * - RecommendPlanOutput - The return type for the function.
  */
 
-import { ai, MODEL_BY_TASK } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
+import { runReplicateText } from '@/ai/genkit';
 
 const RecommendPlanInputSchema = z.object({
   businessDescription: z.string().describe('The description of the user\'s business.'),
@@ -25,14 +25,7 @@ const RecommendPlanOutputSchema = z.object({
 export type RecommendPlanOutput = z.infer<typeof RecommendPlanOutputSchema>;
 
 export async function recommendPlan(input: RecommendPlanInput): Promise<RecommendPlanOutput> {
-  return recommendPlanFlow(input);
-}
-
-const recommendPlanPrompt = ai.definePrompt({
-    name: 'recommendPlanPrompt',
-    input: { schema: RecommendPlanInputSchema },
-    output: { schema: RecommendPlanOutputSchema },
-    prompt: `You are an expert business consultant. Your task is to analyze a business description and recommend the best plan(s) from the available products.
+  const prompt = `You are an expert business consultant. Your task is to analyze a business description and recommend the best plan(s) from the available products.
 
 **Instructions:**
 1.  Analyze the business description to understand its needs.
@@ -42,27 +35,31 @@ const recommendPlanPrompt = ai.definePrompt({
 5.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
 
 **Business Description:**
-{{{businessDescription}}}
+${input.businessDescription}
 
 **Available Products (JSON):**
-{{{products}}}
-`,
-});
+${input.products}
 
-const recommendPlanFlow = ai.defineFlow(
-  {
-    name: 'recommendPlanFlow',
-    inputSchema: RecommendPlanInputSchema,
-    outputSchema: RecommendPlanOutputSchema,
-  },
-  async (input) => {
-    const { output } = await recommendPlanPrompt(input, { model: MODEL_BY_TASK.chat });
-    
-    if (!output) {
-      console.error("AI failed to generate a plan recommendation.");
-      throw new Error('The AI failed to generate a valid plan recommendation.');
+**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.
+`;
+
+    let responseText = '';
+    try {
+        responseText = await runReplicateText(prompt);
+
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('No JSON object found in the AI response.');
+        }
+        const jsonString = jsonMatch[0];
+        const parsedOutput = JSON.parse(jsonString);
+        
+        const validatedOutput = RecommendPlanOutputSchema.parse(parsedOutput);
+        
+        return validatedOutput;
+
+    } catch (error) {
+        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        throw new Error('The AI returned an invalid response format.');
     }
-    
-    return output;
-  }
-);
+}

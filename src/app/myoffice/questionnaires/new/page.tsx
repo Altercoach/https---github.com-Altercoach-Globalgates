@@ -85,8 +85,9 @@ export default function NewQuestionnairePage() {
     
     // Simulate AI generation and saving
     const newId = `q-template-${Date.now()}`;
+    // The link should go to a generic edit page. Let's correct this.
     const url = typeof window !== 'undefined' ? `${window.location.origin}/myoffice/questionnaires/edit` : '';
-    setQuestionnaireUrl(url); // Should be a unique URL for the new template
+    setQuestionnaireUrl(url); // This will just link to the static edit page for now.
 
     setIsGenerated(true);
     toast({ title: t.sentToast, description: t.sentToastDesc });
@@ -125,7 +126,7 @@ export default function NewQuestionnairePage() {
                     <LinkIcon className="h-4 w-4" />
                     <AlertTitle>{t.linkGenerated}</AlertTitle>
                     <AlertDescription className="flex items-center justify-between">
-                      <Link href={questionnaireUrl} target="_blank" className="text-sm underline truncate pr-4">
+                      <Link href={questionnaireUrl} className="text-sm underline truncate pr-4">
                         Ver y editar nueva plantilla
                       </Link>
                       <Button variant="outline" size="icon" onClick={copyToClipboard} className="h-8 w-8">
