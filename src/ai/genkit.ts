@@ -1,5 +1,5 @@
 
-import { genkit, Model } from 'genkit';
+import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import Replicate from 'replicate';
 
@@ -61,21 +61,6 @@ export async function runReplicateText(prompt: string, modelId: keyof typeof MOD
         return output.join('');
     }
     return JSON.stringify(output);
-}
-
-/**
- * Obtiene el objeto de modelo de Genkit configurado para una tarea específica.
- * @deprecated Esta función ahora está deprecada a favor de runReplicateText para texto.
- * La mantenemos por si alguna herramienta futura de Google AI se necesita.
- */
-export function getAbacusModelForTask(task: keyof typeof MODEL_BY_TASK): Model | string {
-  const modelId = MODEL_BY_TASK[task];
-  // Si es un modelo de Google, devuelve el objeto Model de Genkit.
-  if (modelId.startsWith('gemini')) {
-    return googleAI.model(modelId);
-  }
-  // Si es de Replicate, devuelve el string.
-  return modelId;
 }
 
 

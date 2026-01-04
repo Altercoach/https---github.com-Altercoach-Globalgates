@@ -9,7 +9,7 @@
  * - TranslateSiteContentOutput - The return type for the translateSiteContent function.
  */
 
-import { ai, getAbacusModelForTask } from '@/ai/genkit';
+import { ai, runReplicateText } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const TranslateSiteContentInputSchema = z.object({
@@ -25,19 +25,6 @@ export async function translateSiteContent(input: TranslateSiteContentInput): Pr
   return translateSiteContentFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'translateSiteContentPrompt',
-  input: { schema: TranslateSiteContentInputSchema },
-  output: { schema: z.string().nullable() },
-  prompt: `You are a professional translator specializing in marketing content. Translate the provided Spanish JSON content into the target language, preserving the JSON structure and keys perfectly.
-
-The target language is: **{{{targetLanguage}}}**.
-
-Here is the website content to translate from Spanish:
-{{{siteContent}}}
-
-**IMPORTANT**: Respond only with the translated JSON object as a string. Do not add any extra explanations, comments, or markdown formatting. The JSON structure must remain identical to the input.`,
-});
 
 const translateSiteContentFlow = ai.defineFlow(
   {
@@ -51,8 +38,36 @@ const translateSiteContentFlow = ai.defineFlow(
       return input.siteContent;
     }
     
-    const abacusModel = getAbacusModelForTask('onboarding');
-    const { output } = await prompt(input, { model: abacusModel });
-    return output || '{}';
+    const constructedPrompt = `<s>[INST] <<SYS>>
+You are a professional translator specializing in marketing content. Translate the provided Spanish JSON content into the target language, preserving the JSON structure and keys perfectly.
+
+**IMPORTANT**: Respond only with the translated JSON object as a string. Do not add any extra explanations, comments, or markdown formatting. The JSON structure must remain identical to the input.
+<</SYS>>
+
+The target language is: **${input.targetLanguage}**.
+
+Here is the website content to translate from Spanish:
+${input.siteContent}
+[/INST]`;
+
+    const responseText = await runReplicateText(constructedPrompt, 'onboarding');
+
+    try {
+        const jsonStart = responseText.indexOf('{');
+        const jsonEnd = responseText.lastIndexOf('}');
+        
+        if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+            console.warn("No valid JSON object found in translation response, returning original content.", responseText);
+            return input.siteContent; // Return original if parsing fails
+        }
+
+        const jsonString = responseText.substring(jsonStart, jsonEnd + 1);
+        JSON.parse(jsonString); // Just to validate it's valid JSON
+        
+        return jsonString;
+      } catch (error) {
+        console.error("Failed to parse AI translation output, returning original:", error, "Raw response:", responseText);
+        return input.siteContent; // Return original on error
+      }
   }
 );
