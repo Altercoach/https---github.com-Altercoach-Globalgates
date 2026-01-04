@@ -13,14 +13,8 @@ export const ai = genkit({
       // Specify the API version if necessary, otherwise it uses the default
     }),
   ],
-  // Log level can be 'debug', 'info', 'warn', or 'error'
-  logLevel: 'debug',
-  // Enable OpenTelemetry for tracing if needed
-  // openTelemetry: {
-  //   instrumentation: {
-  //     // Instrumentation options
-  //   },
-  // },
+  // The 'logLevel' option is from a legacy version and causes initialization errors.
+  // Removing it allows the Genkit flows to run correctly.
 });
 
 // Export googleAI plugin for direct model reference if needed
