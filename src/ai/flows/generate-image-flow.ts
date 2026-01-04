@@ -2,16 +2,10 @@
 'use server';
 
 import { z } from 'zod';
-import Replicate from 'replicate';
-import { ai } from '@/ai/genkit';
+import { ai, MODEL_BY_TASK } from '@/ai/genkit';
 import type { GenerateImageOutput, GenerateImageInput } from '@/lib/types';
 import { GenerateImageInputSchema } from '@/lib/types';
-import { MODEL_BY_TASK } from '@/ai/genkit';
 
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
 
 export const generateImageFlow = ai.defineFlow(
   {
@@ -34,40 +28,32 @@ export const generateImageFlow = ai.defineFlow(
       
       const imageModel = MODEL_BY_TASK.imageGeneration;
       
-      const output = await replicate.run(
-        imageModel,
-        {
-          input: {
-            prompt: input.creativeBrief,
-            width: 1024, // Valores estándar para SDXL
-            height: 1024,
-          }
+      const { media, usage } = await ai.generate({
+        model: imageModel,
+        prompt: input.creativeBrief,
+        config: {
+          aspectRatio: input.aspectRatio,
         }
-      );
-
-      const imageUrl = Array.isArray(output) ? output[0] : null;
+      });
+      
+      const imageUrl = media?.url;
 
       if (!imageUrl) {
-        throw new Error('Replicate no devolvió una URL de imagen válida.');
+        throw new Error('Google AI no devolvió una URL de imagen válida.');
       }
       
       console.log('✅ ÉXITO! Imagen generada.');
       
       return {
         imageUrl: imageUrl,
-        refinedPrompt: input.creativeBrief, // Replicate no refina el prompt, usamos el original
-        cost: 0, // El costo se manejaría fuera del flujo en una app real
+        refinedPrompt: input.creativeBrief,
+        cost: usage?.totalTokens || 0, // Placeholder for cost
         model: imageModel,
       };
 
     } catch (error: any) {
       console.error('❌ ERROR en la generación de imagen:', error.message);
-      return {
-        imageUrl: '',
-        refinedPrompt: input.creativeBrief,
-        cost: 0,
-        model: 'error-fallback',
-      };
+      throw new Error(`Error al generar la imagen: ${error.message}`);
     }
   }
 );

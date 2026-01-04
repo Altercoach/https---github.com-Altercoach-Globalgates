@@ -1,67 +1,41 @@
 
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import Replicate from 'replicate';
 
 // ============================================
 // CONFIGURACIÓN DE GENKIT Y CLIENTES
 // ============================================
 
 export const ai = genkit({
-  plugins: [googleAI()], // Mantenemos Google AI para futuras herramientas, pero no como default para texto.
-});
-
-// Cliente de Replicate
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
+  plugins: [
+    googleAI({
+      apiVersion: "v1beta",
+    }),
+  ],
 });
 
 // ============================================
-// MAPEO DE MODELOS "ABACUS AI" (Lógica Abstraída)
+// MAPEO DE MODELOS (Lógica Abstraída)
 // ============================================
 
 /**
- * Mapea tareas a modelos de Replicate y Google.
+ * Mapea tareas a modelos de Google.
  * Esta es la fuente de verdad para la selección de modelos en la app.
  */
 export const MODEL_BY_TASK = {
-  // Text & Logic (usando Replicate)
-  onboarding: 'meta/meta-llama-3-70b-instruct',
-  evaluation: 'meta/meta-llama-3-70b-instruct',
-  copywriting: 'meta/meta-llama-3-70b-instruct',
-  chat: 'meta/meta-llama-3-70b-instruct',
-  strategic: 'meta/meta-llama-3-70b-instruct',
+  // Text & Logic (usando Google)
+  onboarding: 'gemini-1.5-pro-latest',
+  evaluation: 'gemini-1.5-pro-latest',
+  copywriting: 'gemini-1.5-pro-latest',
+  chat: 'gemini-1.5-pro-latest',
+  strategic: 'gemini-1.5-pro-latest',
 
-  // Visuals (usando Replicate)
-  imageGeneration: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b', 
+  // Visuals (usando Google)
+  imageGeneration: 'imagen-3.0-fast-generate-001', 
 
-  // Analytics (usando Google por si se necesita en un futuro)
+  // Analytics (usando Google)
   analytics: 'gemini-1.5-pro-latest',
 };
-
-
-/**
- * Ejecuta una predicción de texto usando Replicate.
- * @param prompt El prompt a enviar al modelo.
- * @param modelId El ID del modelo de Replicate a usar.
- * @returns El texto generado.
- */
-export async function runReplicateText(prompt: string, modelId: keyof typeof MODEL_BY_TASK): Promise<string> {
-    const model = MODEL_BY_TASK[modelId] as any;
-    console.log(`Running Replicate with model: ${model}`);
-    
-    const output = await replicate.run(model, {
-        input: { prompt }
-    });
-
-    if (typeof output === 'string') {
-        return output;
-    }
-    if (Array.isArray(output)) {
-        return output.join('');
-    }
-    return JSON.stringify(output);
-}
 
 
 // ============================================
@@ -69,7 +43,7 @@ export async function runReplicateText(prompt: string, modelId: keyof typeof MOD
 // ============================================
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('🤖 Genkit configured with Abacus AI model abstraction (using Replicate).');
-  console.log(`   Default Text Model (Abacus): ${MODEL_BY_TASK.chat}`);
-  console.log(`   Image Model (Abacus): ${MODEL_BY_TASK.imageGeneration}`);
+  console.log('🤖 Genkit configured with Google AI model abstraction.');
+  console.log(`   Default Text Model: ${MODEL_BY_TASK.chat}`);
+  console.log(`   Image Model: ${MODEL_BY_TASK.imageGeneration}`);
 }

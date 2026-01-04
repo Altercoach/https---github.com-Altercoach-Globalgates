@@ -1,13 +1,14 @@
+
 'use server';
 /**
- * @fileOverview A simple chat flow for the AI Agent, using Abacus AI (Replicate).
+ * @fileOverview A simple chat flow for the AI Agent, using Google AI.
  *
  * - chat - A function that handles the chat interaction.
  * - ChatInput - The input type for the chat function.
  * - ChatOutput - The return type for the chat function.
  */
 
-import { ai, runReplicateText } from '@/ai/genkit';
+import { ai, MODEL_BY_TASK } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const ChatHistorySchema = z.object({
@@ -32,7 +33,7 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
   return chatFlow(input);
 }
 
-// This flow now builds the prompt and calls the Replicate function
+// This flow now builds the prompt and calls the Google AI function
 const chatFlow = ai.defineFlow(
   {
     name: 'chatFlow',
@@ -41,17 +42,7 @@ const chatFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // Construct the chat history for Llama-3
-    const historyString = input.history
-      .map(msg => {
-          if (msg.role === 'user') return `[INST] ${msg.content} [/INST]`;
-          return msg.content;
-      })
-      .join('\n');
-      
-    // Construct the final prompt to be sent to Replicate
-    const constructedPrompt = `<s>[INST] <<SYS>>
-${input.systemPrompt}
+    const constructedPrompt = `${input.systemPrompt}
 
 You MUST respond in the following language: ${input.language}.
 
@@ -59,19 +50,19 @@ Here is some additional information to use as your knowledge base. Use it as the
 --- KNOWLEDGE BASE ---
 ${input.knowledgeBase}
 --- END KNOWLEDGE BASE ---
-<</SYS>>
+`;
 
-${historyString}
-</s>`;
-
-    // Call our Replicate wrapper function
-    const responseText = await runReplicateText(constructedPrompt, 'chat');
+    const { text } = await ai.generate({
+      model: MODEL_BY_TASK.chat,
+      history: input.history,
+      prompt: constructedPrompt,
+    });
     
-    if (!responseText) {
-      throw new Error('The AI (Replicate) failed to generate a response.');
+    if (!text) {
+      throw new Error('The AI (Google) failed to generate a response.');
     }
 
     // Return the response in the expected format.
-    return { response: responseText };
+    return { response: text };
   }
 );

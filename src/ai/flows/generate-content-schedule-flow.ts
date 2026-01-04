@@ -2,14 +2,14 @@
 'use server';
 
 /**
- * @fileOverview Generates a monthly content schedule for a client using Abacus AI.
+ * @fileOverview Generates a monthly content schedule for a client using Google AI.
  *
  * - generateContentSchedule - A function that creates the content schedule.
  * - GenerateContentScheduleInput - The input type for the function.
  * - GenerateContentScheduleOutput - The return type for the function.
  */
 
-import { ai, runReplicateText } from '@/ai/genkit';
+import { ai, MODEL_BY_TASK } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateContentScheduleInputSchema = z.object({
@@ -36,27 +36,11 @@ export async function generateContentSchedule(input: GenerateContentScheduleInpu
   return generateContentScheduleFlow(input);
 }
 
-const generateContentScheduleFlow = ai.defineFlow(
-  {
-    name: 'generateContentScheduleFlow',
-    inputSchema: GenerateContentScheduleInputSchema,
-    outputSchema: GenerateContentScheduleOutputSchema,
-  },
-  async (input) => {
-    const outputSchemaAsJson = `{
-      "posts": [
-        {
-          "postNumber": "1",
-          "format": "Post fijo",
-          "topic": "Venta",
-          "copyIn": "Title: Nuestro producto estrella. Subtitle: El café que te mereces. Idea: Foto profesional del producto.",
-          "copyOut": "Descubre el sabor único de nuestro café de especialidad. #café #calidad"
-        }
-      ]
-    }`;
-
-    const constructedPrompt = `<s>[INST] <<SYS>>
-You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
+const generateContentSchedulePrompt = ai.definePrompt({
+    name: 'generateContentSchedulePrompt',
+    input: { schema: GenerateContentScheduleInputSchema },
+    output: { schema: GenerateContentScheduleOutputSchema },
+    prompt: `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
 
 **Your Task:**
 Create a diverse content schedule of 10-12 posts. For each post, define:
@@ -66,33 +50,27 @@ Create a diverse content schedule of 10-12 posts. For each post, define:
 4.  **copyIn**: Internal creative brief (Title, Subtitle, ideas).
 5.  **copyOut**: Final, public-facing caption with 3-4 relevant hashtags.
 
-**Output Format:** Your entire response MUST be a valid JSON object matching the structure provided below. Do not add any text before or after the JSON.
-
-**JSON Output Structure:**
-${outputSchemaAsJson}
-<</SYS>>
+**Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
 
 **Client Information & Instructions:**
-${input.clientBusiness}
-[/INST]`;
+{{{clientBusiness}}}
+`,
+});
 
-    const responseText = await runReplicateText(constructedPrompt, 'copywriting');
-
-    try {
-        const jsonStart = responseText.indexOf('{');
-        const jsonEnd = responseText.lastIndexOf('}');
-        
-        if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
-            throw new Error("No valid JSON object found in the AI response for content schedule.");
-        }
-
-        const jsonString = responseText.substring(jsonStart, jsonEnd + 1);
-        const parsedOutput = JSON.parse(jsonString);
-
-        return GenerateContentScheduleOutputSchema.parse(parsedOutput);
-      } catch (error) {
-        console.error("Failed to parse or validate AI output for content schedule:", error, "Raw response:", responseText);
-        throw new Error('The AI returned an invalid response format for content schedule generation.');
-      }
+const generateContentScheduleFlow = ai.defineFlow(
+  {
+    name: 'generateContentScheduleFlow',
+    inputSchema: GenerateContentScheduleInputSchema,
+    outputSchema: GenerateContentScheduleOutputSchema,
+  },
+  async (input) => {
+    const { output } = await generateContentSchedulePrompt(input, { model: MODEL_BY_TASK.copywriting });
+    
+    if (!output) {
+      console.error("AI failed to generate a content schedule.");
+      throw new Error('The AI failed to generate a valid content schedule.');
+    }
+    
+    return output;
   }
 );
