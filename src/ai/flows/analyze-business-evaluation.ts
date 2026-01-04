@@ -61,7 +61,7 @@ You are an expert business consultant named "Business Doctor RX". Your task is t
 
 **JSON Output Structure:**
 ${outputSchemaAsJson}
-<<SYS>>
+<</SYS>>
 
 **Client's Questionnaire Answers (JSON format):**
 ${input.answersJson}
