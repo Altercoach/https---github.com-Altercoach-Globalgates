@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A simple chat flow for the AI Agent, using Abacus AI (Replicate).
@@ -33,7 +32,7 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
   return chatFlow(input);
 }
 
-// Este flow ahora construye el prompt y llama a la función de Replicate
+// This flow now builds the prompt and calls the Replicate function
 const chatFlow = ai.defineFlow(
   {
     name: 'chatFlow',
@@ -42,7 +41,7 @@ const chatFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // Construimos el historial de chat para Llama-3
+    // Construct the chat history for Llama-3
     const historyString = input.history
       .map(msg => {
           if (msg.role === 'user') return `[INST] ${msg.content} [/INST]`;
@@ -50,10 +49,11 @@ const chatFlow = ai.defineFlow(
       })
       .join('\n');
       
-    // Construimos el prompt final que se enviará a Replicate
+    // Construct the final prompt to be sent to Replicate
     const constructedPrompt = `<s>[INST] <<SYS>>
 ${input.systemPrompt}
-You MUST respond in the following language: ${input.language}
+
+You MUST respond in the following language: ${input.language}.
 
 Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
 --- KNOWLEDGE BASE ---
@@ -62,17 +62,16 @@ ${input.knowledgeBase}
 <</SYS>>
 
 ${historyString}
-</s>
-`;
+</s>`;
 
-    // Llamamos a nuestra función wrapper de Replicate
+    // Call our Replicate wrapper function
     const responseText = await runReplicateText(constructedPrompt, 'chat');
     
     if (!responseText) {
       throw new Error('The AI (Replicate) failed to generate a response.');
     }
 
-    // Devolvemos la respuesta en el formato esperado.
+    // Return the response in the expected format.
     return { response: responseText };
   }
 );

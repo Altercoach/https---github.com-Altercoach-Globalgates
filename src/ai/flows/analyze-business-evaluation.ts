@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -52,17 +51,21 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
       "recommendations": "Detailed strategic recommendations, including suggested plans based on the analysis. Use markdown for formatting."
     }`;
 
-    const constructedPrompt = `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations in the specified language.
+    const constructedPrompt = `<s>[INST] <<SYS>>
+You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
 
-    **Client's Answers (JSON format):**
-    ${input.answersJson}
+**Rules:**
+1.  **Analyze the Answers:** Review all responses to understand the business, goals, and challenges.
+2.  **Language**: The entire output MUST be in the target language: **${input.targetLanguage}**.
+3.  **Output Format:** Your entire response MUST be a valid JSON object matching the structure provided below. Do not add any text, explanations, or markdown formatting before or after the JSON object.
 
-    **Your Task:**
-    1.  **Analyze the Answers:** Review all responses to understand the business, goals, and challenges.
-    2.  **Conduct a SWOT Analysis:** Generate a concise SWOT analysis (Strengths, Weaknesses, Opportunities, Threats).
-    3.  **Provide Strategic Recommendations:** Based on the analysis, provide clear, actionable recommendations.
-    4.  **Language**: The entire output MUST be in the target language: **${input.targetLanguage}**.
-    5.  **Output Format:** Your entire response must be a valid JSON object matching this structure: ${outputSchemaAsJson}. Do not add any text or formatting before or after the JSON object.`;
+**JSON Output Structure:**
+${outputSchemaAsJson}
+<<SYS>>
+
+**Client's Questionnaire Answers (JSON format):**
+${input.answersJson}
+[/INST]`;
 
     const responseText = await runReplicateText(constructedPrompt, 'evaluation');
 
