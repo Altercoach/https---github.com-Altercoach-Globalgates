@@ -3,8 +3,8 @@
 
 /**
  * @fileOverview Centralized AI configuration for the application.
- * This file configures the AI provider (Replicate) and exports a utility
- * function to run text generation models.
+ * This file configures the AI provider (Replicate) and exports utility
+ * functions to run text and image generation models.
  */
 
 import Replicate from 'replicate';
@@ -15,12 +15,10 @@ const replicate = new Replicate({
 });
 
 // Define the models to be used for different tasks.
-// We are standardizing on meta-llama-3-8b-instruct for its reliability and performance.
 const REPLICATE_MODELS = {
     text: 'meta/meta-llama-3-8b-instruct',
     image: 'stability-ai/sdxl' // A reliable model for image generation
 };
-
 
 /**
  * Runs a text generation model on Replicate.
@@ -31,7 +29,10 @@ export async function runReplicateText(prompt: string): Promise<string> {
     console.log(`Running Replicate with model: ${REPLICATE_MODELS.text}`);
     
     const output = await replicate.run(REPLICATE_MODELS.text, {
-        input: { prompt }
+        input: { 
+            prompt,
+            max_new_tokens: 4096, // Increased to ensure space for JSON
+        }
     });
 
     // The output is an array of strings; we join them to get the full response.

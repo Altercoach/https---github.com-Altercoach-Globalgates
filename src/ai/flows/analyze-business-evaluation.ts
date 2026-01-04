@@ -67,6 +67,16 @@ ${input.answersJson}
         console.error("--------------------------------- Raw AI Response ---------------------------------");
         console.error(responseText);
         console.error("================================ END OF AI RESPONSE ERROR ================================");
-        throw new Error('The AI returned an invalid response format.');
+        
+        // Fallback to a safe, informative error object instead of throwing
+        return {
+            swot: {
+                strengths: "Información insuficiente para determinar.",
+                weaknesses: "Información insuficiente para determinar.",
+                opportunities: "Información insuficiente para determinar.",
+                threats: "Información insuficiente para determinar.",
+            },
+            recommendations: "No se pudo generar un análisis debido a un error en la respuesta de la IA. Por favor, asegúrese de que el cuestionario esté completo y vuelva a intentarlo. Si el problema persiste, contacte a soporte."
+        };
     }
 }
