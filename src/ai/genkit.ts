@@ -17,27 +17,51 @@ const replicate = new Replicate({
 // Define the models to be used for different tasks.
 const REPLICATE_MODELS = {
     text: 'meta/meta-llama-3-70b-instruct',
-    image: 'stability-ai/sdxl' // A reliable model for image generation
+    image: 'stability-ai/sdxl'
 };
 
 /**
- * Runs a text generation model on Replicate.
+ * Runs a text generation model on Replicate using a robust prediction workflow.
  * @param prompt The complete prompt to send to the model.
  * @returns The generated text as a string.
  */
 export async function runReplicateText(prompt: string): Promise<string> {
-    console.log(`Running Replicate with model: ${REPLICATE_MODELS.text}`);
+    console.log(`Creating Replicate prediction with model: ${REPLICATE_MODELS.text}`);
     
-    const output = await replicate.run(REPLICATE_MODELS.text, {
-        input: { 
-            prompt,
-            max_new_tokens: 4096, // Increased to ensure space for JSON
-        }
-    });
+    try {
+        // Step 1: Create the prediction
+        const prediction = await replicate.predictions.create({
+            version: "0902621f11b3333cfb75143a968c92a2a09540b936d538676233519129598911", // Specific version for meta-llama-3-70b-instruct
+            input: {
+                prompt: prompt,
+                max_new_tokens: 4096,
+            },
+            // stream: true, // Streaming is an option for real-time output, but complicates JSON parsing.
+        });
 
-    // The output is an array of strings; we join them to get the full response.
-    return Array.isArray(output) ? output.join('') : String(output);
+        console.log(`Prediction started: ${prediction.id}. URL: ${prediction.urls.get}`);
+
+        // Step 2: Wait for the prediction to complete
+        const completedPrediction = await replicate.wait(prediction);
+
+        console.log(`Prediction ${completedPrediction.id} finished with status: ${completedPrediction.status}`);
+
+        if (completedPrediction.status === 'succeeded') {
+            // The output is an array of strings; we join them to get the full response.
+            return (completedPrediction.output as string[]).join('');
+        } else if (completedPrediction.status === 'failed' || completedPrediction.status === 'canceled') {
+            console.error('Replicate prediction failed or was canceled.', completedPrediction.error);
+            throw new Error(`Replicate prediction failed: ${completedPrediction.error}`);
+        }
+        
+        throw new Error(`Unexpected prediction status: ${completedPrediction.status}`);
+
+    } catch (error) {
+        console.error("Error running Replicate prediction:", error);
+        throw new Error("Failed to execute Replicate text generation.");
+    }
 }
+
 
 /**
  * Runs an image generation model on Replicate.
@@ -48,11 +72,9 @@ export async function runReplicateText(prompt: string): Promise<string> {
 export async function runReplicateImage(prompt: string, aspectRatio: string): Promise<string> {
     console.log(`Running Replicate image generation with model: ${REPLICATE_MODELS.image}`);
     
-    // Note: Aspect ratio handling might need to be adjusted based on the specific model's input format.
-    // For sdxl, it's width/height. We'll derive it from the aspect ratio.
     const [width, height] = aspectRatio === '1:1' ? [1024, 1024] :
                            aspectRatio === '16:9' ? [1344, 768] :
-                           [768, 1344]; // 9:16 or other vertical
+                           [768, 1344];
 
     const output = await replicate.run(REPLICATE_MODELS.image, {
         input: { 
