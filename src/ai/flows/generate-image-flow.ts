@@ -2,32 +2,36 @@
 'use server';
 
 import { z } from 'zod';
-import { runReplicateImage } from '@/ai/genkit';
+import { ai, googleAI } from '@/ai/genkit';
 import type { GenerateImageOutput, GenerateImageInput } from '@/lib/types';
-import { GenerateImageInputSchema } from '@/lib/types';
-
 
 export async function generateImageFromPrompt(input: GenerateImageInput): Promise<GenerateImageOutput> {
   if (!input.creativeBrief?.trim()) {
     throw new Error('El brief creativo está vacío');
   }
   
+  console.log("🤖 Calling Imagen 3 for Image Generation");
+
   try {
-    console.log(`🎨 Generating image with prompt: ${input.creativeBrief}`);
-    
-    const imageUrl = await runReplicateImage(input.creativeBrief, input.aspectRatio || '1:1');
-    
-    if (!imageUrl) {
-      throw new Error('Replicate AI no devolvió una URL de imagen válida.');
+    const { media, usage } = await ai.generate({
+      model: googleAI.model('imagen-3.0-fast-generate-001'),
+      prompt: input.creativeBrief,
+      config: {
+        aspectRatio: input.aspectRatio || '1:1',
+      }
+    });
+
+    if (!media?.url) {
+      throw new Error('Gemini AI did not return a valid image URL.');
     }
     
     console.log('✅ ÉXITO! Imagen generada.');
     
     return {
-      imageUrl: imageUrl,
-      refinedPrompt: input.creativeBrief, // Replicate doesn't refine the prompt in the same way
-      cost: 0, // Cost calculation would require more specific logic for Replicate
-      model: 'stability-ai/sdxl', // The model used in runReplicateImage
+      imageUrl: media.url,
+      refinedPrompt: input.creativeBrief, // Imagen doesn't provide a refined prompt in this way
+      cost: 0, // Cost calculation requires token/pricing info
+      model: 'imagen-3.0-fast-generate-001',
     };
 
   } catch (error: any) {

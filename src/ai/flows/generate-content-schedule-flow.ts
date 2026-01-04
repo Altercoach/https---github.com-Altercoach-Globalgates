@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview Generates a monthly content schedule for a client using Replicate.
+ * @fileOverview Generates a monthly content schedule for a client using Gemini 1.5 Pro.
  *
  * - generateContentSchedule - A function that creates the content schedule.
  * - GenerateContentScheduleInput - The input type for the function.
@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod';
-import { runReplicateText } from '@/ai/genkit';
+import { ai, googleAI } from '@/ai/genkit';
 
 const GenerateContentScheduleInputSchema = z.object({
   clientBusiness: z.string().describe("A description of the client's business, their purchased plan, and any specific instructions from the marketing team."),
@@ -32,8 +32,12 @@ const GenerateContentScheduleOutputSchema = z.object({
 export type GenerateContentScheduleOutput = z.infer<typeof GenerateContentScheduleOutputSchema>;
 
 
-export async function generateContentSchedule(input: GenerateContentScheduleInput): Promise<GenerateContentScheduleOutput> {
-  const systemPrompt = `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
+const generateContentSchedulePrompt = ai.definePrompt(
+  {
+    name: 'generateContentSchedulePrompt',
+    input: { schema: GenerateContentScheduleInputSchema },
+    output: { schema: GenerateContentScheduleOutputSchema },
+    prompt: `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
 
 **Your Task:**
 Create a diverse content schedule of 10-12 posts. For each post, define:
@@ -44,39 +48,28 @@ Create a diverse content schedule of 10-12 posts. For each post, define:
 5.  **copyOut**: Final, public-facing caption with 3-4 relevant hashtags.
 
 **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
-`;
-    
-    const userPrompt = `**Client Information & Instructions:**
-${input.clientBusiness}
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+**Client Information & Instructions:**
+{{{clientBusiness}}}
+`,
+  },
+);
 
-    const constructedPrompt = `<s>[INST] <<SYS>>
-${systemPrompt}
-<</SYS>>
 
-${userPrompt} [/INST]`;
-
-    let responseText = '';
+export async function generateContentSchedule(input: GenerateContentScheduleInput): Promise<GenerateContentScheduleOutput> {
+  console.log("🤖 Calling Gemini 1.5 Pro for Content Schedule Generation");
     try {
-        responseText = await runReplicateText(constructedPrompt);
+        const { output } = await generateContentSchedulePrompt(input, { 
+            model: googleAI.model('gemini-1.5-pro') 
+        });
 
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error('No JSON object found in the AI response.');
+        if (!output) {
+          throw new Error('AI returned no output.');
         }
-        const jsonString = jsonMatch[0];
-        const parsedOutput = JSON.parse(jsonString);
-        
-        const validatedOutput = GenerateContentScheduleOutputSchema.parse(parsedOutput);
-        
-        return validatedOutput;
-
+        return output;
     } catch (error) {
         console.error("==================== AI RESPONSE ERROR (generateContentSchedule) ====================");
-        console.error("Failed to parse or validate AI output. Error:", error);
-        console.error("--------------------------------- Raw AI Response ---------------------------------");
-        console.error(responseText);
+        console.error("Failed to get a valid response from Gemini. Error:", error);
         console.error("================================ END OF AI RESPONSE ERROR ================================");
         throw new Error('The AI returned an invalid response format.');
     }

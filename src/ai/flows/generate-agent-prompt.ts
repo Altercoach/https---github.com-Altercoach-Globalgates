@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview Generates an AI Agent's persona and system prompt using Replicate.
+ * @fileOverview Generates an AI Agent's persona and system prompt using Gemini 1.5 Pro.
  * 
  * - generateAgentPrompt - a function that creates the agent's profile.
  * - GenerateAgentPromptInput - The input type for the function.
@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod';
-import { runReplicateText } from '@/ai/genkit';
+import { ai, googleAI } from '@/ai/genkit';
 
 const GenerateAgentPromptInputSchema = z.object({
   answersJson: z.string().describe('The JSON string representing the agent training questionnaire answers.'),
@@ -31,47 +31,38 @@ const GenerateAgentPromptOutputSchema = z.object({
 export type GenerateAgentPromptOutput = z.infer<typeof GenerateAgentPromptOutputSchema>;
 
 
-export async function generateAgentPrompt(input: GenerateAgentPromptInput): Promise<GenerateAgentPromptOutput> {
-  
-  const systemPrompt = `You are an expert in organizational psychology and AI personality design. Your task is to analyze the client's questionnaire answers to create a complete profile and a detailed system prompt for their new AI Agent.
+const generateAgentPromptPrompt = ai.definePrompt(
+  {
+    name: 'generateAgentPromptPrompt',
+    input: { schema: GenerateAgentPromptInputSchema },
+    output: { schema: GenerateAgentPromptOutputSchema },
+    prompt: `You are an expert in organizational psychology and AI personality design. Your task is to analyze the client's questionnaire answers to create a complete profile and a detailed system prompt for their new AI Agent.
 
 **Rules:**
 1.  **Analyze and Create Profile:** Define the agent's role, tone, psychological archetype, and key personality traits based on the client's answers.
 2.  **Build the System Prompt:** Construct a comprehensive system prompt that defines the AI's persona, main objective, process rules (leads, sales, support), knowledge base instructions, and escalation protocols. Use clear, actionable language.
 3.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text, explanations, or markdown formatting before or after the JSON object.
-`;
 
-    const userPrompt = `**Client's Questionnaire Answers (JSON format):**
-${input.answersJson}
+**Client's Questionnaire Answers (JSON format):**
+{{{answersJson}}}
+`,
+  },
+);
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
-
-    const constructedPrompt = `<s>[INST] <<SYS>>
-${systemPrompt}
-<</SYS>>
-
-${userPrompt} [/INST]`;
-    
-    let responseText = '';
+export async function generateAgentPrompt(input: GenerateAgentPromptInput): Promise<GenerateAgentPromptOutput> {
+  console.log("🤖 Calling Gemini 1.5 Pro for Agent Prompt Generation");
     try {
-        responseText = await runReplicateText(constructedPrompt);
+        const { output } = await generateAgentPromptPrompt(input, { 
+            model: googleAI.model('gemini-1.5-pro') 
+        });
 
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error('No JSON object found in the AI response.');
+        if (!output) {
+          throw new Error('AI returned no output.');
         }
-        const jsonString = jsonMatch[0];
-        const parsedOutput = JSON.parse(jsonString);
-        
-        const validatedOutput = GenerateAgentPromptOutputSchema.parse(parsedOutput);
-        
-        return validatedOutput;
-
+        return output;
     } catch (error) {
         console.error("==================== AI RESPONSE ERROR (generateAgentPrompt) ====================");
-        console.error("Failed to parse or validate AI output. Error:", error);
-        console.error("--------------------------------- Raw AI Response ---------------------------------");
-        console.error(responseText);
+        console.error("Failed to get a valid response from Gemini. Error:", error);
         console.error("================================ END OF AI RESPONSE ERROR ================================");
         throw new Error('The AI returned an invalid response format.');
     }

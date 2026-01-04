@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview Analyzes a business evaluation questionnaire using Replicate.
+ * @fileOverview Analyzes a business evaluation questionnaire using Gemini 1.5 Pro.
  *
  * - analyzeBusinessEvaluation - A function that analyzes the questionnaire answers.
  * - AnalyzeBusinessEvaluationInput - The input type for the function.
@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod';
-import { runReplicateText } from '@/ai/genkit';
+import { ai, googleAI } from '@/ai/genkit';
 
 const AnalyzeBusinessEvaluationInputSchema = z.object({
   answersJson: z.string().describe('The JSON string representing the questionnaire answers.'),
@@ -29,57 +29,52 @@ const AnalyzeBusinessEvaluationOutputSchema = z.object({
 });
 export type AnalyzeBusinessEvaluationOutput = z.infer<typeof AnalyzeBusinessEvaluationOutputSchema>;
 
-
-export async function analyzeBusinessEvaluation(input: AnalyzeBusinessEvaluationInput): Promise<AnalyzeBusinessEvaluationOutput> {
-  const systemPrompt = `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
+const analyzeBusinessEvaluationPrompt = ai.definePrompt(
+  {
+    name: 'analyzeBusinessEvaluationPrompt',
+    input: { schema: AnalyzeBusinessEvaluationInputSchema },
+    output: { schema: AnalyzeBusinessEvaluationOutputSchema },
+    prompt: `You are an expert business consultant named "Business Doctor RX". Your task is to analyze a client's questionnaire answers and provide a comprehensive SWOT analysis and strategic recommendations.
 
 **Rules:**
 1.  **Analyze the Answers:** Review all responses to understand the business, goals, and challenges.
-2.  **Language**: The entire output MUST be in the target language: ${input.targetLanguage}.
+2.  **Language**: The entire output MUST be in the target language: {{{targetLanguage}}}.
 3.  **Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text, explanations, or markdown formatting before or after the JSON object.
-`;
 
-    const userPrompt = `**Client's Questionnaire Answers (JSON format):**
-${input.answersJson}
+**Client's Questionnaire Answers (JSON format):**
+{{{answersJson}}}
+`,
+  },
+);
 
-**IMPORTANT**: Your entire response MUST be a valid JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object.`;
+export async function analyzeBusinessEvaluation(input: AnalyzeBusinessEvaluationInput): Promise<AnalyzeBusinessEvaluationOutput> {
+  console.log("🤖 Calling Gemini 1.5 Pro for Business Evaluation Analysis");
+  try {
+      const { output } = await analyzeBusinessEvaluationPrompt(input, { 
+        model: googleAI.model('gemini-1.5-pro') 
+      });
+      
+      if (!output) {
+        throw new Error('AI returned no output.');
+      }
+      return output;
+  } catch (error) {
+      console.error("==================== AI RESPONSE ERROR (analyzeBusinessEvaluation) ====================");
+      console.error("Failed to get a valid response from Gemini. Error:", error);
+      console.error("================================ END OF AI RESPONSE ERROR ================================");
+      
+      const errorMessage = input.targetLanguage === 'es' 
+          ? "No se pudo generar un análisis debido a un error en la respuesta de la IA. Por favor, asegúrese de que el cuestionario esté completo y vuelva a intentarlo."
+          : "Could not generate analysis due to an error in the AI's response. Please ensure the questionnaire is complete and try again.";
 
-    const constructedPrompt = `<s>[INST] <<SYS>>
-${systemPrompt}
-<</SYS>>
-
-${userPrompt} [/INST]`;
-
-    let responseText = '';
-    try {
-        responseText = await runReplicateText(constructedPrompt);
-
-        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error('No JSON object found in the AI response.');
-        }
-        const jsonString = jsonMatch[0];
-        const parsedOutput = JSON.parse(jsonString);
-
-        const validatedOutput = AnalyzeBusinessEvaluationOutputSchema.parse(parsedOutput);
-        
-        return validatedOutput;
-
-    } catch (error) {
-        console.error("==================== AI RESPONSE ERROR (analyzeBusinessEvaluation) ====================");
-        console.error("Failed to parse or validate AI output. Error:", error);
-        console.error("--------------------------------- Raw AI Response ---------------------------------");
-        console.error(responseText);
-        console.error("================================ END OF AI RESPONSE ERROR ================================");
-        
-        return {
-            swot: {
-                strengths: "Información insuficiente para determinar.",
-                weaknesses: "Información insuficiente para determinar.",
-                opportunities: "Información insuficiente para determinar.",
-                threats: "Información insuficiente para determinar.",
-            },
-            recommendations: "No se pudo generar un análisis debido a un error en la respuesta de la IA. Por favor, asegúrese de que el cuestionario esté completo y vuelva a intentarlo. Si el problema persiste, contacte a soporte."
-        };
-    }
+      return {
+          swot: {
+              strengths: "Información insuficiente para determinar.",
+              weaknesses: "Información insuficiente para determinar.",
+              opportunities: "Información insuficiente para determinar.",
+              threats: "Información insuficiente para determinar.",
+          },
+          recommendations: errorMessage,
+      };
+  }
 }

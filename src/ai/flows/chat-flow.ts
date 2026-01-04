@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview A simple chat flow for the AI Agent, using Replicate.
+ * @fileOverview A simple chat flow for the AI Agent, using Gemini 1.5 Pro.
  *
  * - chat - A function that handles the chat interaction.
  * - ChatInput - The input type for the chat function.
@@ -9,7 +9,7 @@
  */
 
 import { z } from 'zod';
-import { runReplicateText } from '@/ai/genkit';
+import { ai, googleAI } from '@/ai/genkit';
 
 const ChatHistorySchema = z.object({
   role: z.enum(['user', 'model']),
@@ -29,31 +29,49 @@ const ChatOutputSchema = z.object({
 });
 export type ChatOutput = z.infer<typeof ChatOutputSchema>;
 
-export async function chat(input: ChatInput): Promise<ChatOutput> {
-    const lastUserMessage = input.history.slice(-1)[0]?.content || '';
-    
-    // LLaMA3 prompt format
-    const constructedPrompt = `<s>[INST] <<SYS>>
-${input.systemPrompt}
 
-You MUST respond in the following language: ${input.language}.
+const chatPrompt = ai.definePrompt(
+  {
+    name: 'chatPrompt',
+    input: { schema: ChatInputSchema },
+    output: { schema: ChatOutputSchema },
+    prompt: `{{#if systemPrompt}}
+<<SYS>>
+{{{systemPrompt}}}
+
+You MUST respond in the following language: {{{language}}}.
 
 Here is some additional information to use as your knowledge base. Use it as the primary source of truth for your answers. If the information is not here, say you don't know.
 --- KNOWLEDGE BASE ---
-${input.knowledgeBase}
+{{{knowledgeBase}}}
 --- END KNOWLEDGE BASE ---
 <</SYS>>
+{{/if}}
 
-${lastUserMessage} [/INST]`;
+{{#each history}}
+  {{#ifEquals role 'user'}}
+    [INST] {{{content}}} [/INST]
+  {{/ifEquals}}
+  {{#ifEquals role 'model'}}
+    {{{content}}}
+  {{/ifEquals}}
+{{/each}}
+`,
+  }
+);
 
+
+export async function chat(input: ChatInput): Promise<ChatOutput> {
+    console.log("🤖 Calling Gemini 1.5 Pro for Chat");
     try {
-        const text = await runReplicateText(constructedPrompt);
-        
-        if (!text) {
-            throw new Error('The AI (Replicate) failed to generate a response.');
-        }
+        const { output } = await chatPrompt(input, { 
+            model: googleAI.model('gemini-1.5-pro') 
+        });
 
-        return { response: text };
+        if (!output) {
+          throw new Error('AI returned no output.');
+        }
+        return output;
 
     } catch (error) {
         console.error("Error in chat flow:", error);
