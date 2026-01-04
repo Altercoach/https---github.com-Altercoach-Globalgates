@@ -42,7 +42,7 @@ const chatFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // Construimos el historial de chat para Llama-2
+    // Construimos el historial de chat para Llama-3
     const historyString = input.history
       .map(msg => {
           if (msg.role === 'user') return `[INST] ${msg.content} [/INST]`;
@@ -73,7 +73,6 @@ ${historyString}
     }
 
     // Devolvemos la respuesta en el formato esperado.
-    // No necesitamos parsear JSON si Replicate devuelve texto plano.
     return { response: responseText };
   }
 );
