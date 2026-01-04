@@ -1,6 +1,3 @@
-
-'use server';
-
 /**
  * @fileOverview Centralized AI configuration for the application.
  * This file configures Genkit to use the Google AI provider (Gemini).
@@ -25,8 +22,6 @@ export const ai = genkit({
   //   },
   // },
 });
-
-console.log("✅ Using Google Gemini 1.5 Pro exclusively for all AI tasks.");
 
 // Export googleAI plugin for direct model reference if needed
 export { googleAI };
