@@ -26,11 +26,11 @@ const replicate = new Replicate({
  */
 export const MODEL_BY_TASK = {
   // Text & Logic (usando Replicate)
-  onboarding: 'meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3',
-  evaluation: 'meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3', 
-  copywriting: 'meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3',
-  chat: 'meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3',
-  strategic: 'meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3',
+  onboarding: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
+  evaluation: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
+  copywriting: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
+  chat: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
+  strategic: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
 
   // Visuals (usando Replicate)
   imageGeneration: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b', 
