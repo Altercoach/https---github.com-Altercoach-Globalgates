@@ -16,7 +16,7 @@ const replicate = new Replicate({
 
 // Define the models to be used for different tasks.
 const REPLICATE_MODELS = {
-    text: 'meta/meta-llama-3-8b-instruct',
+    text: 'meta/meta-llama-3-70b-instruct',
     image: 'stability-ai/sdxl' // A reliable model for image generation
 };
 
