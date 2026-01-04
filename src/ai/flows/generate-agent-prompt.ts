@@ -4,7 +4,7 @@
 /**
  * @fileOverview Generates an AI Agent's persona and system prompt using Replicate.
  * 
- * - generateAgentPrompt - A function that creates the agent's profile.
+ * - generateAgentPrompt - a function that creates the agent's profile.
  * - GenerateAgentPromptInput - The input type for the function.
  * - GenerateAgentPromptOutput - The return type for the function.
  */
@@ -62,7 +62,11 @@ ${input.answersJson}
         return validatedOutput;
 
     } catch (error) {
-        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        console.error("==================== AI RESPONSE ERROR (generateAgentPrompt) ====================");
+        console.error("Failed to parse or validate AI output. Error:", error);
+        console.error("--------------------------------- Raw AI Response ---------------------------------");
+        console.error(responseText);
+        console.error("================================ END OF AI RESPONSE ERROR ================================");
         throw new Error('The AI returned an invalid response format.');
     }
 }

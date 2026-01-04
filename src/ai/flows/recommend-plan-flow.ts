@@ -59,7 +59,11 @@ ${input.products}
         return validatedOutput;
 
     } catch (error) {
-        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        console.error("==================== AI RESPONSE ERROR (recommendPlan) ====================");
+        console.error("Failed to parse or validate AI output. Error:", error);
+        console.error("--------------------------------- Raw AI Response ---------------------------------");
+        console.error(responseText);
+        console.error("================================ END OF AI RESPONSE ERROR ================================");
         throw new Error('The AI returned an invalid response format.');
     }
 }

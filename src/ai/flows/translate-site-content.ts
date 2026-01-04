@@ -56,7 +56,11 @@ ${input.siteContent}
         return jsonString;
 
     } catch (error) {
-        console.error("Failed to parse or validate AI output, returning original:", error, "Raw response:", responseText);
+        console.error("==================== AI RESPONSE ERROR (translateSiteContent) ====================");
+        console.error("Failed to parse or validate AI output. Error:", error);
+        console.error("--------------------------------- Raw AI Response ---------------------------------");
+        console.error(responseText);
+        console.error("================================ END OF AI RESPONSE ERROR ================================");
         // Fallback to original content on error
         return input.siteContent; 
     }
