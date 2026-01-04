@@ -26,11 +26,11 @@ const replicate = new Replicate({
  */
 export const MODEL_BY_TASK = {
   // Text & Logic (usando Replicate)
-  onboarding: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
-  evaluation: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
-  copywriting: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
-  chat: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
-  strategic: 'meta/meta-llama-3-70b-instruct:6249df490c333e3808544c457bb85c490aef73142a59a7dc9366f8e792610b86',
+  onboarding: 'meta/meta-llama-3-70b-instruct',
+  evaluation: 'meta/meta-llama-3-70b-instruct',
+  copywriting: 'meta/meta-llama-3-70b-instruct',
+  chat: 'meta/meta-llama-3-70b-instruct',
+  strategic: 'meta/meta-llama-3-70b-instruct',
 
   // Visuals (usando Replicate)
   imageGeneration: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b', 
@@ -47,7 +47,7 @@ export const MODEL_BY_TASK = {
  * @returns El texto generado.
  */
 export async function runReplicateText(prompt: string, modelId: keyof typeof MODEL_BY_TASK): Promise<string> {
-    const model = MODEL_BY_TASK[modelId];
+    const model = MODEL_BY_TASK[modelId] as any;
     console.log(`Running Replicate with model: ${model}`);
     
     const output = await replicate.run(model, {
