@@ -67,13 +67,23 @@ const analyzeBusinessEvaluationFlow = ai.defineFlow(
     const responseText = await runReplicateText(constructedPrompt, 'evaluation');
 
     try {
-      const parsedOutput = JSON.parse(responseText);
-      // Validate the parsed output against the schema
-      const validatedOutput = AnalyzeBusinessEvaluationOutputSchema.parse(parsedOutput);
-      return validatedOutput;
+        // Find the start and end of the JSON object
+        const jsonStart = responseText.indexOf('{');
+        const jsonEnd = responseText.lastIndexOf('}');
+        
+        if (jsonStart === -1 || jsonEnd === -1 || jsonStart > jsonEnd) {
+            throw new Error("No valid JSON object found in the AI response.");
+        }
+
+        const jsonString = responseText.substring(jsonStart, jsonEnd + 1);
+        const parsedOutput = JSON.parse(jsonString);
+
+        // Validate the parsed output against the schema
+        const validatedOutput = AnalyzeBusinessEvaluationOutputSchema.parse(parsedOutput);
+        return validatedOutput;
     } catch (error) {
-      console.error("Failed to parse or validate AI output:", error);
-      throw new Error('The AI returned an invalid response format.');
+        console.error("Failed to parse or validate AI output:", error, "Raw response:", responseText);
+        throw new Error('The AI returned an invalid response format.');
     }
   }
 );
