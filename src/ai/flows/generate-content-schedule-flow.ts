@@ -1,76 +1,65 @@
-
 'use server';
-
-/**
- * @fileOverview Generates a monthly content schedule for a client using Gemini 1.5 Pro.
- *
- * - generateContentSchedule - A function that creates the content schedule.
- * - GenerateContentScheduleInput - The input type for the function.
- * - GenerateContentScheduleOutput - The return type for the function.
- */
 
 import { z } from 'zod';
 import { ai, googleAI } from '@/ai/genkit';
 
 const GenerateContentScheduleInputSchema = z.object({
-  clientBusiness: z.string().describe("A description of the client's business, their purchased plan, and any specific instructions from the marketing team."),
+  clientBusiness: z.string().describe("Description of the client's business and instructions."),
 });
 export type GenerateContentScheduleInput = z.infer<typeof GenerateContentScheduleInputSchema>;
 
 const ContentPostSchema = z.object({
-    postNumber: z.string().describe("The post number or range, e.g., '1', '2-3'."),
-    format: z.string().describe("The format of the post (e.g., 'Post fijo', 'Historia', 'Carrusel', 'Video')."),
-    topic: z.string().describe("The main topic or theme (e.g., 'Venta', 'Branding', 'Dato curioso', 'Recomendación')."),
-    copyIn: z.string().describe("The internal copy or creative brief. Includes Title, Subtitle, and ideas for slides or content."),
-    copyOut: z.string().describe("The final, public-facing copy for the post, including text and relevant hashtags."),
+    postNumber: z.string().describe("Post number, e.g., '1', '2-3'."),
+    format: z.string().describe("Format: 'Post fijo', 'Historia', 'Carrusel', 'Video'."),
+    topic: z.string().describe("Topic: 'Venta', 'Branding', 'Dato curioso'."),
+    copyIn: z.string().describe("Internal creative brief with Title, Subtitle, ideas."),
+    copyOut: z.string().describe("Final public caption with hashtags."),
 });
 export type ContentPost = z.infer<typeof ContentPostSchema>;
 
 const GenerateContentScheduleOutputSchema = z.object({
-  posts: z.array(ContentPostSchema).describe("An array of 10-12 content post objects for the monthly schedule."),
+  posts: z.array(ContentPostSchema).describe("Array of 10-12 content posts."),
 });
 export type GenerateContentScheduleOutput = z.infer<typeof GenerateContentScheduleOutputSchema>;
-
 
 const generateContentSchedulePrompt = ai.definePrompt(
   {
     name: 'generateContentSchedulePrompt',
     input: { schema: GenerateContentScheduleInputSchema },
     output: { schema: GenerateContentScheduleOutputSchema },
-    prompt: `You are a world-class social media content strategist. Create a monthly content schedule (a "parrilla de contenido") for an Instagram account based on the client's profile and team instructions. The entire output must be in Spanish.
-
-**Your Task:**
-Create a diverse content schedule of 10-12 posts. For each post, define:
-1.  **postNumber**: Sequential number.
-2.  **format**: Choose from: 'Post fijo', 'Historia', 'Carrusel', 'Video'.
-3.  **topic**: Strategic theme (e.g., 'Venta', 'Branding', 'Interacción').
-4.  **copyIn**: Internal creative brief (Title, Subtitle, ideas).
-5.  **copyOut**: Final, public-facing caption with 3-4 relevant hashtags.
-
-**Output Format:** Your entire response MUST be a valid JSON object matching the requested output schema. Do not add any text before or after the JSON.
-
-**Client Information & Instructions:**
-{{{clientBusiness}}}
-`,
   },
+  `Eres un estratega de contenido de redes sociales de clase mundial. Crea una parrilla de contenido mensual (10-12 posts) para Instagram basada en la información del cliente.
+
+**Tu tarea:**
+Crea un calendario diverso de 10-12 publicaciones. Para cada post define:
+1. **postNumber**: Número secuencial
+2. **format**: Elige entre 'Post fijo', 'Historia', 'Carrusel', 'Video'
+3. **topic**: Tema estratégico como 'Venta', 'Branding', 'Interacción', 'Educativo'
+4. **copyIn**: Brief creativo interno (Título, Subtítulo, ideas para slides)
+5. **copyOut**: Caption final público con 3-4 hashtags relevantes
+
+**CRÍTICO:** Tu respuesta COMPLETA debe ser UN SOLO objeto JSON válido. No agregues texto antes ni después del JSON.
+
+**Información del Cliente:**
+{{clientBusiness}}
+`
 );
 
-
 export async function generateContentSchedule(input: GenerateContentScheduleInput): Promise<GenerateContentScheduleOutput> {
-  console.log("🤖 Calling Gemini 1.5 Pro for Content Schedule Generation");
+  console.log("🤖 Llamando a Gemini 1.5 Pro para generar parrilla de contenido");
     try {
         const { output } = await generateContentSchedulePrompt(input, { 
             model: googleAI.model('gemini-1.5-pro') 
         });
 
         if (!output) {
-          throw new Error('AI returned no output.');
+          throw new Error('La IA no devolvió ninguna respuesta.');
         }
+        
+        console.log("✅ Parrilla de contenido generada exitosamente");
         return output;
-    } catch (error) {
-        console.error("==================== AI RESPONSE ERROR (generateContentSchedule) ====================");
-        console.error("Failed to get a valid response from Gemini. Error:", error);
-        console.error("================================ END OF AI RESPONSE ERROR ================================");
-        throw new Error('The AI returned an invalid response format.');
+    } catch (error: any) {
+        console.error("❌ ERROR generando parrilla de contenido:", error.message);
+        throw new Error('La IA devolvió una respuesta en formato inválido.');
     }
 }
