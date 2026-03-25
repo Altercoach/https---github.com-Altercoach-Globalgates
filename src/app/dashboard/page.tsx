@@ -228,7 +228,7 @@ const PhaseCard = ({ phase, t }: { phase: ProjectPhase, isLast: boolean, t: any 
 
 
 export default function DashboardPage() {
-  const { auth } = useAuth();
+  const { auth, logout } = useAuth();
   const router = useRouter();
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
@@ -311,9 +311,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
-          <p className="text-muted-foreground">{t.welcome}, {auth.user?.email}</p>
+        <header className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
+            <p className="text-muted-foreground">{t.welcome}, {auth.user?.email}</p>
+          </div>
+          <Button variant="outline" onClick={logout}>
+            Logout
+          </Button>
         </header>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
