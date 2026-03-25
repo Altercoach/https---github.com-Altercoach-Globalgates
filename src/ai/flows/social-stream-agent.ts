@@ -13,12 +13,6 @@
  * - Error recovery
  */
 
-import { defineFlow, defineTool } from '@genkit-ai/core';
-import { gemini15Pro } from '@genkit-ai/google-genai';
-import { WebSocket } from 'ws';
-import { db } from '@/lib/firebase-config';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -65,7 +59,7 @@ const DEFAULT_CONFIG: AgentConfig = {
 // GLOBAL STATE
 // ============================================================================
 
-let ws: WebSocket | null = null;
+let ws: any = null; // WebSocket instance
 let isConnected = false;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -98,6 +92,7 @@ export function setupSocialStreamListener(config: Partial<AgentConfig> = {}) {
 
   console.log(`🔗 Connecting to Social Stream: ${wsUrl}`);
 
+  const WebSocket = require('ws');
   ws = new WebSocket(wsUrl);
 
   ws.on('open', () => {
@@ -109,16 +104,18 @@ export function setupSocialStreamListener(config: Partial<AgentConfig> = {}) {
     processBufferedMessages();
   });
 
-  ws.on('message', async (data) => {
+  ws.on('message', async (data: Buffer | string) => {
     try {
-      const message = JSON.parse(data.toString()) as IncomingMessage;
+      const message = typeof data === 'string' 
+        ? JSON.parse(data) 
+        : JSON.parse(data.toString()) as IncomingMessage;
       await handleIncomingMessage(message);
     } catch (error) {
       console.error('❌ Error parsing Social Stream message:', error);
     }
   });
 
-  ws.on('error', (error) => {
+  ws.on('error', (error: Error) => {
     console.error('⚠️ WebSocket error:', error);
     isConnected = false;
   });
@@ -210,12 +207,12 @@ async function generateAIResponse(
 /**
  * Send response back through Social Stream
  */
-async function sendResponse(
+export async function sendResponse(
   responseText: string,
   chatname: string,
   platform: string
 ): Promise<void> {
-  if (!ws || !isConnected || ws.readyState !== WebSocket.OPEN) {
+  if (!ws || ws.readyState !== (require('ws').OPEN)) {
     console.error('❌ WebSocket not connected. Cannot send response.');
     return;
   }
@@ -236,7 +233,7 @@ export async function sendCommand(
   action: string,
   value: unknown = null
 ): Promise<void> {
-  if (!ws || !isConnected || ws.readyState !== WebSocket.OPEN) {
+  if (!ws || ws.readyState !== (require('ws').OPEN)) {
     console.error('❌ WebSocket not connected.');
     return;
   }
@@ -329,180 +326,70 @@ export function closeSocialStream(): void {
 }
 
 // ============================================================================
-// GENKIT INTEGRATION
+// GENKIT INTEGRATION (Simplified)
 // ============================================================================
 
-/**
- * Tool: Send message through Social Stream
- */
-export const sendMessageTool = defineTool(
-  {
-    name: 'sendMessage',
-    description: 'Send message through Social Stream to multiple channels',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        message: {
-          type: 'string',
-          description: 'Message to send',
-        },
-        username: {
-          type: 'string',
-          description: 'Target username (optional)',
-        },
-        platform: {
-          type: 'string',
-          enum: ['twitch', 'youtube', 'discord', 'whatsapp', 'telegram', 'api'],
-          description: 'Platform to send to',
-        },
-      },
-      required: ['message'],
-    },
-  },
-  async (input) => {
-    await sendResponse(input.message, input.username || 'all', input.platform || 'api');
-    return { success: true };
-  }
-);
+// Note: Full Genkit flows can be integrated here once Genkit API is fully configured
+// For now, exposing core functions that can be called from Genkit flows
 
 /**
- * Tool: Block user
+ * Helper function for Genkit flows to initialize Social Stream
  */
-export const blockUserTool = defineTool(
-  {
-    name: 'blockUser',
-    description: 'Block a user from chat',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        username: {
-          type: 'string',
-          description: 'Username to block',
-        },
-        platform: {
-          type: 'string',
-          description: 'Chat platform (twitch, youtube, etc.)',
-        },
-      },
-      required: ['username', 'platform'],
-    },
-  },
-  async (input) => {
-    await blockUser(input.username, input.platform);
-    return { success: true, blocked: input.username };
-  }
-);
-
-/**
- * Tool: Get agent status
- */
-export const getAgentStatusTool = defineTool(
-  {
-    name: 'getAgentStatus',
-    description: 'Get Social Stream Agent connection status',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {},
-    },
-  },
-  async () => {
-    return getConnectionStatus();
-  }
-);
-
-/**
- * Genkit Flow: Initialize Social Stream Agent
- */
-export const initializeSocialStreamFlow = defineFlow(
-  {
-    name: 'initializeSocialStream',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        sessionId: {
-          type: 'string',
-          description: 'Social Stream session ID',
-        },
-      },
-    },
-    outputSchema: {
-      type: 'object',
-      properties: {
-        status: { type: 'string' },
-        message: { type: 'string' },
-      },
-    },
-  },
-  async (input) => {
-    try {
-      const config: Partial<AgentConfig> = {};
-      if (input.sessionId) {
-        config.sessionId = input.sessionId;
-      }
-
-      setupSocialStreamListener(config);
-
-      return {
-        status: 'initialized',
-        message: 'Social Stream Agent listening for incoming messages',
-      };
-    } catch (error) {
-      return {
-        status: 'error',
-        message: `Failed to initialize: ${error instanceof Error ? error.message : String(error)}`,
-      };
+export async function initializeSocialStreamAsync(sessionId?: string): Promise<{
+  status: string;
+  message: string;
+}> {
+  try {
+    const config: Partial<AgentConfig> = {};
+    if (sessionId) {
+      config.sessionId = sessionId;
     }
+
+    setupSocialStreamListener(config);
+
+    return {
+      status: 'initialized',
+      message: 'Social Stream Agent listening for incoming messages',
+    };
+  } catch (error) {
+    return {
+      status: 'error',
+      message: `Failed to initialize: ${error instanceof Error ? error.message : String(error)}`,
+    };
   }
-);
+}
 
 /**
- * Genkit Flow: Process Social Stream Message
+ * Helper function for Genkit flows to process messages
  */
-export const processSocialStreamMessageFlow = defineFlow(
-  {
-    name: 'processSocialStreamMessage',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        username: { type: 'string' },
-        message: { type: 'string' },
-        platform: { type: 'string' },
-      },
-      required: ['username', 'message'],
-    },
-    outputSchema: {
-      type: 'object',
-      properties: {
-        response: { type: 'string' },
-        success: { type: 'boolean' },
-      },
-    },
-  },
-  async (input) => {
-    try {
-      const response = await generateAIResponse(
-        input.message,
-        input.username,
-        input.platform || 'api'
-      );
-      return {
-        response: response.text,
-        success: true,
-      };
-    } catch (error) {
-      return {
-        response: 'Error processing message',
-        success: false,
-      };
-    }
+export async function processSocialStreamMessageAsync(input: {
+  username: string;
+  message: string;
+  platform?: string;
+}): Promise<{ response: string; success: boolean }> {
+  try {
+    const response = await generateAIResponse(
+      input.message,
+      input.username,
+      input.platform || 'api'
+    );
+    return {
+      response: response.text,
+      success: true,
+    };
+  } catch (error) {
+    return {
+      response: 'Error processing message',
+      success: false,
+    };
   }
-);
+}
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
-export {
+export type {
   DEFAULT_CONFIG,
   AgentConfig,
   IncomingMessage,
