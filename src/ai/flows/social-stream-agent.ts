@@ -180,7 +180,7 @@ async function handleIncomingMessage(message: IncomingMessage) {
 }
 
 /**
- * Generate AI response using Genkit
+ * Generate AI response using Google Gemini 1.5 Pro
  * Integrate with your existing Genkit flows
  */
 async function generateAIResponse(
@@ -188,17 +188,83 @@ async function generateAIResponse(
   username: string,
   platform: string
 ): Promise<AIResponse> {
-  // TODO: Integrate with your Genkit flows
-  // Example: call your chat-flow, analyze-business-evaluation, etc.
+  try {
+    // Use Google Gemini API directly for real AI responses
+    const apiKey = process.env.GOOGLE_GENAI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn('⚠️ GOOGLE_GENAI_API_KEY not configured. Using fallback response.');
+      return getFallbackResponse(message, username);
+    }
 
-  // For now, simple response
-  const responseText = `Hola ${username} 👋\n\nGracias por tu mensaje:\n"${message}"\n\n✨ Keruxia AI está aquí para ayudarte. ¿En qué puedo asistirte?`;
+    // Call Google Gemini 1.5 Pro API
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `Eres Keruxia, un asistente IA especializado en marketing digital y automatización de negocio para agencias.
+
+Tu rol:
+- Responder preguntas sobre servicios de marketing 
+- Recomendar planes y soluciones
+- Ayudar con estrategia de contenido
+- Guiar a clientes en automatización
+
+Usuario: ${username}
+Canal: ${platform}
+Mensaje: "${message}"
+
+Responde de manera profesional, amable y concisa. Máximo 2-3 oraciones. En español.`,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 150,
+        },
+      }),
+    });
+
+    const data = await response.json();
+    const responseText =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      getFallbackResponse(message, username).text;
+
+    return {
+      text: responseText,
+      metadata: {
+        confidence: 0.95,
+        source: 'gemini-1.5-pro',
+        timestamp: Date.now(),
+      },
+    };
+  } catch (error) {
+    console.error('❌ Error calling Gemini API:', error);
+    return getFallbackResponse(message, username);
+  }
+}
+
+/**
+ * Fallback response when API fails
+ */
+function getFallbackResponse(message: string, username: string): AIResponse {
+  const responseText = `Hola ${username} 👋\n\nGracias por tu mensaje sobre: "${message}"\n\n✨ Keruxia IA está aquí para ayudarte con tu estrategia de marketing. ¿En qué puedo asistirte?`;
 
   return {
     text: responseText,
     metadata: {
-      confidence: 0.95,
-      source: 'social-stream-agent',
+      confidence: 0.80,
+      source: 'fallback',
       timestamp: Date.now(),
     },
   };

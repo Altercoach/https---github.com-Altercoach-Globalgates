@@ -8,48 +8,125 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
-import { Shield, User } from 'lucide-react';
+import { Shield, User, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const labels = {
   es: {
     title: "Iniciar Sesión",
-    description: "Selecciona tu rol para acceder.",
-    adminButton: "Entrar como Administrador",
-    customerButton: "Entrar como Cliente (Demo)",
-    demoMessage: "El inicio de sesión manual está deshabilitado para esta demostración.",
-    backButton: "Volver al Inicio"
+    description: "Accede a tu cuenta",
+    emailLabel: "Email",
+    passwordLabel: "Contraseña",
+    loginButton: "Iniciar Sesión",
+    signupButton: "Crear Cuenta",
+    errorMessage: "Error al iniciar sesión. Intenta nuevamente.",
+    demoCredentials: "Credenciales de demo: admin@negocio.com / demo@cliente.com (Contraseña: Demo123!)",
+    backButton: "Volver al Inicio",
+    adminEmail: "admin@negocio.com",
+    customerEmail: "demo@cliente.com",
+    demoPassword: "Demo123!",
+    adminButtonText: "Demo: Entrar como Administrador",
+    customerButtonText: "Demo: Entrar como Cliente"
   },
   en: {
     title: "Login",
-    description: "Select your role to access.",
-    adminButton: "Enter as Administrator",
-    customerButton: "Enter as Customer (Demo)",
-    demoMessage: "Manual login is disabled for this demonstration.",
-    backButton: "Back to Home"
+    description: "Access your account",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    loginButton: "Sign In",
+    signupButton: "Create Account",
+    errorMessage: "Error signing in. Please try again.",
+    demoCredentials: "Demo credentials: admin@negocio.com / demo@cliente.com (Password: Demo123!)",
+    backButton: "Back to Home",
+    adminEmail: "admin@negocio.com",
+    customerEmail: "demo@cliente.com",
+    demoPassword: "Demo123!",
+    adminButtonText: "Demo: Enter as Administrator",
+    customerButtonText: "Demo: Enter as Customer"
   },
   fr: {
     title: "Connexion",
-    description: "Sélectionnez votre rôle pour accéder.",
-    adminButton: "Entrer en tant qu'administrateur",
-    customerButton: "Entrer en tant que client (Démo)",
-    demoMessage: "La connexion manuelle est désactivée pour cette démonstration.",
-    backButton: "Retour à l'accueil"
+    description: "Accédez à votre compte",
+    emailLabel: "Email",
+    passwordLabel: "Mot de passe",
+    loginButton: "Se connecter",
+    signupButton: "Créer un compte",
+    errorMessage: "Erreur de connexion. Veuillez réessayer.",
+    demoCredentials: "Identifiants de démonstration: admin@negocio.com / demo@cliente.com (Mot de passe: Demo123!)",
+    backButton: "Retour à l'accueil",
+    adminEmail: "admin@negocio.com",
+    customerEmail: "demo@cliente.com",
+    demoPassword: "Demo123!",
+    adminButtonText: "Démo: Entrer en tant qu'administrateur",
+    customerButtonText: "Démo: Entrer en tant que client"
   }
 };
 
-
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, signup } = useAuth();
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAdminLogin = () => {
-    login('admin@negocio.com', 'admin');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      await login(email, password);
+    } catch (err) {
+      setError(t.errorMessage);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCustomerLogin = () => {
-    login('demo@cliente.com', 'customer');
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      await signup(email, password);
+    } catch (err) {
+      setError(t.errorMessage);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoAdmin = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      await login(t.adminEmail, t.demoPassword);
+    } catch (err) {
+      setError(t.errorMessage);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoCustomer = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      await login(t.customerEmail, t.demoPassword);
+    } catch (err) {
+      setError(t.errorMessage);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,21 +137,82 @@ export default function LoginPage() {
           <CardDescription>{t.description}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-           <Button onClick={handleAdminLogin} className="w-full">
-            <Shield className="mr-2"/>
-            {t.adminButton}
-          </Button>
-           <Button onClick={handleCustomerLogin} variant="secondary" className="w-full">
-            <User className="mr-2"/>
-            {t.customerButton}
-          </Button>
-          
-          <p className="px-8 text-center text-sm text-muted-foreground pt-2">
-            {t.demoMessage}
-          </p>
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-          <Button variant="outline" className="w-full" asChild>
-              <Link href="/">{t.backButton}</Link>
+          <form onSubmit={handleLogin} className="flex flex-col gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="email">{t.emailLabel}</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">{t.passwordLabel}</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                required
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Cargando...' : t.loginButton}
+            </Button>
+          </form>
+
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-muted" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Demos</span>
+            </div>
+          </div>
+
+          <Button 
+            onClick={handleDemoAdmin} 
+            variant="outline" 
+            className="w-full"
+            disabled={isLoading}
+          >
+            <Shield className="mr-2 h-4 w-4"/>
+            {t.adminButtonText}
+          </Button>
+
+          <Button 
+            onClick={handleDemoCustomer} 
+            variant="outline" 
+            className="w-full"
+            disabled={isLoading}
+          >
+            <User className="mr-2 h-4 w-4"/>
+            {t.customerButtonText}
+          </Button>
+
+          <div className="pt-2 border-t">
+            <p className="text-xs text-muted-foreground text-center">
+              {t.demoCredentials}
+            </p>
+          </div>
+
+          <Button variant="ghost" className="w-full" asChild>
+            <Link href="/">{t.backButton}</Link>
           </Button>
         </CardContent>
       </Card>
