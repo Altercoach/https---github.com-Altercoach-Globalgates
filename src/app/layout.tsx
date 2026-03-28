@@ -1,3 +1,4 @@
+import { ChatWidgetProvider } from '@/contexts/chat-widget-context';
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
@@ -35,18 +36,20 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-          <SiteProvider>
-            <LanguageProvider>
-              <CurrencyProvider>
-                <CartProvider>
-                  <AuthProvider>
-                    {children}
-                    <Toaster />
-                  </AuthProvider>
-                </CartProvider>
-              </CurrencyProvider>
-            </LanguageProvider>
-          </SiteProvider>
+          <ChatWidgetProvider>
+            <SiteProvider>
+              <LanguageProvider>
+                <CurrencyProvider>
+                  <CartProvider>
+                    <AuthProvider>
+                      {children}
+                      <Toaster />
+                    </AuthProvider>
+                  </CartProvider>
+                </CurrencyProvider>
+              </LanguageProvider>
+            </SiteProvider>
+          </ChatWidgetProvider>
         </ThemeProvider>
       </body>
     </html>
