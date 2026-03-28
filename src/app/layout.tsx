@@ -9,7 +9,9 @@ import { LanguageProvider } from '@/contexts/language-context';
 import { CurrencyProvider } from '@/contexts/currency-context';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
+
 import { ThemeProvider } from '@/contexts/theme-provider';
+import { FeatureFlagProvider } from '@/contexts/feature-flag-context';
 
 export const metadata: Metadata = {
   title: 'Golden Key Agency',
@@ -42,8 +44,10 @@ export default function RootLayout({
                 <CurrencyProvider>
                   <CartProvider>
                     <AuthProvider>
-                      {children}
-                      <Toaster />
+                      <FeatureFlagProvider>
+                        {children}
+                        <Toaster />
+                      </FeatureFlagProvider>
                     </AuthProvider>
                   </CartProvider>
                 </CurrencyProvider>

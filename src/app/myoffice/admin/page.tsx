@@ -1,476 +1,342 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MoreHorizontal, DollarSign, Users, ShoppingCart, Search, Filter, XCircle, PlayCircle, Trash2, Eye, MessageSquare } from 'lucide-react';
-import { format } from 'date-fns';
-import { es, enUS, fr } from 'date-fns/locale';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DollarSign, Users, TrendingUp, ShoppingCart, MoreHorizontal, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
 import type { Customer } from '@/lib/types';
-import Link from 'next/link';
-import { initialCustomers } from '@/lib/constants';
 import { useLanguage } from '@/hooks/use-language';
+import Link from 'next/link';
+import { RouteGuard } from '@/components/auth/route-guard';
 
 const labels = {
   es: {
-    pageTitle: "Administración del Negocio",
-    pageSubtitle: "Gestiona tus clientes, planes y visualiza tus ventas.",
-    totalRevenue: "Ingresos Totales",
-    totalRevenueDesc: "Ingresos totales generados",
-    activeClients: "Clientes Activos",
-    activeClientsDesc: "Clientes con servicios activos",
-    activeSubscriptions: "Suscripciones Activas",
-    activeSubscriptionsDesc: "Planes de suscripción mensuales",
-    clients: "Clientes",
-    crm: "Supervisión de Agente (CRM)",
-    searchPlaceholder: "Buscar por nombre o email...",
-    filterByStatus: "Filtrar por estado",
-    allStatuses: "Todos los estados",
-    active: "Activo",
-    suspended: "Suspendido",
-    canceled: "Cancelado",
-    actions: "Acciones",
-    bulkActions: "Acciones en Lote",
-    suspend: "Suspender",
-    reactivate: "Reactivar",
-    delete: "Eliminar",
-    noClientSelected: "Ningún cliente seleccionado",
-    noClientSelectedDesc: "Por favor, selecciona al menos un cliente.",
-    actionCompleted: "Acción completada",
-    clientsSuspended: "clientes suspendidos",
-    clientsReactivated: "clientes reactivados",
-    clientsDeleted: "clientes eliminados",
-    selectAll: "Seleccionar todo",
-    client: "Cliente",
-    plan: "Plan",
-    status: "Estado",
-    memberSince: "Miembro Desde",
-    viewDetails: "Ver detalles",
-    sendMessage: "Enviar mensaje",
-    noResults: "No se encontraron resultados.",
-    confirmAction: "Confirmar Acción",
-    confirmDelete: "¿Estás seguro que quieres eliminar a",
-    clientsCount: "clientes?",
-    thisAction: "Esta acción",
-    cannotBeUndone: "no se puede deshacer.",
-    cancel: "Cancelar",
-    confirm: "Confirmar",
+    pageTitle: 'Administracion del Negocio',
+    pageSubtitle: 'Gestiona tus clientes, planes y visualiza tus ventas.',
+    totalRevenue: 'Ingresos Totales',
+    totalRevenueDesc: 'Ingresos totales generados',
+    activeClients: 'Clientes Activos',
+    activeClientsDesc: 'Clientes con servicios activos',
+    activeSubscriptions: 'Suscripciones Activas',
+    activeSubscriptionsDesc: 'Planes de suscripcion mensuales',
+    clients: 'Clientes',
+    searchPlaceholder: 'Buscar por nombre o email...',
+    filterByStatus: 'Filtrar por estado',
+    allStatuses: 'Todos los estados',
+    active: 'Activo',
+    suspended: 'Suspendido',
+    canceled: 'Cancelado',
+    actions: 'Acciones',
+    bulkActions: 'Acciones en Lote',
+    suspend: 'Suspender',
+    reactivate: 'Reactivar',
+    deleteAction: 'Eliminar',
+    noClientSelected: 'Ningun cliente seleccionado',
+    noClientSelectedDesc: 'Por favor, selecciona al menos un cliente.',
+    actionCompleted: 'Accion completada',
+    clientsSuspended: 'clientes suspendidos',
+    clientsReactivated: 'clientes reactivados',
+    clientsDeleted: 'clientes eliminados',
+    selectAll: 'Seleccionar todo',
+    client: 'Cliente',
+    plan: 'Plan',
+    status: 'Estado',
+    memberSince: 'Miembro Desde',
+    viewDetails: 'Ver detalles',
+    sendMessage: 'Enviar mensaje',
+    noResults: 'No se encontraron resultados.',
   },
   en: {
-    pageTitle: "Business Administration",
-    pageSubtitle: "Manage your clients, plans, and view your sales.",
-    totalRevenue: "Total Revenue",
-    totalRevenueDesc: "Total generated revenue",
-    activeClients: "Active Clients",
-    activeClientsDesc: "Clients with active services",
-    activeSubscriptions: "Active Subscriptions",
-    activeSubscriptionsDesc: "Monthly subscription plans",
-    clients: "Clients",
-    crm: "Agent Supervision (CRM)",
-    searchPlaceholder: "Search by name or email...",
-    filterByStatus: "Filter by status",
-    allStatuses: "All statuses",
-    active: "Active",
-    suspended: "Suspended",
-    canceled: "Canceled",
-    actions: "Actions",
-    bulkActions: "Bulk Actions",
-    suspend: "Suspend",
-    reactivate: "Reactivate",
-    delete: "Delete",
-    noClientSelected: "No client selected",
-    noClientSelectedDesc: "Please select at least one client.",
-    actionCompleted: "Action completed",
-    clientsSuspended: "clients suspended",
-    clientsReactivated: "clients reactivated",
-    clientsDeleted: "clients deleted",
-    selectAll: "Select all",
-    client: "Client",
-    plan: "Plan",
-    status: "Status",
-    memberSince: "Member Since",
-    viewDetails: "View details",
-    sendMessage: "Send message",
-    noResults: "No results found.",
-    confirmAction: "Confirm Action",
-    confirmDelete: "Are you sure you want to delete",
-    clientsCount: "clients?",
-    thisAction: "This action",
-    cannotBeUndone: "cannot be undone.",
-    cancel: "Cancel",
-    confirm: "Confirm",
+    pageTitle: 'Business Administration',
+    pageSubtitle: 'Manage your clients, plans, and view your sales.',
+    totalRevenue: 'Total Revenue',
+    totalRevenueDesc: 'Total generated revenue',
+    activeClients: 'Active Clients',
+    activeClientsDesc: 'Clients with active services',
+    activeSubscriptions: 'Active Subscriptions',
+    activeSubscriptionsDesc: 'Monthly subscription plans',
+    clients: 'Clients',
+    searchPlaceholder: 'Search by name or email...',
+    filterByStatus: 'Filter by status',
+    allStatuses: 'All statuses',
+    active: 'Active',
+    suspended: 'Suspended',
+    canceled: 'Canceled',
+    actions: 'Actions',
+    bulkActions: 'Bulk Actions',
+    suspend: 'Suspend',
+    reactivate: 'Reactivate',
+    deleteAction: 'Delete',
+    noClientSelected: 'No client selected',
+    noClientSelectedDesc: 'Please select at least one client.',
+    actionCompleted: 'Action completed',
+    clientsSuspended: 'clients suspended',
+    clientsReactivated: 'clients reactivated',
+    clientsDeleted: 'clients deleted',
+    selectAll: 'Select all',
+    client: 'Client',
+    plan: 'Plan',
+    status: 'Status',
+    memberSince: 'Member Since',
+    viewDetails: 'View details',
+    sendMessage: 'Send message',
+    noResults: 'No results found.',
   },
   fr: {
     pageTitle: "Administration de l'Entreprise",
-    pageSubtitle: "Gérez vos clients, vos plans et visualisez vos ventes.",
-    totalRevenue: "Revenu Total",
-    totalRevenueDesc: "Revenu total généré",
-    activeClients: "Clients Actifs",
-    activeClientsDesc: "Clients avec des services actifs",
-    activeSubscriptions: "Abonnements Actifs",
+    pageSubtitle: 'Gerez vos clients, vos plans et visualisez vos ventes.',
+    totalRevenue: 'Revenu Total',
+    totalRevenueDesc: 'Revenu total genere',
+    activeClients: 'Clients Actifs',
+    activeClientsDesc: 'Clients avec des services actifs',
+    activeSubscriptions: 'Abonnements Actifs',
     activeSubscriptionsDesc: "Plans d'abonnement mensuels",
-    clients: "Clients",
-    crm: "Supervision de l'Agent (CRM)",
-    searchPlaceholder: "Rechercher par nom ou e-mail...",
-    filterByStatus: "Filtrer par statut",
-    allStatuses: "Tous les statuts",
-    active: "Actif",
-    suspended: "Suspendu",
-    canceled: "Annulé",
-    actions: "Actions",
-    bulkActions: "Actions en Masse",
-    suspend: "Suspendre",
-    reactivate: "Réactiver",
-    delete: "Supprimer",
-    noClientSelected: "Aucun client sélectionné",
-    noClientSelectedDesc: "Veuillez sélectionner au moins un client.",
-    actionCompleted: "Action terminée",
-    clientsSuspended: "clients suspendus",
-    clientsReactivated: "clients réactivés",
-    clientsDeleted: "clients supprimés",
-    selectAll: "Tout sélectionner",
-    client: "Client",
-    plan: "Plan",
-    status: "Statut",
-    memberSince: "Membre Depuis",
-    viewDetails: "Voir les détails",
-    sendMessage: "Envoyer un message",
-    noResults: "Aucun résultat trouvé.",
-    confirmAction: "Confirmer l'action",
-    confirmDelete: "Êtes-vous sûr de vouloir supprimer",
-    clientsCount: "clients?",
-    thisAction: "Cette action",
-    cannotBeUndone: "ne peut pas être annulée.",
-    cancel: "Annuler",
-    confirm: "Confirmer",
-  }
+    clients: 'Clients',
+    searchPlaceholder: 'Rechercher par nom ou e-mail...',
+    filterByStatus: 'Filtrer par statut',
+    allStatuses: 'Tous les statuts',
+    active: 'Actif',
+    suspended: 'Suspendu',
+    canceled: 'Annule',
+    actions: 'Actions',
+    bulkActions: 'Actions en Masse',
+    suspend: 'Suspendre',
+    reactivate: 'Reactiver',
+    deleteAction: 'Supprimer',
+    noClientSelected: 'Aucun client selectionne',
+    noClientSelectedDesc: 'Veuillez selectionner au moins un client.',
+    actionCompleted: 'Action terminee',
+    clientsSuspended: 'clients suspendus',
+    clientsReactivated: 'clients reactives',
+    clientsDeleted: 'clients supprimes',
+    selectAll: 'Tout selectionner',
+    client: 'Client',
+    plan: 'Plan',
+    status: 'Statut',
+    memberSince: 'Membre Depuis',
+    viewDetails: 'Voir les details',
+    sendMessage: 'Envoyer un message',
+    noResults: 'Aucun resultat trouve.',
+  },
 };
 
+const initialCustomers: Customer[] = [
+  { id: '1', name: 'Ana Garcia', email: 'ana@example.com', plan: 'Pro', status: 'Active', revenue: 1200, signupDate: new Date('2024-01-15') },
+  { id: '2', name: 'Carlos Lopez', email: 'carlos@example.com', plan: 'Basic', status: 'Active', revenue: 400, signupDate: new Date('2024-03-20') },
+  { id: '3', name: 'Maria Torres', email: 'maria@example.com', plan: 'Enterprise', status: 'Suspended', revenue: 3600, signupDate: new Date('2023-11-10') },
+];
 
 export default function AdminDashboardPage() {
   const { toast } = useToast();
   const { currency } = useCurrency();
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
-  const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
   const { language } = useLanguage();
-  const t = labels[language.code as keyof typeof labels] || labels.en;
-  const locale = { es, en: enUS, fr }[language.code] || enUS;
+  const t = labels[language.code as keyof typeof labels] ?? labels.en;
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useEffect(() => { setIsMounted(true); }, []);
 
-  const filteredCustomers = useMemo(() => {
-    return customers.filter(customer => {
-      const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || customer.status.toLowerCase() === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [customers, searchTerm, statusFilter]);
-
-  const handleSelectCustomer = (customerId: string, checked: boolean) => {
-    setSelectedCustomerIds(prev =>
-      checked ? [...prev, customerId] : prev.filter(id => id !== customerId)
-    );
-  };
-  
-  const handleSelectAll = (checked: boolean) => {
-      setSelectedCustomerIds(checked ? filteredCustomers.map(c => c.id) : []);
-  };
-
-  const handleBulkAction = (action: 'suspend' | 'activate' | 'delete') => {
-    if(selectedCustomerIds.length === 0) {
-      toast({ title: t.noClientSelected, description: t.noClientSelectedDesc, variant: 'destructive'});
-      return;
-    }
-
-    let toastMessage = '';
-    
-    if (action === 'delete') {
-        setCustomers(prev => prev.filter(c => !selectedCustomerIds.includes(c.id)));
-        toastMessage = t.clientsDeleted;
-    } else {
-        setCustomers(prev => prev.map(c => {
-            if(selectedCustomerIds.includes(c.id)) {
-                if(action === 'suspend') {
-                    c.status = 'Suspended'; 
-                    toastMessage = t.clientsSuspended;
-                } else if(action === 'activate') {
-                    c.status = 'Active';
-                    toastMessage = t.clientsReactivated;
-                }
-            }
-            return c;
-        }));
-    }
-
-    toast({ title: t.actionCompleted, description: `${selectedCustomerIds.length} ${toastMessage}`});
-    setSelectedCustomerIds([]);
-  }
+  const filteredCustomers = useMemo(() =>
+    customers.filter(c => {
+      const matchSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchStatus = statusFilter === 'all' || c.status.toLowerCase() === statusFilter;
+      return matchSearch && matchStatus;
+    }),
+  [customers, searchTerm, statusFilter]);
 
   const kpi = useMemo(() => ({
     totalRevenue: customers.reduce((sum, c) => sum + c.revenue, 0),
     activeClients: customers.filter(c => c.status === 'Active').length,
     activeSubscriptions: customers.filter(c => c.status === 'Active').length,
   }), [customers]);
-  
-  if (!isMounted) {
-    return null;
-  }
 
-  const getStatusBadgeVariant = (status: Customer['status']): 'default' | 'secondary' | 'destructive' => {
-      switch (status) {
-          case 'Active':
-              return 'default';
-          case 'Suspended':
-              return 'secondary';
-          case 'Canceled':
-              return 'destructive';
-      }
-  }
+  const handleSelect = (id: string, checked: boolean) => {
+    setSelectedIds(prev => checked ? [...prev, id] : prev.filter(x => x !== id));
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedIds(checked ? filteredCustomers.map(c => c.id) : []);
+  };
+
+  const handleBulkAction = (action: 'suspend' | 'activate' | 'delete') => {
+    if (selectedIds.length === 0) {
+      toast({ title: t.noClientSelected, description: t.noClientSelectedDesc, variant: 'destructive' });
+      return;
+    }
+    if (action === 'delete') {
+      setCustomers(prev => prev.filter(c => !selectedIds.includes(c.id)));
+      toast({ title: t.actionCompleted, description: `${selectedIds.length} ${t.clientsDeleted}` });
+    } else {
+      const newStatus = action === 'suspend' ? 'Suspended' : 'Active';
+      setCustomers(prev => prev.map(c =>
+        selectedIds.includes(c.id) ? { ...c, status: newStatus as Customer['status'] } : c
+      ));
+      const msg = action === 'suspend' ? t.clientsSuspended : t.clientsReactivated;
+      toast({ title: t.actionCompleted, description: `${selectedIds.length} ${msg}` });
+    }
+    setSelectedIds([]);
+  };
+
+  const getStatusVariant = (status: Customer['status']): 'default' | 'secondary' | 'destructive' => {
+    if (status === 'Active') return 'default';
+    if (status === 'Suspended') return 'secondary';
+    return 'destructive';
+  };
+
+  if (!isMounted) return null;
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
-        <p className="text-muted-foreground">{t.pageSubtitle}</p>
-      </header>
+    <RouteGuard requireAuth requireRole="admin">
+      <div className="space-y-6">
+        <header>
+          <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
+          <p className="text-muted-foreground">{t.pageSubtitle}</p>
+        </header>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t.totalRevenue}</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(kpi.totalRevenue, currency)}</div>
+              <p className="text-xs text-muted-foreground">{t.totalRevenueDesc}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t.activeClients}</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.activeClients}</div>
+              <p className="text-xs text-muted-foreground">{t.activeClientsDesc}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">{t.activeSubscriptions}</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.activeSubscriptions}</div>
+              <p className="text-xs text-muted-foreground">{t.activeSubscriptionsDesc}</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.totalRevenue}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <CardHeader>
+            <CardTitle>{t.clients}</CardTitle>
+            <div className="flex gap-2 flex-wrap mt-2">
+              <Input
+                placeholder={t.searchPlaceholder}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="max-w-xs"
+              />
+              <Button variant="outline" size="sm" onClick={() => handleBulkAction('suspend')} disabled={selectedIds.length === 0}>
+                {t.suspend}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleBulkAction('activate')} disabled={selectedIds.length === 0}>
+                {t.reactivate}
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleBulkAction('delete')} disabled={selectedIds.length === 0}>
+                {t.deleteAction}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(kpi.totalRevenue, currency)}</div>
-            <p className="text-xs text-muted-foreground">{t.totalRevenueDesc}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.activeClients}</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{kpi.activeClients}</div>
-             <p className="text-xs text-muted-foreground">{t.activeClientsDesc}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t.activeSubscriptions}</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{kpi.activeSubscriptions}</div>
-            <p className="text-xs text-muted-foreground">{t.activeSubscriptionsDesc}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-accent bg-accent/10">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <MessageSquare />
-              {t.crm}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-             <Button asChild className="w-full">
-                <Link href="/myoffice/crm">Ver Conversaciones</Link>
-             </Button>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={selectedIds.length === filteredCustomers.length && filteredCustomers.length > 0}
+                      onCheckedChange={v => handleSelectAll(!!v)}
+                    />
+                  </TableHead>
+                  <TableHead>{t.client}</TableHead>
+                  <TableHead>{t.plan}</TableHead>
+                  <TableHead>{t.status}</TableHead>
+                  <TableHead>{t.memberSince}</TableHead>
+                  <TableHead className="text-right">{t.actions}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCustomers.length > 0 ? (
+                  filteredCustomers.map(c => (
+                    <TableRow key={c.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.includes(c.id)}
+                          onCheckedChange={v => handleSelect(c.id, !!v)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{c.name}</div>
+                        <div className="text-xs text-muted-foreground">{c.email}</div>
+                      </TableCell>
+                      <TableCell>{c.plan}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(c.status)}>{c.status}</Badge>
+                      </TableCell>
+                      <TableCell>{c.signupDate.toLocaleDateString()}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/myoffice/admin/${c.id}`} className="flex items-center">
+                                <Eye className="mr-2 h-4 w-4" />
+                                {t.viewDetails}
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <a href={`mailto:${c.email}`} className="flex items-center">
+                                {t.sendMessage}
+                              </a>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      {t.noResults}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t.clients}</CardTitle>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <div className="relative flex-1 md:grow-0">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                id="search-customer"
-                name="search-customer"
-                placeholder={t.searchPlaceholder}
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                    <SelectValue placeholder={t.filterByStatus} />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">{t.allStatuses}</SelectItem>
-                    <SelectItem value="active">{t.active}</SelectItem>
-                    <SelectItem value="suspended">{t.suspended}</SelectItem>
-                    <SelectItem value="canceled">{t.canceled}</SelectItem>
-                </SelectContent>
-            </Select>
-            <div className="ml-auto flex items-center gap-2">
-              <AlertDialog>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" disabled={selectedCustomerIds.length === 0}>
-                            {t.actions} ({selectedCustomerIds.length})
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuLabel>{t.bulkActions}</DropdownMenuLabel>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem onSelect={e => e.preventDefault()}><XCircle className="mr-2"/>{t.suspend}</DropdownMenuItem>
-                        </AlertDialogTrigger>
-                         <AlertDialogTrigger asChild>
-                           <DropdownMenuItem onSelect={e => e.preventDefault()}><PlayCircle className="mr-2"/>{t.reactivate}</DropdownMenuItem>
-                         </AlertDialogTrigger>
-                        <DropdownMenuSeparator />
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem onSelect={e => e.preventDefault()} className="text-destructive"><Trash2 className="mr-2"/>{t.delete}</DropdownMenuItem>
-                        </AlertDialogTrigger>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>{t.confirmAction}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {t.confirmDelete} {selectedCustomerIds.length} {t.clientsCount} {t.thisAction} <strong>{t.cannotBeUndone}</strong>.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleBulkAction('delete')}>{t.confirm}</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[40px]">
-                   <Checkbox
-                    checked={selectedCustomerIds.length === filteredCustomers.length && filteredCustomers.length > 0}
-                    onCheckedChange={(checked) => handleSelectAll(!!checked)}
-                    aria-label={t.selectAll}
-                  />
-                </TableHead>
-                <TableHead>{t.client}</TableHead>
-                <TableHead>{t.plan}</TableHead>
-                <TableHead>{t.status}</TableHead>
-                <TableHead>{t.memberSince}</TableHead>
-                <TableHead className="text-right">{t.actions}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCustomers.length > 0 ? (
-                filteredCustomers.map(customer => (
-                  <TableRow key={customer.id} data-state={selectedCustomerIds.includes(customer.id) && "selected"}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedCustomerIds.includes(customer.id)}
-                        onCheckedChange={(checked) => handleSelectCustomer(customer.id, !!checked)}
-                        aria-label={`Seleccionar ${customer.name}`}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{customer.name}</div>
-                      <div className="text-sm text-muted-foreground">{customer.email}</div>
-                    </TableCell>
-                    <TableCell>{customer.plan}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={getStatusBadgeVariant(customer.status)}
-                        className={customer.status === 'Active' ? 'bg-green-500/20 text-green-700 border-green-500/30' : ''}
-                      >
-                        {customer.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{format(customer.signupDate, "dd MMM, yyyy", { locale: locale })}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                           <DropdownMenuLabel>{t.actions}</DropdownMenuLabel>
-                           <DropdownMenuItem asChild>
-                            <Link href={`/myoffice/admin/${customer.id}`} className="flex items-center cursor-pointer">
-                              <Eye className="mr-2"/>{t.viewDetails}
-                            </Link>
-                           </DropdownMenuItem>
-                           <DropdownMenuItem asChild>
-                             <a href={`mailto:${customer.email}`} className="flex items-center cursor-pointer">
-                               {t.sendMessage}
-                             </a>
-                           </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    {t.noResults}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+    </RouteGuard>
   );
 }
-

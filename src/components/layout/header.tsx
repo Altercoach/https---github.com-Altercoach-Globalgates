@@ -6,6 +6,7 @@ import { Moon, Sun, ShoppingCart, KeyRound, User, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { useAuth } from '@/hooks/use-auth';
+import { useRole, useIsAdmin, useIsCustomer } from '@/hooks/use-role';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { CurrencySwitcher } from '@/components/currency-switcher';
 import { useLanguage } from '@/hooks/use-language';
@@ -45,7 +46,10 @@ export function Header() {
   const { language, getTranslation } = useLanguage();
   const { site } = useSite();
   const { setIsCartOpen, cart } = useCart();
-  const { auth } = useAuth();
+  const { auth, login, logout } = useAuth();
+  const role = useRole();
+  const isAdmin = useIsAdmin();
+  const isCustomer = useIsCustomer();
   
   const labels = navLabels[language.code as keyof typeof navLabels] || navLabels.en;
   
@@ -78,12 +82,19 @@ export function Header() {
             ))}
             {auth.loggedIn ? (
               <>
-                {auth.user?.role === 'admin' && (
+                {isAdmin && (
                   <Button asChild variant="ghost"><Link href="/myoffice"><Shield/> {labels.myOffice}</Link></Button>
                 )}
-                {auth.user?.role === 'customer' && (
+                {isCustomer && (
                    <Button asChild variant="ghost"><Link href="/dashboard"><User/> {labels.dashboard}</Link></Button>
                 )}
+                <span className="mx-2 text-xs text-muted-foreground">Rol actual: <b>{role}</b></span>
+                <Button size="sm" variant="outline" onClick={async () => { await login(role === 'admin' ? 'demo@cliente.com' : 'admin@negocio.com', 'Demo123!'); }}>
+                  Ver como {role === 'admin' ? 'Cliente' : 'Admin'}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={logout} className="ml-2">
+                  Logout
+                </Button>
               </>
             ) : (
                <Button asChild variant="ghost"><Link href="/login">{labels.login}</Link></Button>

@@ -1,6 +1,8 @@
 
 'use client';
 
+
+import { RouteGuard } from '@/components/auth/route-guard';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/hooks/use-language';
@@ -27,8 +29,10 @@ export default function MyOfficeRedirectPage() {
   }, [router]);
 
   return (
-     <div className="flex h-full w-full items-center justify-center">
-      <p>{t.loadingOffice}</p>
-    </div>
+    <RouteGuard requireAuth requireRole="admin">
+      <div className="flex h-full w-full items-center justify-center">
+        <p>{t.loadingOffice}</p>
+      </div>
+    </RouteGuard>
   );
 }
