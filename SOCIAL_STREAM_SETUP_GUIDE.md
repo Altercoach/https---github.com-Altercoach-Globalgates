@@ -392,7 +392,7 @@ DEBUG=social-stream:*
 ```bash
 # 1. Add environment variables in Vercel dashboard
 SOCIAL_STREAM_SESSION_ID=xxxxx
-SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
+SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
 
 # 2. Deploy
 vercel --prod
