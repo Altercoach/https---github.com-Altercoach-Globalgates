@@ -28,7 +28,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, Cell } from "recharts"
 
 const initialProjects: Project[] = [
   {
@@ -388,7 +388,7 @@ const OptimizationDialog = ({ project, phase }: { project: Project, phase: Proje
                                     <XAxis type="number" dataKey="conversion" hide />
                                     <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                                     <Bar dataKey="conversion" layout="vertical" radius={5}>
-                                         {chartData.map((_, index) => <NextImage key={index} fill={index === 0 ? "hsl(var(--chart-2))" : "hsl(var(--chart-1))"} />)}
+                                         {chartData.map((_, index) => <Cell key={`cell-${index}`} fill={index === 0 ? 'hsl(var(--chart-2))' : 'hsl(var(--chart-1))'} />)}
                                     </Bar>
                                 </BarChart>
                             </ChartContainer>
