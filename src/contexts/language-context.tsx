@@ -74,7 +74,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (site) {
-      const translated: SiteData = {
+      // Translated site has strings where MultilingualStrings would be — cast is intentional
+      const translated = {
         ...site,
         brand: {
           ...site.brand,
@@ -96,7 +97,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           description: getTranslation(product.description),
         }))
       };
-      setTranslatedSite(translated);
+      setTranslatedSite(translated as unknown as SiteData);
     }
   }, [site, language, getTranslation]);
 

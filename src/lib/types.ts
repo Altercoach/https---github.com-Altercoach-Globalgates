@@ -1,6 +1,15 @@
 
 import { z } from 'zod';
+
 import type { ContentPost } from '@/ai/flows/generate-content-schedule-flow';
+
+// Permite asignar agentes IA a cualquier nivel
+export type AgentAssignment = {
+  id: string; // e.g. 'ai_marketing_assistant', 'crm_bot', etc.
+  name: string;
+  description?: string;
+  enabled: boolean;
+};
 
 export type MultilingualString = {
   es: string;
@@ -24,7 +33,9 @@ export type Product = {
   badge: MultilingualString;
   note: MultilingualString;
   description: MultilingualString;
-  features: string[]; // List of feature flags enabled for this product
+  features: string[]; // Feature flags
+  agents?: AgentAssignment[]; // IA agents asignados a este producto
+  bundleId?: string; // Si pertenece a un bundle
   longDescription?: MultilingualString;
   whatIncludes?: MultilingualString;
   whatFor?: MultilingualString;
@@ -35,6 +46,21 @@ export type Service = {
   id: string;
   title: MultilingualString;
   bullets: MultilingualString[];
+  features?: string[]; // Feature flags
+  agents?: AgentAssignment[];
+  bundleId?: string; // Si pertenece a un bundle
+  visible: boolean;
+};
+
+// Nuevo: Bundle jerárquico
+export type Bundle = {
+  id: string;
+  name: MultilingualString;
+  description?: MultilingualString;
+  products?: string[]; // IDs de productos incluidos
+  services?: string[]; // IDs de servicios incluidos
+  features?: string[]; // Feature flags a nivel bundle
+  agents?: AgentAssignment[];
   visible: boolean;
 };
 
@@ -58,11 +84,26 @@ export type AgentPersona = {
   avatar: string; // URL to the avatar image
 };
 
+export interface IntegrationStatus {
+  connected: boolean;
+  connecting: boolean;
+  error?: string;
+}
+
 export type SiteData = {
   brand: SiteBrand;
   services: Service[];
   products: Product[];
+  bundles?: Bundle[];
   agentPersona: AgentPersona;
+  // Permite alternar modalidad de visualización: 'hierarchical' | 'modular' | 'mixed'
+  viewMode?: 'hierarchical' | 'modular' | 'mixed';
+  // Estado de integraciones externas (whatsapp, messenger, etc)
+  integrationStatus?: Record<string, IntegrationStatus>;
+  // Claves de API de integraciones de datos (Facebook, GA4, etc.)
+  integrationsKeys?: Record<string, string>;
+  // Email de la cuenta de administrador
+  accountEmail?: string;
 };
 
 export type CartItem = {
@@ -124,7 +165,10 @@ export type ProjectPhase = {
   id: ProjectPhaseId;
   name: string;
   status: ProjectPhaseStatus;
-  details?: string; // Optional details about the phase status
+  details?: string;
+  title?: string;       // alias display label
+  description?: string; // alias for details
+  progress?: number;    // 0-100
 };
 
 export type Project = {
@@ -141,7 +185,8 @@ export type Project = {
 export const GenerateImageInputSchema = z.object({
   creativeBrief: z.string().describe('Brief creativo o concepto del post'),
   style: z.string().optional().describe('Estilo visual deseado'),
-  aspectRatio: z.enum(['1:1', '4:5', '9:16', '16:9']).default('1:1'),
+  // Ratios soportados por Imagen 3 (Google): https://cloud.google.com/vertex-ai/generative-ai/docs/image/generate-images
+  aspectRatio: z.enum(['1:1', '9:16', '16:9', '3:4', '4:3']).default('1:1'),
 });
 export type GenerateImageInput = z.infer<typeof GenerateImageInputSchema>;
 

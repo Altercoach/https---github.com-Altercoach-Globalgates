@@ -101,12 +101,13 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleAddToCart = () => {
-    // Pass the name in the current language to the cart
-    addToCart({ ...product, name: productName });
+    if (product.type === 'info') return;
+    addToCart({ ...product, name: productName, type: product.type as 'one' | 'sub' });
   }
 
   const handleAskMore = () => {
-    openChatWidget(`${t.askMoreInitialMessage} "${productName}".`);
+      const initialMessage = `${t.askMoreInitialMessage} "${productName}". ¿Qué beneficios tiene este plan para mi negocio? ¿Por qué debería elegirlo sobre otros?`;
+      openChatWidget(initialMessage);
   }
 
   return (

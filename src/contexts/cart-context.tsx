@@ -51,7 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, hasPurchased, isMounted]);
 
-  const addToCart = useCallback((prod: { id: string; name: string; price: number; type: 'one' | 'sub'; interval?: 'month' | null }) => {
+  const addToCart = useCallback((prod: { id: string; name: string; price: number; type: 'one' | 'sub' | 'info'; interval?: 'month' | null }) => {
     if (prod.type === 'info') {
       toast({
         title: 'Plan Informativo',
@@ -71,7 +71,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           x.id === prod.id ? { ...x, qty: clampQty(x.qty + 1) } : x
         );
       }
-      return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type, qty: 1 }];
+      return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type as 'one' | 'sub', qty: 1 }];
     });
     
     toast({ description: 'Añadido al carrito.' });
