@@ -232,7 +232,11 @@ export default function QuestionnaireResponsePage() {
                 <p><strong>{t.threats}:</strong> {businessAnalysis.swot.threats}</p>
             </div>
             <h4 className="mt-4">{t.recommendations}</h4>
-            <div className="text-sm font-sans whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: businessAnalysis.recommendations.replace(/\n/g, '<br />').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+            <div className="text-sm font-sans whitespace-pre-wrap">
+              {businessAnalysis.recommendations.split(/\*\*(.*?)\*\*/g).map((part, i) =>
+                i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+              )}
+            </div>
         </div>
       )
     }
