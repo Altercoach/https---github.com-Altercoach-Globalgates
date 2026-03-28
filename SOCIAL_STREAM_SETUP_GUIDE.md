@@ -31,7 +31,10 @@
 
 ```env
 # .env.local
-SOCIAL_STREAM_SESSION_ID=xxxxxxxxxxxxxxxx
+SOCIAL_STREAM_SESSION_ID=xxxxx
+SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
+SOCIAL_STREAM_IN_CHANNEL=4     # Channel for incoming messages
+SOCIAL_STREAM_OUT_CHANNEL=2    # Channel for outgoing responses
 ```
 
 ### Step 3: Configure Channels in Social Stream
@@ -93,8 +96,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await initializeSocialStreamFlow({
-      sessionId,
+      SOCIAL_STREAM_SESSION_ID=xxxxx
+      SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
+      SOCIAL_STREAM_IN_CHANNEL=4     # Channel for incoming messages
+      SOCIAL_STREAM_OUT_CHANNEL=2    # Channel for outgoing responses
     });
 
     return NextResponse.json(result, { status: 200 });
@@ -107,6 +112,7 @@ export async function POST(request: NextRequest) {
   }
 }
 ```
+    -e SOCIAL_STREAM_BASE_URL=https://your-social-stream-url \
 
 #### File: `src/app/page.tsx` (or wherever app starts)
 
