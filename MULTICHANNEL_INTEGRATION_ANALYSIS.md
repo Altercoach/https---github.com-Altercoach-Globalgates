@@ -88,6 +88,9 @@ GET https://io.socialstream.ninja/SESSION_ID/clearAll
 
 # Siguiente en queue
 GET https://io.socialstream.ninja/SESSION_ID/nextInQueue
+```env
+SOCIAL_STREAM_SESSION_ID=your_session_id_here
+```
 
 # Featured message
 GET https://io.socialstream.ninja/SESSION_ID/feature/USER/null
@@ -177,7 +180,7 @@ GET /api/v1/accounts/{accountId}/conversations?inbox_id=7
 // Enviar mensaje
 POST /api/v1/accounts/{accountId}/conversations/{id}/messages
 {
-  body: "Hola",
+SOCIAL_STREAM_SESSION_ID=your_session_id_here
   message_type: "outgoing",
   private: false
 }

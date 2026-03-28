@@ -39,20 +39,20 @@ Costo                  ✅ $0    Costo                 ✅ $0
 ## 🚀 Implementación Rápida
 
 ### Paso 1: Setup (10 minutos)
-```bash
-# 1. Instalar Social Stream Ninja
-# https://github.com/steveseguin/social_stream
-
-# 2. Obtener SESSION_ID y agregarlo a .env
-SOCIAL_STREAM_SESSION_ID=xxxxx
-
-# 3. Verificar conexión
-curl http://localhost:3000/api/social-stream/status
 ```
+# Social Stream Ninja
+SOCIAL_STREAM_SESSION_ID=your_session_id_here
+SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
+SOCIAL_STREAM_IN_CHANNEL=4
+SOCIAL_STREAM_OUT_CHANNEL=2
 
-### Paso 2: Implementación (1-2 horas)
-```bash
-# Ya están creados en el workspace:
+# Google Gemini AI (Required for real responses)
+GOOGLE_GENAI_API_KEY=your_google_genai_api_key_here
+NEXT_PUBLIC_GOOGLE_GENAI_API_KEY=your_google_genai_api_key_here
+
+# Development
+NODE_ENV=development
+```
 ✅ src/ai/flows/social-stream-agent.ts (implementación core)
 ✅ src/app/api/social-stream/route.ts (API routes)
 ✅ SOCIAL_STREAM_SETUP_GUIDE.md (documentación)

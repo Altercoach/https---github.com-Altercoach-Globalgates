@@ -31,7 +31,7 @@
 
 ```env
 # .env.local
-SOCIAL_STREAM_SESSION_ID=xxxxx
+SOCIAL_STREAM_SESSION_ID=your_session_id_here
 SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
 SOCIAL_STREAM_IN_CHANNEL=4     # Channel for incoming messages
 SOCIAL_STREAM_OUT_CHANNEL=2    # Channel for outgoing responses
@@ -178,7 +178,7 @@ SOCIAL_STREAM_OUT_CHANNEL=2    # Channel for outgoing responses
 # Genkit AI
 GENKIT_PLUGINS=@genkit-ai/google-genai
 GENKIT_ENVIRONMENT=dev
-GOOGLE_GENAI_API_KEY=your_api_key_here
+GOOGLE_GENAI_API_KEY=your_google_genai_api_key_here
 
 # Firebase (if using)
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id

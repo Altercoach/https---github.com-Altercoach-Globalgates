@@ -97,14 +97,14 @@ curl -X POST http://localhost:9003/api/social-stream/send \
 ### Environment Variables (.env.local)
 ```
 # Social Stream Ninja
-SOCIAL_STREAM_SESSION_ID=msyb4grjJy
+SOCIAL_STREAM_SESSION_ID=your_session_id_here
 SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
 SOCIAL_STREAM_IN_CHANNEL=4
 SOCIAL_STREAM_OUT_CHANNEL=2
 
 # Google Gemini AI (Required for real responses)
-GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
-NEXT_PUBLIC_GOOGLE_GENAI_API_KEY=YOUR_API_KEY_HERE
+GOOGLE_GENAI_API_KEY=your_google_genai_api_key_here
+NEXT_PUBLIC_GOOGLE_GENAI_API_KEY=your_google_genai_api_key_here
 
 # Development
 NODE_ENV=development

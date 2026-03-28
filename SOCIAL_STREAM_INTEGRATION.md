@@ -60,7 +60,7 @@ curl -X POST http://localhost:9003/api/social-stream/init \
 
 ```env
 # Requerido
-SOCIAL_STREAM_SESSION_ID=abc123def456
+SOCIAL_STREAM_SESSION_ID=your_session_id_here
 
 # Opcional (con defaults)
 SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
@@ -68,11 +68,11 @@ SOCIAL_STREAM_IN_CHANNEL=4      # Canal de entrada (chat del stream)
 SOCIAL_STREAM_OUT_CHANNEL=2     # Canal de salida (dock/respuestas)
 
 # Firestore (para persistencia de mensajes)
-FIREBASE_PROJECT_ID=keruxia-prod
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=keruxia-prod
+FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 
 # Google AI
-GOOGLE_GENAI_API_KEY=your_api_key
+GOOGLE_GENAI_API_KEY=your_google_genai_api_key_here
 ```
 
 ---
