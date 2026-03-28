@@ -73,7 +73,7 @@ const questions = {
   ]
 };
 
-export default function QuestionnaireFillPage({ params }: { params: { id: string } }) {
+export default function QuestionnaireFillPage() {
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
