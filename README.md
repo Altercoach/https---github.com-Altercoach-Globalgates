@@ -1,4 +1,5 @@
 # Firebase Studio
+# Trigger Netlify redeploy
 
 This is a NextJS starter in Firebase Studio.
 
