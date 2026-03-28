@@ -63,7 +63,7 @@ Social Stream Menu → Settings → Integrations
 
 #### Custom Webhook
 ```
-POST https://io.socialstream.ninja/{SESSION_ID}/sendChat/null/{MESSAGE}
+POST https://your-social-stream-url/{SESSION_ID}/sendChat/null/{MESSAGE}
 ```
 
 ### Step 4: Install Keruxia Dependencies
@@ -171,7 +171,7 @@ Create `.env.local`:
 ```env
 # Social Stream Ninja
 SOCIAL_STREAM_SESSION_ID=your_session_id_here
-SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
+SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
 SOCIAL_STREAM_IN_CHANNEL=4     # Channel for incoming messages
 SOCIAL_STREAM_OUT_CHANNEL=2    # Channel for outgoing responses
 

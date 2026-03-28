@@ -81,24 +81,24 @@ ws.send(JSON.stringify({ action: "nextInQueue" }));
 #### 2. HTTP/REST API
 ```bash
 # Enviar chat
-GET https://io.socialstream.ninja/SESSION_ID/sendChat/null/Hello%20World?channel=1
+GET https://your-social-stream-url/SESSION_ID/sendChat/null/Hello%20World?channel=1
 
 # Limpiar
-GET https://io.socialstream.ninja/SESSION_ID/clearAll
+GET https://your-social-stream-url/SESSION_ID/clearAll
 
 # Siguiente en queue
-GET https://io.socialstream.ninja/SESSION_ID/nextInQueue
+GET https://your-social-stream-url/SESSION_ID/nextInQueue
 ```env
 SOCIAL_STREAM_SESSION_ID=your_session_id_here
 ```
 
 # Featured message
-GET https://io.socialstream.ninja/SESSION_ID/feature/USER/null
+GET https://your-social-stream-url/SESSION_ID/feature/USER/null
 ```
 
 #### 3. Server-Sent Events (SSE)
 ```javascript
-const eventSource = new EventSource('https://io.socialstream.ninja/sse/SESSION_ID');
+const eventSource = new EventSource('https://your-social-stream-url/sse/SESSION_ID');
 eventSource.onmessage = (event) => {
   console.log(JSON.parse(event.data));
 };
@@ -106,10 +106,10 @@ eventSource.onmessage = (event) => {
 
 #### 4. Webhooks Inbound
 ```
-Stripe: https://io.socialstream.ninja/SESSION_ID/stripe
-Ko-Fi: https://io.socialstream.ninja/SESSION_ID/kofi
-Buy Me A Coffee: https://io.socialstream.ninja/SESSION_ID/bmac
-Fourthwall: https://io.socialstream.ninja/SESSION_ID/fourthwall
+Stripe: https://your-social-stream-url/SESSION_ID/stripe
+Ko-Fi: https://your-social-stream-url/SESSION_ID/kofi
+Buy Me A Coffee: https://your-social-stream-url/SESSION_ID/bmac
+Fourthwall: https://your-social-stream-url/SESSION_ID/fourthwall
 ```
 
 ### 📚 Documentación
@@ -349,7 +349,7 @@ const hmac = crypto.createHmac('sha256', secretKey)
 - Configura en `.env`:
 ```env
 SOCIAL_STREAM_SESSION_ID=xxxxx
-SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
+SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
 ```
 
 #### 3. Crear flow de integración

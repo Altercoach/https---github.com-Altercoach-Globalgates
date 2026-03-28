@@ -98,7 +98,7 @@ curl -X POST http://localhost:9003/api/social-stream/send \
 ```
 # Social Stream Ninja
 SOCIAL_STREAM_SESSION_ID=your_session_id_here
-SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
+SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
 SOCIAL_STREAM_IN_CHANNEL=4
 SOCIAL_STREAM_OUT_CHANNEL=2
 

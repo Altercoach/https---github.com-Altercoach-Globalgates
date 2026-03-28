@@ -68,12 +68,12 @@ Webhooks: Ko-Fi, Stripe, Buy Me A Coffee, Fourthwall
 
 2. **HTTP/REST** (GET/POST)
    ```
-   https://io.socialstream.ninja/{SESSION_ID}/sendChat/null/{MESSAGE}
+   https://your-social-stream-url/{SESSION_ID}/sendChat/null/{MESSAGE}
    ```
 
 3. **Server-Sent Events (SSE)**
    ```javascript
-   const sse = new EventSource('https://io.socialstream.ninja/sse/SESSION_ID')
+   const sse = new EventSource('https://your-social-stream-url/sse/SESSION_ID')
    ```
 
 4. **Webhooks Inbound** (Donaciones, eventos)

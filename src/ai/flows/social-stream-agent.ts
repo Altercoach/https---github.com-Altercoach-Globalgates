@@ -51,7 +51,7 @@ const DEFAULT_CONFIG: AgentConfig = {
   sessionId: process.env.SOCIAL_STREAM_SESSION_ID || '',
   inChannel: 4,    // Channel 4: Chat messages from extension
   outChannel: 2,   // Channel 2: Dock/responses
-  baseUrl: 'https://io.socialstream.ninja',
+  baseUrl: process.env.SOCIAL_STREAM_BASE_URL,
   autoReconnect: true,
 };
 

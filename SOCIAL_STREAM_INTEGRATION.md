@@ -63,7 +63,7 @@ curl -X POST http://localhost:9003/api/social-stream/init \
 SOCIAL_STREAM_SESSION_ID=your_session_id_here
 
 # Opcional (con defaults)
-SOCIAL_STREAM_BASE_URL=https://io.socialstream.ninja
+SOCIAL_STREAM_BASE_URL=https://your-social-stream-url
 SOCIAL_STREAM_IN_CHANNEL=4      # Canal de entrada (chat del stream)
 SOCIAL_STREAM_OUT_CHANNEL=2     # Canal de salida (dock/respuestas)
 
@@ -335,7 +335,7 @@ graph LR
 1. Verificar Session ID es correcto
 2. Probar conexión manualmente:
    ```bash
-   curl https://io.socialstream.ninja/api/status
+  curl https://your-social-stream-url/api/status
    ```
 3. Revisar logs: `GET /api/social-stream/health`
 
