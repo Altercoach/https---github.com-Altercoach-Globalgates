@@ -42,7 +42,7 @@ export function HeroText() {
 
   return (
     <section className="bg-background">
-        <div className="container px-4 md:px-6 -mt-32 md:-mt-40 relative z-10">
+      <div className="container px-4 md:px-6 -mt-20 md:-mt-28 relative z-10">
             <div className="bg-background p-8 md:p-12 rounded-lg shadow-2xl max-w-4xl mx-auto text-center">
                 <div className="space-y-4">
                     <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl font-headline text-foreground">

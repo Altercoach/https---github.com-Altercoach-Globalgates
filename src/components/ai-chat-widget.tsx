@@ -10,7 +10,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useChatWidget } from '@/hooks/use-chat-widget';
 import { cn } from '@/lib/utils';
-import { chat } from '@/ai/flows/chat-flow';
 import type { ChatInput } from '@/ai/flows/chat-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useSite } from '@/hooks/use-site';
@@ -147,7 +146,20 @@ export function AIChatWidget() {
             language: language.code,
         };
 
-        const result = await chat(chatInput);
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(chatInput),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chat API returned ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (!result?.response || typeof result.response !== 'string') {
+          throw new Error('Chat API response format is invalid');
+        }
         
         setMessages(prev => [...prev, { role: 'model', content: result.response }]);
     } catch (err) {
