@@ -75,6 +75,14 @@ export async function chat(input: ChatInput): Promise<ChatOutput> {
 
     } catch (error) {
         console.error("Error in chat flow:", error);
-        throw new Error('Failed to get a response from the AI.');
+        const fallbackByLanguage: Record<string, string> = {
+          es: 'En este momento nuestro asistente IA esta temporalmente no disponible por configuracion del servidor. Si gustas, te puedo ayudar con informacion de planes y te contactamos por WhatsApp o correo.',
+          en: 'Our AI assistant is temporarily unavailable due to a server configuration issue. I can still help with plan information and arrange follow-up by WhatsApp or email.',
+          fr: 'Notre assistant IA est temporairement indisponible en raison d\'une configuration serveur. Je peux quand meme vous aider avec les informations sur les offres et organiser un suivi par WhatsApp ou e-mail.',
+        };
+
+        return {
+          response: fallbackByLanguage[input.language] || fallbackByLanguage.en,
+        };
     }
 }

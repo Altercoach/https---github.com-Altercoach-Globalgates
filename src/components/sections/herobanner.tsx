@@ -7,13 +7,13 @@ export function HeroBanner() {
   const { site } = useSite();
 
   return (
-    <section className="relative w-full h-[50vh] md:h-[60vh]">
+    <section className="relative w-full h-[62vh] md:h-[74vh] lg:h-[78vh]">
       <div className="absolute inset-0 z-0">
         <Image
           src={site.brand.heroImage || '/hero-default.jpg'}
           alt="Hero Image"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           data-ai-hint="business marketing"
           priority
         />
