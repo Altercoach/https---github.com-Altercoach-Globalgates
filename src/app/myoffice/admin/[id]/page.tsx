@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Edit, ArrowLeft, CheckCircle, Clock, BarChart, FileText } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, CheckCircle, Clock, BarChart, FileText } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';

@@ -6,7 +6,7 @@ export default function LegalPage() {
       <h1 className="text-3xl font-bold mb-4">Aviso Legal y Límite de Responsabilidad</h1>
       <p className="mb-4">El uso de esta plataforma implica la aceptación de los siguientes términos legales:</p>
       <ul className="list-disc ml-6 mb-4">
-        <li>El software y los contenidos se proveen "tal cual" sin garantías de ningún tipo.</li>
+        <li>El software y los contenidos se proveen &quot;tal cual&quot; sin garantías de ningún tipo.</li>
         <li>No somos responsables por daños directos, indirectos o incidentales derivados del uso.</li>
         <li>Si detectas contenido que infringe derechos, contáctanos para su revisión y remoción (DMCA).</li>
       </ul>

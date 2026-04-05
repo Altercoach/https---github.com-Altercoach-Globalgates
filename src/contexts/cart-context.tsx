@@ -78,12 +78,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsCartOpen(true);
   }, [toast]);
 
-  const removeFromCart = (id: string) => setCart((prev) => prev.filter((x) => x.id !== id));
+  const removeFromCart = useCallback((id: string) => setCart((prev) => prev.filter((x) => x.id !== id)), []);
   
-  const setQty = (id: string, qty: number) => {
+  const setQty = useCallback((id: string, qty: number) => {
     const safeQty = clampQty(qty);
     setCart((prev) => prev.map((x) => (x.id === id ? { ...x, qty: safeQty } : x)));
-  };
+  }, []);
 
   const totals = useMemo(() => {
     const one = cart.filter((i) => i.type === 'one');
@@ -93,7 +93,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return { oneTotal, subTotal, total: oneTotal + subTotal };
   }, [cart]);
 
-  const checkout = async () => {
+  const checkout = useCallback(async () => {
     try {
       if (totals.total <= 0) {
         toast({ title: 'Tu carrito está vacío.' });
@@ -112,7 +112,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       console.error('checkout', err);
       toast({ title: 'Error procesando el pago', variant: 'destructive' });
     }
-  };
+  }, [totals.total, toast, router]);
 
   const value = useMemo(() => ({
     cart,
@@ -124,7 +124,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     hasPurchased,
     isCartOpen,
     setIsCartOpen,
-  }), [cart, addToCart, totals, hasPurchased, isCartOpen]);
+  }), [cart, addToCart, removeFromCart, setQty, totals, checkout, hasPurchased, isCartOpen, setIsCartOpen]);
   
   if (!isMounted) {
     return null;

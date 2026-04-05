@@ -13,7 +13,7 @@ import {
   DropdownMenuLabel, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DollarSign, Users, TrendingUp, ShoppingCart, MoreHorizontal, Eye } from 'lucide-react';
+import { DollarSign, Users, ShoppingCart, MoreHorizontal, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
@@ -145,7 +145,7 @@ export default function AdminDashboardPage() {
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] ?? labels.en;

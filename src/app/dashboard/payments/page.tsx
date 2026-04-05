@@ -1,13 +1,10 @@
 
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToast } from '@/hooks/use-toast';
-import { CreditCard, DollarSign, Receipt, TrendingUp, Settings, Link as LinkIcon, Download } from 'lucide-react';
+import { DollarSign, Receipt, TrendingUp, Link as LinkIcon, Download } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { useCurrency } from '@/hooks/use-currency';
 import { formatCurrency } from '@/lib/utils';

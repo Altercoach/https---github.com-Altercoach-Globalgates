@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2, Zap, Image as ImageIcon, ExternalLink, ThumbsUp, RefreshCw, BarChart2 } from 'lucide-react';
+import { Beaker, CheckCircle, Clock, Search, Settings, User, Bot, Loader2, Zap, Image as ImageIcon, ThumbsUp, RefreshCw, BarChart2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
@@ -28,7 +28,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis, Cell } from "recharts"
+import { Bar, BarChart, XAxis, Cell } from "recharts"
 
 const initialProjects: Project[] = [
   {
@@ -94,8 +94,8 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
             });
             setAnalysis(result);
             toast({ title: "Análisis completado", description: "La IA ha generado el análisis FODA y las recomendaciones." });
-        } catch (error) {
-            console.error("Analysis failed", error);
+        } catch {
+            console.error("Analysis failed");
             toast({
               variant: "destructive",
               title: "Error de Análisis",
@@ -126,10 +126,10 @@ const AnalysisReviewDialog = ({ project, phase }: { project: Project, phase: Pro
                         <h4 className="font-semibold">Entrada: Respuestas del Cuestionario (Ejemplo)</h4>
                         <Card className="bg-muted/50">
                             <CardContent className="p-4 space-y-4 text-sm">
-                                {Object.entries(sampleAnswers.eval).map(([section, answers]: [string, any]) => (
+                                {Object.entries(sampleAnswers.eval).map(([section, answers]: [string, Record<string, string>]) => (
                                 <div key={section}>
                                     <h5 className="font-semibold mb-1">{section}</h5>
-                                    {Object.entries(answers).map(([question, answer]: [string, any]) => (
+                                    {Object.entries(answers).map(([question, answer]: [string, string]) => (
                                     <div key={question} className="text-xs">
                                         <p className="text-muted-foreground">{question}</p>
                                         <p className="font-medium pl-2">{answer}</p>
@@ -187,7 +187,7 @@ const ContentScheduleDialog = ({ project, phase }: { project: Project, phase: Pr
             const result = await generateContentSchedule({ clientBusiness: clientBusinessDescription });
             setSchedule(result);
             toast({ title: "Parrilla generada", description: "Se ha creado el calendario de contenido mensual." });
-        } catch (error) {
+        } catch {
             toast({ variant: "destructive", title: "Error de Generación" });
         } finally {
             setIsLoading(false);
@@ -270,7 +270,7 @@ const ImageGenerationDialog = ({ project, phase }: { project: Project, phase: Pr
             const result = await generateContentSchedule({ clientBusiness: `Cliente: ${project.customerName}` });
             setSchedule(result);
             if (result.posts.length > 0) setSelectedPost(result.posts[0]);
-        } catch (error) {
+        } catch {
             toast({ title: "Error al cargar la parrilla", variant: "destructive" });
         } finally {
             setIsLoading(false);
@@ -285,7 +285,7 @@ const ImageGenerationDialog = ({ project, phase }: { project: Project, phase: Pr
             const result = await generateImageFromPrompt({ creativeBrief: selectedPost.copyIn, aspectRatio: '1:1' });
             setImageOutput(result);
             toast({ title: "Imagen generada con éxito" });
-        } catch (error) {
+        } catch {
             toast({ title: "Error al generar la imagen", variant: "destructive" });
         } finally {
             setIsLoading(false);
@@ -380,8 +380,8 @@ const OptimizationDialog = ({ project, phase }: { project: Project, phase: Proje
                         <CardHeader><CardTitle className="text-base">Simulación de Prueba A/B</CardTitle></CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <div className="text-sm font-semibold">Copy A: "Descubre nuestro Cold Brew artesanal." - <Badge variant="destructive">Perdedor (4.5% CVR)</Badge></div>
-                                <div className="text-sm font-semibold">Copy B: "El Cold Brew que te cambiará la vida. ¡Pruébalo hoy!" - <Badge className="bg-green-500 text-white">Ganador (5.2% CVR)</Badge></div>
+                                <div className="text-sm font-semibold">Copy A: &quot;Descubre nuestro Cold Brew artesanal.&quot; - <Badge variant="destructive">Perdedor (4.5% CVR)</Badge></div>
+                                <div className="text-sm font-semibold">Copy B: &quot;El Cold Brew que te cambiará la vida. ¡Pruébalo hoy!&quot; - <Badge className="bg-green-500 text-white">Ganador (5.2% CVR)</Badge></div>
                             </div>
                             <ChartContainer config={chartConfig} className="h-[100px] w-full">
                                 <BarChart accessibilityLayer data={chartData} layout="vertical" margin={{ left: -20, right: 20 }}>
@@ -400,7 +400,7 @@ const OptimizationDialog = ({ project, phase }: { project: Project, phase: Proje
                              <ul className="list-disc list-inside space-y-1 text-sm">
                                 <li>**Optimizar:** Incrementar presupuesto en campañas de video, mostraron 15% más engagement.</li>
                                 <li>**Enfocar:** El segmento de 25-34 años tuvo la tasa de conversión más alta. Crear audiencia lookalike.</li>
-                                <li>**Sugerencia:** Lanzar promoción de "2x1 en Cold Brew" los fines de semana para capitalizar el tráfico.</li>
+                                <li>**Sugerencia:** Lanzar promoción de &quot;2x1 en Cold Brew&quot; los fines de semana para capitalizar el tráfico.</li>
                             </ul>
                         </CardContent>
                     </Card>
@@ -500,7 +500,7 @@ export default function TeamLabPage() {
                     <h1 className="text-3xl font-bold font-headline">Team Lab: Supervisión de Proyectos</h1>
                 </div>
                 <p className="text-muted-foreground">
-                    Supervisa el flujo de trabajo automatizado de cada cliente. Usa a "James Bond" para simular y validar las tareas de la IA.
+                    Supervisa el flujo de trabajo automatizado de cada cliente. Usa a &quot;James Bond&quot; para simular y validar las tareas de la IA.
                 </p>
             </header>
 

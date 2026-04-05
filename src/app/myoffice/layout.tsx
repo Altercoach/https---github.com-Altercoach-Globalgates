@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, Save, BookOpen, Beaker, User } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, BookOpen, Beaker, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';

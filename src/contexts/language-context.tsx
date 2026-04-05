@@ -4,13 +4,12 @@
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import type { SiteData, Language, MultilingualString } from '@/lib/types';
 import { LANGUAGES, LS_KEYS } from '@/lib/constants';
-import { useToast } from '@/hooks/use-toast';
 import { useSite } from '@/hooks/use-site';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  getTranslation: <T extends string | MultilingualString | MultilingualString[]>(content: T) => T extends any[] ? string[] : string;
+  getTranslation: <T extends string | MultilingualString | MultilingualString[]>(content: T) => T extends MultilingualString[] ? string[] : string;
   isTranslating: boolean; // Kept for UI feedback, though no AI calls are made.
   translatedSite: SiteData | null; // This will hold the site content in the selected language
 }
@@ -40,11 +39,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [language, isMounted]);
 
-  const getTranslation = useCallback(<T extends string | MultilingualString | MultilingualString[]>(content: T): T extends any[] ? string[] : string => {
+  const getTranslation = useCallback(<T extends string | MultilingualString | MultilingualString[]>(content: T): T extends MultilingualString[] ? string[] : string => {
     const langCode = language.code;
     
     if (typeof content === 'string') {
-        return content as any;
+        return content as unknown as T extends MultilingualString[] ? string[] : string;
     }
 
     if (Array.isArray(content)) {
@@ -54,22 +53,22 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             }
             // Fallback for array elements that might not be multilingual strings
             return item; 
-        }) as any;
+        }) as T extends MultilingualString[] ? string[] : string;
     }
 
     if (typeof content === 'object' && content !== null && langCode in content) {
-        return (content as MultilingualString)[langCode] as any;
+        return (content as MultilingualString)[langCode] as T extends MultilingualString[] ? string[] : string;
     }
 
     // Fallback for safety, though with proper types this shouldn't be hit often.
     if (typeof content === 'object' && content !== null) {
       const fallbackLang = 'en' as const;
       if (fallbackLang in content) {
-        return (content as MultilingualString)[fallbackLang] as any;
+        return (content as MultilingualString)[fallbackLang] as T extends MultilingualString[] ? string[] : string;
       }
     }
     
-    return '' as any;
+    return '' as T extends MultilingualString[] ? string[] : string;
   }, [language.code]);
 
   useEffect(() => {

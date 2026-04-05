@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { useLanguage } from '@/hooks/use-language';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 
 const labels = {
@@ -53,7 +52,6 @@ export default function SignupPage() {
   const { toast } = useToast();
   const { language } = useLanguage();
   const { login } = useAuth();
-  const router = useRouter();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
 

@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ArrowLeft, Bot, Download, Loader2, EyeOff, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
@@ -12,7 +12,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 const sampleAnswers = {
   eval: {
@@ -145,7 +145,6 @@ const labels = {
 
 
 export default function QuestionnaireResponsePage() {
-  const router = useRouter();
   const params = useParams();
   const questionnaireId = params.id as string;
   const isCompleted = questionnaireId === 'brief-001' || questionnaireId === 'agent-training-001' || questionnaireId === 'business-evaluation-001';
@@ -287,11 +286,11 @@ export default function QuestionnaireResponsePage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {isCompleted ? (
-              Object.entries(currentAnswers).map(([section, answers]: [string, any]) => (
+              Object.entries(currentAnswers).map(([section, answers]: [string, Record<string, string>]) => (
                 <div key={section}>
                   <h4 className="font-semibold text-lg mb-2">{section}</h4>
                   <div className="space-y-4 text-sm">
-                    {Object.entries(answers).map(([question, answer]: [string, any]) => (
+                    {Object.entries(answers).map(([question, answer]: [string, string]) => (
                       <div key={question}>
                         <p className="text-muted-foreground">{question}</p>
                         <p className="font-medium pl-2 border-l-2 border-primary">{answer}</p>

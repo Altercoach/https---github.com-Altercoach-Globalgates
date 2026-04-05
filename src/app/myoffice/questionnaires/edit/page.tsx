@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 // Estas son las preguntas que me proporcionaste, ahora usadas como plantilla para el admin.

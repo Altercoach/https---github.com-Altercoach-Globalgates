@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, User, FileText, MessageSquare, BookOpen, ArrowRight, Settings, Beaker } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, FileText, MessageSquare, BookOpen, ArrowRight, Beaker } from 'lucide-react';
 
 export default function AdminInstructionsPage() {
 
@@ -14,7 +14,7 @@ export default function AdminInstructionsPage() {
                     <h1 className="text-3xl font-bold font-headline">Manual de Operaciones del Administrador</h1>
                 </div>
                 <p className="text-muted-foreground">
-                    Esta guía explica cómo gestionar cada módulo del panel "Mi Oficina" para configurar y administrar la plataforma.
+                    Esta guía explica cómo gestionar cada módulo del panel &quot;Mi Oficina&quot; para configurar y administrar la plataforma.
                 </p>
             </header>
 
@@ -25,8 +25,8 @@ export default function AdminInstructionsPage() {
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground space-y-2">
                         <p><strong>Función:</strong> Gestionar la identidad visual y textual principal del sitio web.</p>
-                        <p><strong>Uso:</strong> Cambia el nombre de la marca, el eslogan y los textos de la sección "Héroe". Sube la imagen principal que los visitantes verán al entrar. Todos los cambios aquí son multi-idioma.</p>
-                        <p><strong>Importante:</strong> Los cambios son temporales hasta que los guardes permanentemente desde "Revisar y Guardar".</p>
+                        <p><strong>Uso:</strong> Cambia el nombre de la marca, el eslogan y los textos de la sección &quot;Héroe&quot;. Sube la imagen principal que los visitantes verán al entrar. Todos los cambios aquí son multi-idioma.</p>
+                        <p><strong>Importante:</strong> Los cambios son temporales hasta que los guardes permanentemente desde &quot;Revisar y Guardar&quot;.</p>
                     </CardContent>
                 </Card>
 
@@ -56,7 +56,7 @@ export default function AdminInstructionsPage() {
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground space-y-2">
                         <p><strong>Función:</strong> Crear y revisar los cuestionarios de onboarding para clientes.</p>
-                        <p><strong>Uso:</strong> Usa "Nuevo Cuestionario" para crear un formulario personalizado pegando una lista de preguntas. Revisa las respuestas de los clientes y el análisis de la IA en los envíos completados.</p>
+                        <p><strong>Uso:</strong> Usa &quot;Nuevo Cuestionario&quot; para crear un formulario personalizado pegando una lista de preguntas. Revisa las respuestas de los clientes y el análisis de la IA en los envíos completados.</p>
                     </CardContent>
                 </Card>
 
@@ -76,7 +76,7 @@ export default function AdminInstructionsPage() {
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground space-y-2">
                         <p><strong>Función:</strong> Conectar canales de mensajería y configurar el Agente de IA.</p>
-                        <p><strong>Uso:</strong> Desde esta página, puedes acceder al configurador del agente para darle una identidad (nombre, foto), editar su "cerebro" (System Prompt), y gestionar su base de conocimiento y reglas de exclusión.</p>
+                        <p><strong>Uso:</strong> Desde esta página, puedes acceder al configurador del agente para darle una identidad (nombre, foto), editar su &quot;cerebro&quot; (System Prompt), y gestionar su base de conocimiento y reglas de exclusión.</p>
                     </CardContent>
                 </Card>
 
@@ -105,7 +105,7 @@ export default function AdminInstructionsPage() {
                         <CardTitle className="flex items-center gap-2 text-destructive"><KeyRound/> Guardado Permanente</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground space-y-2">
-                        <p><strong>Crucial:</strong> Cualquier cambio realizado en las secciones de "Marca", "Soluciones" o "Planes" es temporal. Para hacerlos permanentes, debes ir a la página **"Revisar y Guardar"** (botón flotante) y usar el botón **"Guardar Cambios en el Código"**.</p>
+                        <p><strong>Crucial:</strong> Cualquier cambio realizado en las secciones de &quot;Marca&quot;, &quot;Soluciones&quot; o &quot;Planes&quot; es temporal. Para hacerlos permanentes, debes ir a la página **&quot;Revisar y Guardar&quot;** (botón flotante) y usar el botón **&quot;Guardar Cambios en el Código&quot;**.</p>
                     </CardContent>
                 </Card>
             </div>

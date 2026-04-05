@@ -13,6 +13,8 @@
  * - Error recovery
  */
 
+import WebSocket, { RawData } from 'ws';
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -59,7 +61,7 @@ const DEFAULT_CONFIG: AgentConfig = {
 // GLOBAL STATE
 // ============================================================================
 
-let ws: any = null; // WebSocket instance
+let ws: WebSocket | null = null;
 let isConnected = false;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -92,7 +94,6 @@ export function setupSocialStreamListener(config: Partial<AgentConfig> = {}) {
 
   console.log(`🔗 Connecting to Social Stream: ${wsUrl}`);
 
-  const WebSocket = require('ws');
   ws = new WebSocket(wsUrl);
 
   ws.on('open', () => {
@@ -104,14 +105,17 @@ export function setupSocialStreamListener(config: Partial<AgentConfig> = {}) {
     processBufferedMessages();
   });
 
-  ws.on('message', async (data: Buffer | string) => {
+  ws.on('message', async (data: RawData) => {
+    const message = parseIncomingMessage(data);
+    if (!message) {
+      console.warn('⚠️ Ignoring malformed Social Stream message');
+      return;
+    }
+
     try {
-      const message = typeof data === 'string' 
-        ? JSON.parse(data) 
-        : JSON.parse(data.toString()) as IncomingMessage;
       await handleIncomingMessage(message);
     } catch (error) {
-      console.error('❌ Error parsing Social Stream message:', error);
+      console.error('❌ Error processing Social Stream message:', error);
     }
   });
 
@@ -140,6 +144,31 @@ export function setupSocialStreamListener(config: Partial<AgentConfig> = {}) {
 /**
  * Handle incoming message from Social Stream
  */
+function parseIncomingMessage(rawData: RawData): IncomingMessage | null {
+  try {
+    const dataAsText = typeof rawData === 'string' ? rawData : rawData.toString();
+    const parsed: unknown = JSON.parse(dataAsText);
+
+    if (typeof parsed !== 'object' || parsed === null) return null;
+
+    const candidate = parsed as Partial<IncomingMessage>;
+    if (typeof candidate.chatname !== 'string' || typeof candidate.chatmessage !== 'string') {
+      return null;
+    }
+
+    return {
+      chatname: candidate.chatname,
+      chatmessage: candidate.chatmessage,
+      type: typeof candidate.type === 'string' ? candidate.type : 'api',
+      timestamp: typeof candidate.timestamp === 'number' ? candidate.timestamp : undefined,
+      channel: typeof candidate.channel === 'string' ? candidate.channel : undefined,
+      data: typeof candidate.data === 'object' && candidate.data !== null ? candidate.data : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function handleIncomingMessage(message: IncomingMessage) {
   const { chatname, chatmessage, type = 'api' } = message;
 
@@ -278,7 +307,7 @@ export async function sendResponse(
   chatname: string,
   platform: string
 ): Promise<void> {
-  if (!ws || ws.readyState !== (require('ws').OPEN)) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
     console.error('❌ WebSocket not connected. Cannot send response.');
     return;
   }
@@ -299,7 +328,7 @@ export async function sendCommand(
   action: string,
   value: unknown = null
 ): Promise<void> {
-  if (!ws || ws.readyState !== (require('ws').OPEN)) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
     console.error('❌ WebSocket not connected.');
     return;
   }
@@ -443,7 +472,7 @@ export async function processSocialStreamMessageAsync(input: {
       response: response.text,
       success: true,
     };
-  } catch (error) {
+  } catch {
     return {
       response: 'Error processing message',
       success: false,
@@ -462,7 +491,7 @@ export type {
   AIResponse,
 };
 
-export default {
+const socialStreamAgent = {
   setupSocialStreamListener,
   closeSocialStream,
   sendCommand,
@@ -474,3 +503,5 @@ export default {
   getConnectionStatus,
   getBufferedMessages,
 };
+
+export default socialStreamAgent;

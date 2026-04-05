@@ -3,13 +3,11 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
 // Estas son las preguntas que me proporcionaste.
 const questions = {
@@ -76,8 +74,7 @@ const questions = {
 
 export default function QuestionnaireFillPage() {
   const { toast } = useToast();
-  const params = useParams();
-  const questionnaireId = params.id;
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

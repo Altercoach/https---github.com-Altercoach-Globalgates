@@ -58,8 +58,8 @@ export async function generateContentSchedule(input: GenerateContentScheduleInpu
         
         console.log("✅ Parrilla de contenido generada exitosamente");
         return output;
-    } catch (error: any) {
-        console.error("❌ ERROR generando parrilla de contenido:", error.message);
+    } catch (error: unknown) {
+        console.error("❌ ERROR generando parrilla de contenido:", error instanceof Error ? error.message : String(error));
         throw new Error('La IA devolvió una respuesta en formato inválido.');
     }
 }

@@ -2,12 +2,12 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Bot, Send, X, User, Sparkles, ChevronDown } from 'lucide-react';
+import { Send, User, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useChatWidget } from '@/hooks/use-chat-widget';
 import { cn } from '@/lib/utils';
 import type { ChatInput } from '@/ai/flows/chat-flow';
@@ -93,7 +93,6 @@ export function AIChatWidget() {
   }, [site, isPayingCustomer, auth.user, language.code, getTranslation]);
   
   const systemPrompt = useMemo(() => {
-    const isRegisteredButNotPaying = auth.loggedIn && auth.user?.role === 'customer' && !isPayingCustomer;
     let prompt = isPayingCustomer ? customerSystemPrompt : leadSystemPrompt;
     
     prompt = prompt.replace(/\[Agent Name\]/g, agentName);
@@ -103,7 +102,7 @@ export function AIChatWidget() {
         prompt = prompt.replace('[Nombre Cliente]', auth.user.email);
     }
     return prompt;
-  }, [isPayingCustomer, auth.loggedIn, auth.user, brandName, agentName]);
+  }, [isPayingCustomer, auth.user, brandName, agentName]);
 
   useEffect(() => {
     if (isWidgetOpen && initialMessage) {
@@ -116,7 +115,7 @@ export function AIChatWidget() {
        setMessages([]);
        setInput('');
     }
-  }, [isWidgetOpen, initialMessage]);
+  }, [isWidgetOpen, initialMessage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const scrollToBottom = () => {
     setTimeout(() => {

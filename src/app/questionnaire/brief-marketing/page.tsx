@@ -61,7 +61,7 @@ const FileUpload = ({ label, files, onFileChange, onFileRemove, field }: { label
 export default function BriefMarketingPage() {
   const { toast } = useToast();
   const [showEcommerce, setShowEcommerce] = useState(false);
-  const [showOffline, setShowOffline] = useState(false);
+  const [, setShowOffline] = useState(false);
 
   const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File[]}>({});
 

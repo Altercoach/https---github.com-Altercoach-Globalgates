@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, BarChart3, HelpCircle } from 'lucide-react';
+import { BarChart3, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Link from 'next/link';

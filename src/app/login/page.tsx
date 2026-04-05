@@ -64,7 +64,7 @@ const labels = {
 };
 
 export default function LoginPage() {
-  const { login, signup } = useAuth();
+  const { login } = useAuth();
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] || labels.en;
 
@@ -81,21 +81,6 @@ export default function LoginPage() {
     
     try {
       await login(email, password);
-    } catch (err) {
-      setError(t.errorMessage);
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-    
-    try {
-      await signup(email, password);
     } catch (err) {
       setError(t.errorMessage);
       console.error(err);

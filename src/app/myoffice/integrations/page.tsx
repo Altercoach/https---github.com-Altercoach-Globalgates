@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { RouteGuard } from '@/components/auth/route-guard';
 import { useIntegration } from '@/hooks/use-integration';
-import { useToast } from '@/hooks/use-toast';
 import { MessageSquare, Linkedin, Twitter, Mail, Rss, Globe } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
 

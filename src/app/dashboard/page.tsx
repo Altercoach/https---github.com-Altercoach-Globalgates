@@ -26,7 +26,7 @@ import { generateContentSchedule, GenerateContentScheduleOutput } from '@/ai/flo
 import { generateImageFromPrompt } from '@/ai/flows/generate-image-flow';
 import type { GenerateImageOutput } from '@/lib/types';
 import { analyzeBusinessEvaluation, AnalyzeBusinessEvaluationOutput } from '@/ai/flows/analyze-business-evaluation';
-import { Loader2, Shield } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 const labels = {
   es: { pageTitle: 'Panel de Cliente', welcome: 'Bienvenido', generatedLeads: 'Leads Generados', inLast6Months: 'En los ultimos 6 meses', conversionRate: 'Tasa de Conversion', fromLeadToSale: 'De lead a venta', newFollowers: 'Nuevos Seguidores', inAllWindows: 'En todas las redes', pendingActions: 'Acciones Pendientes', pendingActionsDescription: 'Completa estos formularios para desbloquear tu estrategia y empezar a crecer.', complete: 'Completar', projectWorkflow: 'Flujo de Trabajo del Proyecto', projectWorkflowDescription: 'Sigue el progreso en tiempo real de tu campana automatizada.', inProgress: 'En Progreso', viewDeliverables: 'Ver Entregables', deliverablesTitle: 'Entregables de la Fase', deliverablesDescription: 'Estos son los resultados generados para la fase:', viewLivePost: 'Ver Publicacion en Vivo', publishedOn: 'Publicado el', generateContent: 'Generar Parrilla de Contenido', generating: 'Generando...', loading: 'Cargando...', noDeliverable: 'Aun no hay entregables para esta fase.', swotAnalysis: 'Analisis FODA', strengths: 'Fortalezas', weaknesses: 'Debilidades', opportunities: 'Oportunidades', threats: 'Amenazas', recommendations: 'Recomendaciones Estrategicas', questionnaireResponses: 'Respuestas al Cuestionario', upcoming: 'Se activara al completar la fase.', completed: 'Completado', logout: 'Cerrar Sesion' },
@@ -36,41 +36,12 @@ const labels = {
 
 const platforms = ['instagram', 'facebook', 'tiktok'];
 
-function SecurityStatusBadge() {
-  const [status, setStatus] = useState<'ok' | 'vulnerable' | 'scanning'>('ok');
-  const [lastScan, setLastScan] = useState('');
+type DashboardLabels = typeof labels.es;
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const r = Math.random();
-      if (r < 0.15) setStatus('vulnerable');
-      else if (r < 0.25) setStatus('scanning');
-      else setStatus('ok');
-      setLastScan(new Date().toLocaleTimeString());
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  let colorClass = 'bg-green-100 text-green-800';
-  let label = 'Seguro';
-  if (status === 'vulnerable') { colorClass = 'bg-orange-100 text-orange-800'; label = 'Vulnerable'; }
-  if (status === 'scanning') { colorClass = 'bg-blue-100 text-blue-800 animate-pulse'; label = 'Escaneando...'; }
-
-  return (
-    <div className="flex items-center gap-2 mb-2">
-      <Shield className="h-4 w-4" />
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${colorClass}`}>
-        {label}
-        {lastScan && <span className="ml-2 text-[10px]">{lastScan}</span>}
-      </span>
-    </div>
-  );
-}
-
-const DeliverablesDialogContent = ({ phase, t }: { phase: ProjectPhase; t: any }) => {
+const DeliverablesDialogContent = ({ phase, t }: { phase: ProjectPhase; t: DashboardLabels }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<unknown>(null);
   const { language } = useLanguage();
 
   useEffect(() => {
@@ -91,7 +62,7 @@ const DeliverablesDialogContent = ({ phase, t }: { phase: ProjectPhase; t: any }
             break;
           case 'execution': {
             const schedule = await generateContentSchedule({ clientBusiness: 'Cliente: Cafeteria de Especialidad.' });
-            const imagePromises = schedule.posts.map((post: any) => generateImageFromPrompt({ creativeBrief: post.copyIn, aspectRatio: '1:1' }));
+            const imagePromises = schedule.posts.map((post) => generateImageFromPrompt({ creativeBrief: post.copyIn, aspectRatio: '1:1' }));
             const images = await Promise.all(imagePromises);
             result = { schedule, images };
             break;
@@ -118,10 +89,10 @@ const DeliverablesDialogContent = ({ phase, t }: { phase: ProjectPhase; t: any }
       return (
         <div className="prose prose-sm max-w-none">
           <h4>{t.questionnaireResponses}</h4>
-          {Object.entries(data).map(([section, answers]: [string, any]) => (
+            {Object.entries(data as Record<string, Record<string, string>>).map(([section, answers]: [string, Record<string, string>]) => (
             <div key={section} className="mt-4">
               <h5 className="font-semibold">{section}</h5>
-              {Object.entries(answers).map(([question, answer]: [string, any]) => (
+              {Object.entries(answers).map(([question, answer]: [string, string]) => (
                 <div key={question} className="text-xs ml-2 mt-1">
                   <p className="text-muted-foreground">{question}</p>
                   <p className="font-medium">{answer}</p>
@@ -166,7 +137,7 @@ const DeliverablesDialogContent = ({ phase, t }: { phase: ProjectPhase; t: any }
           <TabsContent value="instagram" className="flex-1">
             <ScrollArea className="h-[50vh] pr-4">
               <div className="space-y-6">
-                {execSchedule.posts.map((item: any, index: number) => (
+                {execSchedule.posts.map((item, index: number) => (
                   <Card key={item.postNumber}>
                     <CardContent className="p-4 grid grid-cols-[150px_1fr] gap-4">
                       <div className="relative aspect-square w-[150px] h-[150px]">
@@ -205,7 +176,7 @@ const DeliverablesDialogContent = ({ phase, t }: { phase: ProjectPhase; t: any }
   }
 };
 
-const PhaseCard = ({ phase, isLast, t }: { phase: ProjectPhase; isLast: boolean; t: any }) => {
+const PhaseCard = ({ phase, isLast, t }: { phase: ProjectPhase; isLast: boolean; t: DashboardLabels }) => {
   const displayTitle = phase.title ?? phase.name;
   const displayDescription = phase.description ?? phase.details;
   const statusIcon = phase.status === 'completed'
@@ -261,7 +232,7 @@ export default function DashboardPage() {
   const isPayingCustomer = true;
 
   const kpis = useMemo(() => ({
-    totalLeads: (chartData as any[]).reduce((a: number, b: any) => a + (b.leads ?? 0), 0),
+    totalLeads: chartData.reduce((a, b) => a + b.leads, 0),
     conversionRate: '12.5%',
     newFollowers: '1,247',
   }), []);
@@ -298,7 +269,7 @@ export default function DashboardPage() {
         <CardDescription>{t.pendingActionsDescription}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {pendingActions.map((action: any) => (
+        {pendingActions.map((action) => (
           <div key={action.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
             <div>
               <h4 className="font-semibold">{action.title}</h4>
@@ -319,7 +290,6 @@ export default function DashboardPage() {
   return (
     <RouteGuard requireAuth requireRole="customer">
       <div className="space-y-6 relative">
-        <SecurityStatusBadge />
         <header className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>

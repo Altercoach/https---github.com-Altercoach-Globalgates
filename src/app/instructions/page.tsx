@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Zap, LifeBuoy, Home, UserPlus, ShoppingCart, LogIn, LayoutDashboard, FileText, BarChart3, ArrowRight, ArrowDown, ArrowLeft } from 'lucide-react';
+import { BookOpen, Zap, Home, UserPlus, ShoppingCart, FileText, BarChart3, ArrowDown, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -43,15 +43,15 @@ export default function ClientInstructionsPage() {
                         <CardContent className="space-y-4 text-sm text-muted-foreground">
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">1. Explora y Compra</h4>
-                                <p>Navega por las secciones "Soluciones" y "Planes" en la página principal. Usa el botón "Ver Detalles" para saber más sobre un servicio y "Añadir al Carrito" para comprar. Las suscripciones se renuevan automáticamente.</p>
+                                <p>Navega por las secciones &quot;Soluciones&quot; y &quot;Planes&quot; en la página principal. Usa el botón &quot;Ver Detalles&quot; para saber más sobre un servicio y &quot;Añadir al Carrito&quot; para comprar. Las suscripciones se renuevan automáticamente.</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">2. Crea tu Cuenta</h4>
-                                <p>Puedes crear una cuenta de dos formas: 1) Después de finalizar una compra, serás dirigido a la página de registro. 2) Haciendo clic en "Regístrate Gratis" en la página principal. En ambos casos, tu cuenta te dará acceso a tu panel de cliente.</p>
+                                <p>Puedes crear una cuenta de dos formas: 1) Después de finalizar una compra, serás dirigido a la página de registro. 2) Haciendo clic en &quot;Regístrate Gratis&quot; en la página principal. En ambos casos, tu cuenta te dará acceso a tu panel de cliente.</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">3. Usa tu Panel de Cliente</h4>
-                                <p>Una vez creada tu cuenta, accederás a tu Dashboard. Si compraste un plan, verás tus KPIs de marketing y análisis. Si te registraste gratis, verás "Acciones Pendientes" (como llenar cuestionarios) para que podamos crear una estrategia para ti.</p>
+                                <p>Una vez creada tu cuenta, accederás a tu Dashboard. Si compraste un plan, verás tus KPIs de marketing y análisis. Si te registraste gratis, verás &quot;Acciones Pendientes&quot; (como llenar cuestionarios) para que podamos crear una estrategia para ti.</p>
                             </div>
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">4. Habla con tu Agente IA</h4>
@@ -70,7 +70,7 @@ export default function ClientInstructionsPage() {
                         <CardContent className="space-y-4 text-sm text-muted-foreground">
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">Gestión de Cuenta y Suscripciones</h4>
-                                <p>En tu panel de cliente, en la sección "Configuración", puedes actualizar tus datos de contacto. La cancelación de suscripciones se gestiona desde el mismo panel, en la sección de "Servicios Activos" (aún no implementado en este prototipo).</p>
+                                <p>En tu panel de cliente, en la sección &quot;Configuración&quot;, puedes actualizar tus datos de contacto. La cancelación de suscripciones se gestiona desde el mismo panel, en la sección de &quot;Servicios Activos&quot; (aún no implementado en este prototipo).</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">Cuestionarios y Estrategia</h4>
@@ -78,11 +78,11 @@ export default function ClientInstructionsPage() {
                             </div>
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">Métricas y KPIs</h4>
-                                <p>Si tienes un plan de marketing activo, tu dashboard mostrará métricas clave como "Leads Generados", "Tasa de Conversión" y un gráfico del rendimiento de tu embudo de ventas. Estos datos se actualizan a medida que tus campañas progresan.</p>
+                                <p>Si tienes un plan de marketing activo, tu dashboard mostrará métricas clave como &quot;Leads Generados&quot;, &quot;Tasa de Conversión&quot; y un gráfico del rendimiento de tu embudo de ventas. Estos datos se actualizan a medida que tus campañas progresan.</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">Soporte y Contacto</h4>
-                                <p>Además de tu agente de IA, puedes contactarnos a través del formulario en la sección "Contacto" de la página principal. Para problemas técnicos o consultas sobre tu cuenta, nuestro equipo de soporte está disponible.</p>
+                                <p>Además de tu agente de IA, puedes contactarnos a través del formulario en la sección &quot;Contacto&quot; de la página principal. Para problemas técnicos o consultas sobre tu cuenta, nuestro equipo de soporte está disponible.</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -131,7 +131,7 @@ export default function ClientInstructionsPage() {
                                    <CardTitle className="flex flex-col items-center gap-2"><FileText/> Panel con Tareas</CardTitle>
                                </CardHeader>
                                <CardContent>
-                                  <p className="text-sm">Recibes "Acciones Pendientes" para definir tu estrategia.</p>
+                                  <p className="text-sm">Recibes &quot;Acciones Pendientes&quot; para definir tu estrategia.</p>
                                </CardContent>
                            </Card>
                         </div>

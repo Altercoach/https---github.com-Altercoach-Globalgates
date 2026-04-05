@@ -18,9 +18,7 @@ const TranslateSiteContentInputSchema = z.object({
 });
 export type TranslateSiteContentInput = z.infer<typeof TranslateSiteContentInputSchema>;
 
-// The output is still a string, but it's a JSON string.
-const TranslateSiteContentOutputSchema = z.string().describe('The translated JSON string of the site content.');
-export type TranslateSiteContentOutput = z.infer<typeof TranslateSiteContentOutputSchema>;
+export type TranslateSiteContentOutput = string;
 
 const translateSiteContentPrompt = ai.definePrompt(
   {

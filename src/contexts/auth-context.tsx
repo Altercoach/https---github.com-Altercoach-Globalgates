@@ -1,9 +1,9 @@
 
 "use client";
 
-import React, { createContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import type { AuthState, AuthRole, User } from '@/lib/types';
+import type { AuthRole, User } from '@/lib/types';
 import { LS_KEYS, initialCustomers } from '@/lib/constants';
 
 interface AuthContextType {
@@ -49,9 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [auth]);
 
-  const login = async (email: string, password?: string) => {
+  const login = useCallback(async (email: string, password?: string) => {
     // Demo credentials
-    const isValidDemo = 
+    const isValidDemo =
       (email === 'admin@negocio.com' || email === 'demo@cliente.com') &&
       (!password || password === 'Demo123!');
 
@@ -74,12 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       router.push('/dashboard');
     }
-  };
+  }, [router]);
 
-  const signup = async (email: string, password?: string) => {
+  const signup = useCallback(async (email: string) => {
     // Allow signup with demo emails for testing
     const isAllowed = email && (email.includes('@') || email === 'admin@negocio.com' || email === 'demo@cliente.com');
-    
+
     if (!isAllowed) {
       throw new Error('Please enter a valid email address');
     }
@@ -95,14 +95,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       router.push('/dashboard');
     }
-  };
+  }, [router]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setAuth({ isMounted: true, loggedIn: false, user: null });
     router.push('/login');
-  };
+  }, [router]);
 
-  const value = useMemo(() => ({ auth, login, signup, logout }), [auth]);
+  const value = useMemo(() => ({ auth, login, signup, logout }), [auth, login, signup, logout]);
 
   // Prevent flash of unauthenticated content by returning null until mounted
   if (!auth.isMounted) {

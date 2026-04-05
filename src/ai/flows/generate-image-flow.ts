@@ -1,7 +1,6 @@
 
 'use server';
 
-import { z } from 'zod';
 import { ai, googleAI } from '@/ai/genkit';
 import type { GenerateImageOutput, GenerateImageInput } from '@/lib/types';
 
@@ -13,7 +12,7 @@ export async function generateImageFromPrompt(input: GenerateImageInput): Promis
   console.log("🤖 Calling Imagen 3 for Image Generation");
 
   try {
-    const { media, usage } = await ai.generate({
+    const { media } = await ai.generate({
       model: googleAI.model('imagen-3.0-fast-generate-001'),
       prompt: input.creativeBrief,
       config: {
@@ -34,8 +33,8 @@ export async function generateImageFromPrompt(input: GenerateImageInput): Promis
       model: 'imagen-3.0-fast-generate-001',
     };
 
-  } catch (error: any) {
-    console.error('❌ ERROR en la generación de imagen:', error.message);
-    throw new Error(`Error al generar la imagen: ${error.message}`);
+  } catch (error: unknown) {
+    console.error('❌ ERROR en la generación de imagen:', error instanceof Error ? error.message : String(error));
+    throw new Error(`Error al generar la imagen: ${error instanceof Error ? error.message : String(error)}`);
   }
 }

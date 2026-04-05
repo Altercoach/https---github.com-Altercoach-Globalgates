@@ -20,9 +20,9 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
 // Initialize Firebase if keys are configured
-let app: any = null;
-let auth: any = null;
-let db: any = null;
+let app: firebase.app.App | null = null;
+let auth: firebase.auth.Auth | null = null;
+let db: firebase.firestore.Firestore | null = null;
 
 const isConfigured = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID && 
                      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID !== 'mock-project';
@@ -32,7 +32,7 @@ if (isConfigured) {
     app = firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
     db = firebase.firestore();
-  } catch (error) {
+  } catch {
     console.warn('⚠️ Firebase not fully configured. Using fallback auth.');
   }
 }
@@ -81,9 +81,10 @@ export async function signInWithEmail(
   // If Firebase is configured, use real auth
   if (isFirebaseConfigured() && auth) {
     const result = await auth.signInWithEmailAndPassword(email, password);
+    if (!result.user) throw new Error('Authentication failed');
     return {
       uid: result.user.uid,
-      email: result.user.email,
+      email: result.user.email ?? email,
       role: 'customer', // Get from Firestore in production
     };
   }

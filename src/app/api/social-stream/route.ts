@@ -16,6 +16,30 @@ import {
   sendCommand,
 } from '@/ai/flows/social-stream-agent';
 
+const DEFAULT_IN_CHANNEL = 4;
+const DEFAULT_OUT_CHANNEL = 2;
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 100;
+
+function parseSafeInt(value: string | null | undefined, fallback: number): number {
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function clampLimit(value: string | null | undefined): number {
+  const parsed = parseSafeInt(value, DEFAULT_LIMIT);
+  return Math.min(Math.max(parsed, 1), MAX_LIMIT);
+}
+
+function sanitizeIdentifier(value: unknown, fallback = 'all'): string {
+  if (typeof value !== 'string') return fallback;
+
+  // Allow common username/platform characters and limit size.
+  const normalized = value.trim().slice(0, 64).replace(/[^a-zA-Z0-9._:@-]/g, '');
+  return normalized.length > 0 ? normalized : fallback;
+}
+
 /**
  * POST /api/social-stream
  * Route all POST requests to appropriate handler based on pathname
@@ -40,8 +64,8 @@ export async function POST(request: NextRequest) {
 
       setupSocialStreamListener({
         sessionId,
-        inChannel: parseInt(process.env.SOCIAL_STREAM_IN_CHANNEL || '4'),
-        outChannel: parseInt(process.env.SOCIAL_STREAM_OUT_CHANNEL || '2'),
+        inChannel: parseSafeInt(process.env.SOCIAL_STREAM_IN_CHANNEL, DEFAULT_IN_CHANNEL),
+        outChannel: parseSafeInt(process.env.SOCIAL_STREAM_OUT_CHANNEL, DEFAULT_OUT_CHANNEL),
       });
 
       return NextResponse.json(
@@ -61,7 +85,9 @@ export async function POST(request: NextRequest) {
     // POST /api/social-stream/send
     if (pathname.includes('/send')) {
       const body = await request.json();
-      const { message, username = 'all', platform = 'api' } = body;
+      const message = typeof body?.message === 'string' ? body.message.trim() : '';
+      const username = sanitizeIdentifier(body?.username, 'all');
+      const platform = sanitizeIdentifier(body?.platform, 'api');
 
       if (!message) {
         return NextResponse.json(
@@ -85,7 +111,8 @@ export async function POST(request: NextRequest) {
     // POST /api/social-stream/block
     if (pathname.includes('/block')) {
       const body = await request.json();
-      const { username, platform } = body;
+      const username = sanitizeIdentifier(body?.username, '');
+      const platform = sanitizeIdentifier(body?.platform, '');
 
       if (!username || !platform) {
         return NextResponse.json(
@@ -194,7 +221,7 @@ export async function GET(request: NextRequest) {
 
     // GET /api/social-stream/messages?limit=10
     if (pathname.includes('/messages')) {
-      const limit = parseInt(searchParams.get('limit') || '10');
+      const limit = clampLimit(searchParams.get('limit'));
       const messages = getBufferedMessages(limit);
 
       return NextResponse.json(
@@ -202,6 +229,7 @@ export async function GET(request: NextRequest) {
           status: 'success',
           data: {
             count: messages.length,
+            limit,
             messages,
           },
           timestamp: new Date().toISOString(),

@@ -157,8 +157,8 @@ export default function SettingsPage() {
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       errs.email = 'Email invalido';
     }
-    if (password && password.length < 6) {
-      errs.password = 'La contrasena debe tener al menos 6 caracteres';
+    if (password && password.length < 12) {
+      errs.password = 'La contrasena debe tener al menos 12 caracteres';
     }
     return errs;
   };

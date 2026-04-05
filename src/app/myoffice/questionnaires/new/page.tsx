@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Send, Link as LinkIcon, Clipboard, ArrowLeft, Bot, Wand2 } from 'lucide-react';
+import { Link as LinkIcon, Clipboard, ArrowLeft, Bot, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
@@ -87,8 +87,6 @@ export default function NewQuestionnairePage() {
     e.preventDefault();
     
     // Simulate AI generation and saving
-    const newId = `q-template-${Date.now()}`;
-    // The link should go to a generic edit page. Let's correct this.
     const url = typeof window !== 'undefined' ? `${window.location.origin}/myoffice/questionnaires/edit` : '';
     setQuestionnaireUrl(url); // This will just link to the static edit page for now.
 

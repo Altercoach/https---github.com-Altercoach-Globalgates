@@ -10,7 +10,6 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-  SheetClose,
 } from '@/components/ui/sheet';
 import { useCart } from '@/hooks/use-cart';
 import { useCurrency } from '@/hooks/use-currency';

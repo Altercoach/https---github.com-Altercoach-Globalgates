@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, User, AlertTriangle, Search, MessageSquare, Linkedin, Twitter, Mail, Inbox } from 'lucide-react';
+import { Send, AlertTriangle, Search, MessageSquare, Linkedin, Twitter, Mail, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/use-language';
 import { Badge } from '@/components/ui/badge';

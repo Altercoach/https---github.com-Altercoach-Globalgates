@@ -28,7 +28,7 @@ const featureGroups = [
 ];
 
 export default function FeatureFlagAdminPanel() {
-  const { enabledFlags, isFeatureEnabled, setFeatureFlag, toggleFeatureFlag } = useFeatureFlags();
+  const { isFeatureEnabled, setFeatureFlag } = useFeatureFlags();
   const [search, setSearch] = useState('');
 
   return (

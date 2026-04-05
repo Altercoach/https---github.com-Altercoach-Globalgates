@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useSite } from '@/hooks/use-site';
 import { RouteGuard } from '@/components/auth/route-guard';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/hooks/use-language';
-import { useToast } from '@/hooks/use-toast';
 import { PlusCircle, Trash2, Eye, EyeOff, Info } from 'lucide-react';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import type { Service, MultilingualString } from '@/lib/types';
@@ -73,7 +71,6 @@ function newService(): Service {
 export default function ServicesEditorPage() {
   const { site, setSite } = useSite();
   const { language } = useLanguage();
-  const { toast } = useToast();
   const langCode = language.code as keyof MultilingualString;
   const t = labels[langCode as keyof typeof labels] ?? labels.es;
   const services: Service[] = site.services ?? [];

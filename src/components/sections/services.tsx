@@ -4,7 +4,6 @@ import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Check, Wand } from 'lucide-react';
 import { useSite } from '@/hooks/use-site';
-import type { MultilingualString } from '@/lib/types';
 import { useChatWidget } from '@/hooks/use-chat-widget';
 import { Button } from '../ui/button';
 
