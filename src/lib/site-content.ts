@@ -7,13 +7,13 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     tagline: { es: 'Estrategia digital con IA para hacer crecer tu negocio.', en: 'AI-powered digital strategy to grow your business.', fr: 'Strategie numerique pilotee par IA pour faire croitre votre entreprise.' },
     heroTitle: { es: 'Transforma tu negocio con Inteligencia Artificial', en: 'Transform Your Business with Artificial Intelligence', fr: 'Transformez votre entreprise avec l\'Intelligence Artificielle' },
     heroSubtitle: { es: 'Estrategias de marketing digital, automatizacion y agentes IA para empresas que quieren crecer.', en: 'Digital marketing strategies, automation and AI agents for businesses that want to grow.', fr: 'Strategies de marketing numerique, automatisation et agents IA pour les entreprises qui veulent croitre.' },
-    heroImage: '/globalgates-hero.jpg',
+    heroImage: '/hero-default.jpg',
     colors: { gold: '#D4AF37', ink: '#1a1a2e', bg: '#f8f9fa', slate: '#64748b' },
   },
   agentPersona: {
     firstName: 'Aria',
     lastName: 'Gates',
-    avatar: '/agent-avatar.png',
+    avatar: '/favicon.ico',
   },
   services: [
     {

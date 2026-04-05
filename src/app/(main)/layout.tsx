@@ -3,7 +3,6 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartDrawer } from "@/components/cart-drawer";
-import { AIChatWidget } from "@/components/ai-chat-widget";
 
 export default function MainLayout({
   children,
@@ -16,7 +15,6 @@ export default function MainLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <CartDrawer />
-      <AIChatWidget />
     </div>
   );
 }

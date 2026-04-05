@@ -9,6 +9,7 @@ import { LanguageProvider } from '@/contexts/language-context';
 import { CurrencyProvider } from '@/contexts/currency-context';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
+import { AIChatWidget } from '@/components/ai-chat-widget';
 
 import { ThemeProvider } from '@/contexts/theme-provider';
 import { FeatureFlagProvider } from '@/contexts/feature-flag-context';
@@ -46,6 +47,7 @@ export default function RootLayout({
                     <AuthProvider>
                       <FeatureFlagProvider>
                         {children}
+                        <AIChatWidget />
                         <Toaster />
                       </FeatureFlagProvider>
                     </AuthProvider>
