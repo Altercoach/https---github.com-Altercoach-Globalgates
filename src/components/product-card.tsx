@@ -181,10 +181,12 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
         <DialogFooter className="mt-auto pt-4 border-t sm:justify-between gap-2">
-             <Button variant="secondary" onClick={handleAskMore}>
-                <Wand className="mr-2"/>
-                {t.askMore}
+          <DialogClose asChild>
+            <Button variant="secondary" onClick={handleAskMore}>
+              <Wand className="mr-2"/>
+              {t.askMore}
             </Button>
+          </DialogClose>
             <div className='flex gap-2'>
                 <DialogClose asChild>
                     <Button variant="outline">{t.close}</Button>
