@@ -13,7 +13,8 @@
     "qa": "npm run -s typecheck && npm run -s lint && npm run -s build",
     "backup:migrate": "node scripts/migrate-site-backup.mjs",
     "smoke:agent": "node scripts/smoke-agent-chat.mjs",
-    "smoke:orders-report": "node scripts/smoke-orders-report.mjs"
+    "smoke:orders-report": "node scripts/smoke-orders-report.mjs",
+    "deploy:firestore": "npx firebase-tools deploy --only firestore:rules,firestore:indexes --project globalgate-agency --non-interactive"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
