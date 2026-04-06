@@ -49,6 +49,9 @@ export const FEATURE_FLAGS = {
   CAMPAIGN_TRACKING: 'campaign_tracking',
   UTM_MANAGER: 'utm_manager',
   AB_TESTING: 'ab_testing',
+  AGENCY_WHITE_LABEL: 'agency_white_label',
+  ON_DEMAND_STUDIO: 'on_demand_studio',
+  CUSTOM_PACKAGE_BUILDER: 'custom_package_builder',
 
   // 🧾 Monetization & Payments
   PRICING_PAGES: 'pricing_pages',

@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run -s typecheck
+
+      - name: Lint
+        run: npm run -s lint
+
+      - name: Build
+        run: npm run -s build
+
+      - name: Smoke Agent Chat
+        if: ${{ vars.ENABLE_SMOKE_TESTS == '1' }}
+        run: npm run -s smoke:agent
+
+      - name: Smoke Orders Report
+        if: ${{ vars.ENABLE_SMOKE_TESTS == '1' }}
+        env:
+          SMOKE_RUN_HTTP: ${{ vars.SMOKE_RUN_HTTP }}
+        run: npm run -s smoke:orders-report

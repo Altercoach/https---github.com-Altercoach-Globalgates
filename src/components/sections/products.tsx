@@ -44,7 +44,7 @@ export function Products() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">{t.title}</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <p className="max-w-[900px] text-sm text-muted-foreground sm:text-base md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               {t.subtitle}
             </p>
           </div>
@@ -52,12 +52,12 @@ export function Products() {
             <PlanRecommender />
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-stretch gap-8 pt-12 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mx-auto grid max-w-5xl items-stretch gap-5 pt-10 sm:grid-cols-2 md:gap-8 lg:max-w-none lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
-        <div className="mt-8 text-center text-xs text-muted-foreground">
+        <div className="mt-8 space-y-1 text-center text-xs leading-relaxed text-muted-foreground sm:text-sm">
             <p>{t.disclaimer1}</p>
             <p>{t.disclaimer2}</p>
             <p>{t.disclaimer3}</p>

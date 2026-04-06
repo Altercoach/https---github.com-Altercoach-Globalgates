@@ -14,7 +14,7 @@ export default function ApiAccessPage() {
       <h2 className="text-xl font-semibold mt-6 mb-2">Documentación de la API</h2>
       <p>Consulta la <a href="/API_REFERENCE.md" className="text-blue-600 underline">documentación de endpoints</a> para ver métodos, ejemplos y límites de uso.</p>
       <h2 className="text-xl font-semibold mt-6 mb-2">Soporte</h2>
-      <p>¿Dudas? Escribe a <a href="mailto:api@globalgate.com" className="text-blue-600 underline">api@globalgate.com</a>.</p>
+      <p>¿Dudas? Escribe a <a href="mailto:api@goldenkey.website" className="text-blue-600 underline">api@goldenkey.website</a>.</p>
     </main>
   );
 }

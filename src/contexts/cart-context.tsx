@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import type { CartItem } from '@/lib/types';
+import type { CartItem, PurchaseOrder } from '@/lib/types';
 import { LS_KEYS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,7 +11,14 @@ const clampQty = (n: number) => Math.max(1, Math.min(99, Number.isFinite(n) ? Ma
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: { id: string; name: string; price: number; type: 'one' | 'sub'; interval?: 'month' | null }) => void;
+  addToCart: (product: {
+    id: string;
+    name: string;
+    price: number;
+    type: 'one' | 'sub';
+    interval?: 'month' | null;
+    metadata?: CartItem['metadata'];
+  }) => void;
   removeFromCart: (id: string) => void;
   setQty: (id: string, qty: number) => void;
   totals: { oneTotal: number; subTotal: number; total: number };
@@ -51,7 +58,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [cart, hasPurchased, isMounted]);
 
-  const addToCart = useCallback((prod: { id: string; name: string; price: number; type: 'one' | 'sub' | 'info'; interval?: 'month' | null }) => {
+  const addToCart = useCallback((prod: {
+    id: string;
+    name: string;
+    price: number;
+    type: 'one' | 'sub' | 'info';
+    interval?: 'month' | null;
+    metadata?: CartItem['metadata'];
+  }) => {
     if (prod.type === 'info') {
       toast({
         title: 'Plan Informativo',
@@ -71,7 +85,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           x.id === prod.id ? { ...x, qty: clampQty(x.qty + 1) } : x
         );
       }
-      return [...prev, { id: prod.id, name: prod.name, price: prod.price, type: prod.type as 'one' | 'sub', qty: 1 }];
+      return [
+        ...prev,
+        {
+          id: prod.id,
+          name: prod.name,
+          price: prod.price,
+          type: prod.type as 'one' | 'sub',
+          qty: 1,
+          metadata: prod.metadata,
+        },
+      ];
     });
     
     toast({ description: 'Añadido al carrito.' });
@@ -100,6 +124,104 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       await new Promise((res) => setTimeout(res, 600));
+
+      const now = new Date();
+      const yyyymm = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const invoiceSeqKey = `${LS_KEYS.INVOICE_SEQ_PREFIX}_${yyyymm}`;
+      let invoiceSeq = 1;
+      try {
+        const rawSeq = localStorage.getItem(invoiceSeqKey);
+        invoiceSeq = rawSeq ? Math.max(1, Number(rawSeq) + 1) : 1;
+      } catch {
+        invoiceSeq = 1;
+      }
+      const invoiceNumber = `GG-${yyyymm}-${String(invoiceSeq).padStart(6, '0')}`;
+
+      let customerEmail: string | undefined;
+      let customerPlan: string | undefined;
+      let customerName: string | undefined;
+      let billingCountry = 'MX';
+      try {
+        const rawAuth = localStorage.getItem(LS_KEYS.AUTH);
+        if (rawAuth) {
+          const parsed = JSON.parse(rawAuth) as { user?: { email?: string; plan?: string } };
+          customerEmail = parsed.user?.email;
+          customerPlan = parsed.user?.plan;
+          if (customerEmail) {
+            customerName = customerEmail.split('@')[0];
+          }
+        }
+        const rawBillingCountry = localStorage.getItem(LS_KEYS.BILLING_COUNTRY);
+        if (rawBillingCountry?.trim()) {
+          billingCountry = rawBillingCountry.trim().toUpperCase();
+        }
+      } catch {
+        // Ignore auth parsing errors
+      }
+
+      const taxRates: Record<string, number> = {
+        MX: 0.16,
+        ES: 0.21,
+        FR: 0.20,
+        US: 0,
+      };
+      const taxRate = taxRates[billingCountry] ?? 0;
+      const subtotal = totals.total;
+      const taxAmount = Math.round(subtotal * taxRate * 100) / 100;
+      const grandTotal = Math.round((subtotal + taxAmount) * 100) / 100;
+
+      const orderSnapshot: PurchaseOrder = {
+        id: `ord_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        invoiceNumber,
+        status: 'paid',
+        syncState: 'local_only',
+        customer: {
+          name: customerName,
+          email: customerEmail,
+          plan: customerPlan,
+        },
+        fiscal: {
+          countryCode: billingCountry,
+          taxRate,
+          subtotal,
+          taxAmount,
+          grandTotal,
+        },
+        items: cart,
+        totals,
+      };
+
+      // Best-effort sync via server API backed by Firebase Admin SDK.
+      try {
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderSnapshot),
+        });
+
+        if (response.ok) {
+          orderSnapshot.syncState = 'synced';
+        } else {
+          const payload = await response.json().catch(() => null);
+          console.warn('order_sync_failed', payload?.error ?? response.statusText);
+        }
+      } catch (syncError) {
+        console.warn('order_sync_failed', syncError);
+      }
+
+      localStorage.setItem(LS_KEYS.LAST_ORDER, JSON.stringify(orderSnapshot));
+      localStorage.setItem(invoiceSeqKey, String(invoiceSeq));
+      try {
+        const rawHistory = localStorage.getItem(LS_KEYS.ORDERS_HISTORY);
+        const history = rawHistory ? (JSON.parse(rawHistory) as PurchaseOrder[]) : [];
+        const next = [orderSnapshot, ...history].slice(0, 200);
+        localStorage.setItem(LS_KEYS.ORDERS_HISTORY, JSON.stringify(next));
+      } catch {
+        // Ignore history persistence errors
+      }
       setHasPurchased(true);
       setCart([]);
       setIsCartOpen(false);
@@ -112,7 +234,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       console.error('checkout', err);
       toast({ title: 'Error procesando el pago', variant: 'destructive' });
     }
-  }, [totals.total, toast, router]);
+  }, [cart, totals, toast, router]);
 
   const value = useMemo(() => ({
     cart,

@@ -96,36 +96,36 @@ export function Contact() {
 
   return (
     <section id="contact" className="w-full py-12 md:py-24 lg:py-32">
-      <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 lg:gap-10">
+      <div className="container grid items-center justify-center gap-6 px-4 text-center md:px-6 lg:gap-10">
         <div className="space-y-3">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">{t.title}</h2>
-          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+          <p className="mx-auto max-w-[700px] text-sm text-muted-foreground sm:text-base md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
             {t.subtitle}
           </p>
         </div>
         <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-          <div className="space-y-4 text-left">
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-accent" />
-              <a href="mailto:atencion@goldenkey.agency">atencion@goldenkey.agency</a>
+          <div className="space-y-3 text-left">
+            <div className="flex items-center gap-3 rounded-md px-2 py-1">
+              <Mail className="h-5 w-5 shrink-0 text-accent" />
+              <a className="break-all" href="mailto:atencion@goldenkey.website">atencion@goldenkey.website</a>
             </div>
-             <div className="flex items-center gap-3">
-              <WhatsAppIcon className="h-5 w-5 text-accent" />
-              <Link href="https://wa.me/message/I6IIHJNC7PP5C1" target="_blank" rel="noopener noreferrer">
+             <div className="flex items-center gap-3 rounded-md px-2 py-1">
+              <WhatsAppIcon className="h-5 w-5 shrink-0 text-accent" />
+              <Link className="break-words" href="https://wa.me/message/I6IIHJNC7PP5C1" target="_blank" rel="noopener noreferrer">
                 {t.whatsapp}
               </Link>
             </div>
-            <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-accent" />
+            <div className="flex items-center gap-3 rounded-md px-2 py-1">
+              <Phone className="h-5 w-5 shrink-0 text-accent" />
               <a href="tel:+526649035314">+52 (664) 903-5314</a>
             </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-accent" />
-              <span>Tijuana • San Diego • Chula Vista • Los Angeles</span>
+            <div className="flex items-center gap-3 rounded-md px-2 py-1">
+              <MapPin className="h-5 w-5 shrink-0 text-accent" />
+              <span className="leading-relaxed">Tijuana • San Diego • Chula Vista • Los Angeles</span>
             </div>
           </div>
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-left block">{t.nameLabel}</Label>
@@ -139,7 +139,7 @@ export function Contact() {
                   <Label htmlFor="message" className="text-left block">{t.messageLabel}</Label>
                   <Textarea id="message" name="message" placeholder={t.messagePlaceholder} required />
                 </div>
-                <Button type="submit" className="w-full">{t.submitButton}</Button>
+                <Button type="submit" className="h-11 w-full">{t.submitButton}</Button>
               </form>
             </CardContent>
           </Card>

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -132,24 +132,28 @@ const labels = {
   }
 };
 
-const defaultSystemPrompt = `Eres '[Agent Name]', un asistente experto de Golden Key Agency. Tu rol es ser amigable, proactivo y muy eficiente.
+const DEFAULT_SYSTEM_PROMPT = `Eres '[Agent Name]', un asistente experto de [Brand Name]. Tu rol es ser amigable, proactivo y muy eficiente.
 OBJETIVO: Convertir visitantes en leads calificados y resolver dudas de primer nivel.
 REGLAS:
-1. SIEMPRE pide nombre, email y teléfono para registrar un lead.
+1. SIEMPRE pide nombre, email y telefono para registrar un lead.
 2. NUNCA ofrezcas descuentos a menos que se indique en la BASE DE CONOCIMIENTO.
-3. Si no sabes una respuesta, di: "Excelente pregunta. Permíteme consultarlo con un especialista para darte la información precisa. ¿Me das tu correo para contactarte?". Y registra el lead. Para escalar, usa el correo: [Support Email].
-4. NUNCA te refieras a ti mismo como una IA. Eres un miembro del equipo. Para escalar, usa frases como "consultaré con el departamento técnico".
-5. Usa la BASE DE CONOCIMIENTO como tu única fuente de verdad.
-6. NUNCA atiendas a los contactos en la LISTA DE EXCLUSIÓN. Si te contactan, responde: "¡Hola! En un momento te atiende un miembro del equipo." y no continúes la conversación.`;
+3. Si no sabes una respuesta, di: "Excelente pregunta. Permiteme consultarlo con un especialista para darte la informacion precisa. ¿Me das tu correo para contactarte?". Y registra el lead. Para escalar, usa el correo: [Support Email].
+4. NUNCA te refieras a ti mismo como una IA. Eres un miembro del equipo. Para escalar, usa frases como "consultare con el departamento tecnico".
+5. Usa la BASE DE CONOCIMIENTO como tu unica fuente de verdad.
+6. NUNCA atiendas a los contactos en la LISTA DE EXCLUSION. Si te contactan, responde: "¡Hola! En un momento te atiende un miembro del equipo." y no continues la conversacion.`;
 
-const defaultKnowledgeBase = `https://goldenkey.agency/products
-https://goldenkey.agency/contact
+const DEFAULT_KNOWLEDGE_BASE = `https://www.goldenkey.website/products
+https://www.goldenkey.website/contact
 
-Horario de atención del equipo: Lunes a Viernes, 9am - 6pm (Hora del Pacífico).
-Promoción actual: 10% de descuento en el plan 'Portal Maestro Digital' para nuevos clientes. Código: LAUNCH10.`;
+Horario de atencion del equipo: Lunes a Viernes, 9am - 6pm (Hora del Pacifico).
+Promocion actual: 10% de descuento en el plan 'Portal Maestro Digital' para nuevos clientes. Codigo: LAUNCH10.`;
 
-const agentUrl = "https://goldenkey.agency/chat/alex-rider";
-const embedCode = `<iframe src="${agentUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+const slugify = (value: string) =>
+    value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
 
 export default function AgentConfigPage() {
     const { language } = useLanguage();
@@ -157,19 +161,50 @@ export default function AgentConfigPage() {
     const { toast } = useToast();
     const t = labels[language.code as keyof typeof labels] || labels.en;
 
-    const [isActive, setIsActive] = useState(true);
-    const [gender, setGender] = useState('female');
-    const [systemPrompt, setSystemPrompt] = useState(defaultSystemPrompt);
-    const [knowledgeBase, setKnowledgeBase] = useState(defaultKnowledgeBase);
-    
-    // States for the new fields
-    const [whatsappKey, setWhatsappKey] = useState('wh_xxxxxxxx');
-    const [instagramKey, setInstagramKey] = useState('ig_xxxxxxxx');
-    const [messengerKey, setMessengerKey] = useState('ms_xxxxxxxx');
-    const [linkedinKey, setLinkedinKey] = useState('li_xxxxxxxx');
-    const [twitterKey, setTwitterKey] = useState('tw_xxxxxxxx');
-    const [supportEmail, setSupportEmail] = useState('atencion@goldenkey.website');
-    const [exclusionList, setExclusionList] = useState('proveedor@email.com\n+1234567890');
+    const agentConfig = site.agentConfig ?? {
+        isActive: true,
+        gender: 'female' as const,
+        systemPrompt: DEFAULT_SYSTEM_PROMPT,
+        knowledgeBase: DEFAULT_KNOWLEDGE_BASE,
+        supportEmail: 'atencion@goldenkey.website',
+        exclusionList: 'proveedor@email.com\n+1234567890',
+        sharePath: '/chat',
+        apiKeys: {
+            whatsapp: '',
+            instagram: '',
+            messenger: '',
+            linkedin: '',
+            twitter: '',
+        },
+    };
+
+    const updateAgentConfig = (partial: Omit<Partial<typeof agentConfig>, 'apiKeys'> & { apiKeys?: Partial<typeof agentConfig.apiKeys> }) => {
+        setSite(prev => ({
+            ...prev,
+            agentConfig: {
+                ...(prev.agentConfig ?? agentConfig),
+                ...partial,
+                apiKeys: {
+                    ...(prev.agentConfig?.apiKeys ?? agentConfig.apiKeys),
+                    ...(partial.apiKeys ?? {}),
+                },
+            },
+        }));
+        setHasUnsavedChanges(true);
+    };
+
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://www.goldenkey.website';
+    const agentSlug = useMemo(() => {
+        const raw = `${site.agentPersona.firstName} ${site.agentPersona.lastName}`;
+        const slug = slugify(raw);
+        return slug || 'agente'
+    }, [site.agentPersona.firstName, site.agentPersona.lastName]);
+    const normalizedSharePath = useMemo(() => {
+        const path = (agentConfig.sharePath || '/chat').trim();
+        return path.startsWith('/') ? path : `/${path}`;
+    }, [agentConfig.sharePath]);
+    const agentUrl = `${currentOrigin}${normalizedSharePath}/${agentSlug}`;
+    const embedCode = `<iframe src="${agentUrl}" width="100%" height="600" frameborder="0" loading="lazy"></iframe>`;
 
     
     const triggerFilePicker = () => {
@@ -200,6 +235,11 @@ export default function AgentConfigPage() {
     const copyToClipboard = (textToCopy: string) => {
         navigator.clipboard.writeText(textToCopy);
         toast({ title: t.copied });
+    };
+
+    const handleSave = () => {
+        setHasUnsavedChanges(false);
+        toast({ title: t.toastSuccessTitle, description: t.toastSuccessDescription });
     };
 
     return (
@@ -242,7 +282,7 @@ export default function AgentConfigPage() {
                         </div>
                         <div className="space-y-2">
                            <Label>{t.agentGender}</Label>
-                           <RadioGroup defaultValue={gender} onValueChange={setGender} className="flex gap-4">
+                                    <RadioGroup value={agentConfig.gender} onValueChange={(value: 'male' | 'female') => updateAgentConfig({ gender: value })} className="flex gap-4">
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="female" id="r-female" />
                                     <Label htmlFor="r-female">{t.genderFemale}</Label>
@@ -255,11 +295,11 @@ export default function AgentConfigPage() {
                         </div>
                         <div className="flex items-center space-x-4 rounded-lg border p-4">
                             <div className="flex items-center space-x-2">
-                                <Switch id="agent-status" checked={isActive} onCheckedChange={setIsActive} />
+                                <Switch id="agent-status" checked={agentConfig.isActive} onCheckedChange={(value) => updateAgentConfig({ isActive: value })} />
                                 <Label htmlFor="agent-status">{t.agentStatus}</Label>
                             </div>
-                            <p className={`text-sm font-medium ${isActive ? 'text-green-600' : 'text-muted-foreground'}`}>
-                                {isActive ? t.agentActive : t.agentInactive}
+                            <p className={`text-sm font-medium ${agentConfig.isActive ? 'text-green-600' : 'text-muted-foreground'}`}>
+                                {agentConfig.isActive ? t.agentActive : t.agentInactive}
                             </p>
                         </div>
                     </div>
@@ -301,8 +341,8 @@ export default function AgentConfigPage() {
                     </CardHeader>
                     <CardContent>
                         <Textarea 
-                            value={systemPrompt}
-                            onChange={(e) => setSystemPrompt(e.target.value)}
+                            value={agentConfig.systemPrompt}
+                            onChange={(e) => updateAgentConfig({ systemPrompt: e.target.value })}
                             rows={15}
                             className="font-mono text-xs"
                         />
@@ -316,8 +356,8 @@ export default function AgentConfigPage() {
                     </CardHeader>
                     <CardContent>
                         <Textarea 
-                            value={knowledgeBase}
-                            onChange={(e) => setKnowledgeBase(e.target.value)}
+                            value={agentConfig.knowledgeBase}
+                            onChange={(e) => updateAgentConfig({ knowledgeBase: e.target.value })}
                             rows={15}
                              className="font-mono text-xs"
                         />
@@ -334,27 +374,27 @@ export default function AgentConfigPage() {
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="whatsapp-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.whatsappApiKey}</Label>
-                            <Input id="whatsapp-api" type="password" value={whatsappKey} onChange={(e) => setWhatsappKey(e.target.value)} />
+                            <Input id="whatsapp-api" type="password" value={agentConfig.apiKeys.whatsapp} onChange={(e) => updateAgentConfig({ apiKeys: { whatsapp: e.target.value } })} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="instagram-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.instagramApiKey}</Label>
-                            <Input id="instagram-api" type="password" value={instagramKey} onChange={(e) => setInstagramKey(e.target.value)} />
+                            <Input id="instagram-api" type="password" value={agentConfig.apiKeys.instagram} onChange={(e) => updateAgentConfig({ apiKeys: { instagram: e.target.value } })} />
                         </div>
                          <div className="space-y-2">
                             <Label htmlFor="messenger-api" className="flex items-center gap-2"><MessageSquare className="h-4 w-4" />{t.messengerApiKey}</Label>
-                            <Input id="messenger-api" type="password" value={messengerKey} onChange={(e) => setMessengerKey(e.target.value)} />
+                            <Input id="messenger-api" type="password" value={agentConfig.apiKeys.messenger} onChange={(e) => updateAgentConfig({ apiKeys: { messenger: e.target.value } })} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="linkedin-api" className="flex items-center gap-2"><Linkedin className="h-4 w-4" /> {t.linkedinApiKey}</Label>
-                            <Input id="linkedin-api" type="password" value={linkedinKey} onChange={(e) => setLinkedinKey(e.target.value)} />
+                            <Input id="linkedin-api" type="password" value={agentConfig.apiKeys.linkedin} onChange={(e) => updateAgentConfig({ apiKeys: { linkedin: e.target.value } })} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="twitter-api" className="flex items-center gap-2"><Twitter className="h-4 w-4" /> {t.twitterApiKey}</Label>
-                            <Input id="twitter-api" type="password" value={twitterKey} onChange={(e) => setTwitterKey(e.target.value)} />
+                            <Input id="twitter-api" type="password" value={agentConfig.apiKeys.twitter} onChange={(e) => updateAgentConfig({ apiKeys: { twitter: e.target.value } })} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="support-email">{t.supportEmail}</Label>
-                            <Input id="support-email" type="email" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} />
+                            <Input id="support-email" type="email" value={agentConfig.supportEmail} onChange={(e) => updateAgentConfig({ supportEmail: e.target.value })} />
                         </div>
                     </div>
                 </CardContent>
@@ -367,14 +407,18 @@ export default function AgentConfigPage() {
                 </CardHeader>
                 <CardContent>
                     <Textarea 
-                        value={exclusionList}
-                        onChange={(e) => setExclusionList(e.target.value)}
+                        value={agentConfig.exclusionList}
+                        onChange={(e) => updateAgentConfig({ exclusionList: e.target.value })}
                         rows={5}
                         placeholder="proveedor@email.com
 +1234567890"
                     />
                 </CardContent>
             </Card>
+
+            <div className="flex justify-end">
+                <Button onClick={handleSave}>{t.saveChanges}</Button>
+            </div>
 
         </div>
     );

@@ -18,20 +18,25 @@ import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/utils';
 import { useCurrency } from '@/hooks/use-currency';
 import type { Customer } from '@/lib/types';
+import type { PurchaseOrder } from '@/lib/types';
 import { useLanguage } from '@/hooks/use-language';
 import Link from 'next/link';
 import { RouteGuard } from '@/components/auth/route-guard';
+import { LS_KEYS } from '@/lib/constants';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { db, isFirebaseConfigured } from '@/lib/firebase-config';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const labels = {
   es: {
-    pageTitle: 'Administracion del Negocio',
+    pageTitle: 'Administración del Negocio',
     pageSubtitle: 'Gestiona tus clientes, planes y visualiza tus ventas.',
     totalRevenue: 'Ingresos Totales',
     totalRevenueDesc: 'Ingresos totales generados',
     activeClients: 'Clientes Activos',
     activeClientsDesc: 'Clientes con servicios activos',
     activeSubscriptions: 'Suscripciones Activas',
-    activeSubscriptionsDesc: 'Planes de suscripcion mensuales',
+    activeSubscriptionsDesc: 'Planes de suscripción mensuales',
     clients: 'Clientes',
     searchPlaceholder: 'Buscar por nombre o email...',
     filterByStatus: 'Filtrar por estado',
@@ -44,7 +49,7 @@ const labels = {
     suspend: 'Suspender',
     reactivate: 'Reactivar',
     deleteAction: 'Eliminar',
-    noClientSelected: 'Ningun cliente seleccionado',
+    noClientSelected: 'Ningún cliente seleccionado',
     noClientSelectedDesc: 'Por favor, selecciona al menos un cliente.',
     actionCompleted: 'Accion completada',
     clientsSuspended: 'clientes suspendidos',
@@ -58,6 +63,20 @@ const labels = {
     viewDetails: 'Ver detalles',
     sendMessage: 'Enviar mensaje',
     noResults: 'No se encontraron resultados.',
+    customOrders: 'Pedidos custom recientes',
+    customOrdersDesc: 'Resumen de paquetes a la carta creados por clientes.',
+    orderId: 'Pedido',
+    orderDate: 'Fecha',
+    orderItems: 'Items',
+    orderAmount: 'Monto',
+    orderSla: 'SLA',
+    orderStatus: 'Estado',
+    fromDate: 'Desde',
+    toDate: 'Hasta',
+    noCustomOrders: 'No hay pedidos custom recientes.',
+    exportCsv: 'Exportar CSV',
+    unsyncedOrdersTitle: 'Pedidos pendientes de sincronización',
+    unsyncedOrdersDesc: 'Se detectaron pedidos guardados localmente que aún no se han confirmado en Firestore.',
   },
   en: {
     pageTitle: 'Business Administration',
@@ -94,6 +113,20 @@ const labels = {
     viewDetails: 'View details',
     sendMessage: 'Send message',
     noResults: 'No results found.',
+    customOrders: 'Recent custom orders',
+    customOrdersDesc: 'Summary of a la carte packages created by customers.',
+    orderId: 'Order',
+    orderDate: 'Date',
+    orderItems: 'Items',
+    orderAmount: 'Amount',
+    orderSla: 'SLA',
+    orderStatus: 'Status',
+    fromDate: 'From',
+    toDate: 'To',
+    noCustomOrders: 'No recent custom orders.',
+    exportCsv: 'Export CSV',
+    unsyncedOrdersTitle: 'Orders pending sync',
+    unsyncedOrdersDesc: 'Local orders were detected and are not yet confirmed in Firestore.',
   },
   fr: {
     pageTitle: "Administration de l'Entreprise",
@@ -130,6 +163,20 @@ const labels = {
     viewDetails: 'Voir les details',
     sendMessage: 'Envoyer un message',
     noResults: 'Aucun resultat trouve.',
+    customOrders: 'Commandes custom recentes',
+    customOrdersDesc: 'Resume des packages a la carte crees par les clients.',
+    orderId: 'Commande',
+    orderDate: 'Date',
+    orderItems: 'Items',
+    orderAmount: 'Montant',
+    orderSla: 'SLA',
+    orderStatus: 'Statut',
+    fromDate: 'De',
+    toDate: 'A',
+    noCustomOrders: 'Aucune commande custom recente.',
+    exportCsv: 'Exporter CSV',
+    unsyncedOrdersTitle: 'Commandes en attente de synchronisation',
+    unsyncedOrdersDesc: 'Des commandes locales ont ete detectees et ne sont pas encore confirmees dans Firestore.',
   },
 };
 
@@ -147,10 +194,97 @@ export default function AdminDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
+  const [ordersHistory, setOrdersHistory] = useState<PurchaseOrder[]>([]);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'paid' | 'pending' | 'failed'>('all');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
   const { language } = useLanguage();
   const t = labels[language.code as keyof typeof labels] ?? labels.en;
 
-  useEffect(() => { setIsMounted(true); }, []);
+  useEffect(() => {
+    const loadOrders = async () => {
+      setIsMounted(true);
+
+      const localFallback = () => {
+        try {
+          const rawHistory = localStorage.getItem(LS_KEYS.ORDERS_HISTORY);
+          const rawLast = localStorage.getItem(LS_KEYS.LAST_ORDER);
+          if (rawHistory) return JSON.parse(rawHistory) as PurchaseOrder[];
+          if (rawLast) return [JSON.parse(rawLast) as PurchaseOrder];
+        } catch {
+          // ignore local parse issues
+        }
+        return [] as PurchaseOrder[];
+      };
+
+      if (isFirebaseConfigured() && db) {
+        try {
+          const snap = await db.collection('orders').orderBy('createdAt', 'desc').limit(200).get();
+          const remote = snap.docs.map((d) => d.data() as PurchaseOrder);
+          const local = localFallback();
+          const mergedMap = new Map<string, PurchaseOrder>();
+          for (const order of [...remote, ...local]) {
+            mergedMap.set(order.id, order);
+          }
+          setOrdersHistory(Array.from(mergedMap.values()).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+          return;
+        } catch {
+          // fallback to local history
+        }
+      }
+
+      setOrdersHistory(localFallback());
+    };
+
+    void loadOrders();
+  }, []);
+
+  const handleExportCustomOrdersCsv = () => {
+    if (customOrderRows.length === 0) return;
+    const header = ['invoice_or_order_id', 'created_at', 'status', 'customer_email', 'item_name', 'brief', 'sla_hours', 'amount'];
+    const rows = customOrderRows.map(({ order, item }) => [
+      order.invoiceNumber ?? order.id,
+      order.createdAt,
+      order.status ?? 'paid',
+      order.customer?.email ?? '',
+      item.name,
+      item.metadata?.brief ?? '',
+      String(item.metadata?.slaHours ?? ''),
+      String(item.price * item.qty),
+    ]);
+    const csv = [header, ...rows]
+      .map((cols) => cols.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `custom-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const customOrderRows = useMemo(() => {
+    const fromTs = fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : Number.NEGATIVE_INFINITY;
+    const toTs = toDate ? new Date(`${toDate}T23:59:59`).getTime() : Number.POSITIVE_INFINITY;
+
+    return ordersHistory
+      .filter((order) => {
+        const ts = new Date(order.createdAt).getTime();
+        const statusOk = orderStatusFilter === 'all' || (order.status ?? 'paid') === orderStatusFilter;
+        const dateOk = ts >= fromTs && ts <= toTs;
+        return statusOk && dateOk;
+      })
+      .flatMap((order) =>
+        order.items
+          .filter((item) => item.metadata?.kind === 'custom_package')
+          .map((item) => ({ order, item }))
+      );
+  }, [ordersHistory, orderStatusFilter, fromDate, toDate]);
+
+  const unsyncedCount = useMemo(
+    () => ordersHistory.filter((o) => (o.syncState ?? 'local_only') !== 'synced').length,
+    [ordersHistory]
+  );
 
   const filteredCustomers = useMemo(() =>
     customers.filter(c => {
@@ -209,6 +343,13 @@ export default function AdminDashboardPage() {
           <h1 className="text-3xl font-bold font-headline">{t.pageTitle}</h1>
           <p className="text-muted-foreground">{t.pageSubtitle}</p>
         </header>
+
+        {unsyncedCount > 0 && (
+          <Alert>
+            <AlertTitle>{t.unsyncedOrdersTitle}: {unsyncedCount}</AlertTitle>
+            <AlertDescription>{t.unsyncedOrdersDesc}</AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
@@ -334,6 +475,70 @@ export default function AdminDashboardPage() {
                 )}
               </TableBody>
             </Table>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t.customOrders}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t.customOrdersDesc}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={handleExportCustomOrdersCsv} disabled={customOrderRows.length === 0}>
+                {t.exportCsv}
+              </Button>
+              <Select value={orderStatusFilter} onValueChange={(v) => setOrderStatusFilter(v as 'all' | 'paid' | 'pending' | 'failed')}>
+                <SelectTrigger className="w-[170px]">
+                  <SelectValue placeholder={t.orderStatus} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.allStatuses}</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-[170px]" placeholder={t.fromDate} />
+              <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="w-[170px]" placeholder={t.toDate} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            {customOrderRows.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t.noCustomOrders}</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t.orderId}</TableHead>
+                    <TableHead>{t.orderDate}</TableHead>
+                    <TableHead>{t.orderItems}</TableHead>
+                    <TableHead>{t.orderSla}</TableHead>
+                    <TableHead>{t.orderStatus}</TableHead>
+                    <TableHead>{t.orderAmount}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {customOrderRows.map(({ order, item }) => (
+                    <TableRow key={`${order.id}_${item.id}`}>
+                      <TableCell className="font-medium">{order.invoiceNumber ?? order.id}</TableCell>
+                      <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <div>{item.name}</div>
+                        {item.metadata?.brief && (
+                          <div className="text-xs text-muted-foreground">{item.metadata.brief}</div>
+                        )}
+                      </TableCell>
+                      <TableCell>{item.metadata?.slaHours ? `${item.metadata.slaHours}h` : '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={(order.status ?? 'paid') === 'paid' ? 'default' : (order.status === 'pending' ? 'secondary' : 'destructive')}>
+                          {order.status ?? 'paid'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{formatCurrency(item.price * item.qty, currency)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>

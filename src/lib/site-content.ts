@@ -1,9 +1,25 @@
 import type { SiteData } from '@/lib/types';
 import { FEATURE_FLAGS } from './feature-flags';
 
+const defaultAgentSystemPrompt = `Eres '[Agent Name]', un asistente experto de [Brand Name]. Tu rol es ser amigable, proactivo y muy eficiente.
+OBJETIVO: Convertir visitantes en leads calificados y resolver dudas de primer nivel.
+REGLAS:
+1. SIEMPRE pide nombre, email y telefono para registrar un lead.
+2. NUNCA ofrezcas descuentos a menos que se indique en la BASE DE CONOCIMIENTO.
+3. Si no sabes una respuesta, di: "Excelente pregunta. Permiteme consultarlo con un especialista para darte la informacion precisa. ¿Me das tu correo para contactarte?". Y registra el lead. Para escalar, usa el correo: [Support Email].
+4. NUNCA te refieras a ti mismo como una IA. Eres un miembro del equipo. Para escalar, usa frases como "consultare con el departamento tecnico".
+5. Usa la BASE DE CONOCIMIENTO como tu unica fuente de verdad.
+6. NUNCA atiendas a los contactos en la LISTA DE EXCLUSION. Si te contactan, responde: "¡Hola! En un momento te atiende un miembro del equipo." y no continues la conversacion.`;
+
+const defaultAgentKnowledgeBase = `https://www.goldenkey.website/products
+https://www.goldenkey.website/contact
+
+Horario de atencion del equipo: Lunes a Viernes, 9am - 6pm (Hora del Pacifico).
+Promocion actual: 10% de descuento en el plan 'Portal Maestro Digital' para nuevos clientes. Codigo: LAUNCH10.`;
+
 export const DEFAULT_SITE_CONTENT: SiteData = {
   brand: {
-    name: { es: 'GlobalGates Agency', en: 'GlobalGates Agency', fr: 'GlobalGates Agency' },
+    name: { es: 'Goldek Key International', en: 'Goldek Key International', fr: 'Goldek Key International' },
     tagline: { es: 'Estrategia digital con IA para hacer crecer tu negocio.', en: 'AI-powered digital strategy to grow your business.', fr: 'Strategie numerique pilotee par IA pour faire croitre votre entreprise.' },
     heroTitle: { es: 'Transforma tu negocio con Inteligencia Artificial', en: 'Transform Your Business with Artificial Intelligence', fr: 'Transformez votre entreprise avec l\'Intelligence Artificielle' },
     heroSubtitle: { es: 'Estrategias de marketing digital, automatizacion y agentes IA para empresas que quieren crecer.', en: 'Digital marketing strategies, automation and AI agents for businesses that want to grow.', fr: 'Strategies de marketing numerique, automatisation et agents IA pour les entreprises qui veulent croitre.' },
@@ -14,6 +30,32 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
     firstName: 'Aria',
     lastName: 'Gates',
     avatar: '/favicon.ico',
+  },
+  agentConfig: {
+    isActive: true,
+    gender: 'female',
+    systemPrompt: defaultAgentSystemPrompt,
+    knowledgeBase: defaultAgentKnowledgeBase,
+    supportEmail: 'atencion@goldenkey.website',
+    exclusionList: 'proveedor@email.com\n+1234567890',
+    sharePath: '/chat',
+    apiKeys: {
+      whatsapp: '',
+      instagram: '',
+      messenger: '',
+      linkedin: '',
+      twitter: '',
+    },
+  },
+  socialLinks: {
+    facebook: '',
+    instagram: '',
+    x: '',
+    linkedin: '',
+    youtube: '',
+    tiktok: '',
+    whatsapp: '',
+    threads: '',
   },
   services: [
     {
@@ -49,6 +91,35 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
         { es: 'Integra con IA para ajuste automatico de pujas y audiencias.', en: 'AI integration for automatic bid and audience adjustment.', fr: 'Integration IA pour ajustement automatique des encheres et audiences.' },
       ],
       features: [FEATURE_FLAGS.AI_CAMPAIGN_PLANNER],
+    },
+    {
+      id: 'solution-agency-partner',
+      visible: true,
+      title: { es: 'Programa para Agencias (White Label)', en: 'Agency Partner Program (White Label)', fr: 'Programme Partenaire Agence (Marque Blanche)' },
+      bullets: [
+        { es: 'Operacion white label para que tu agencia escale sin ampliar equipo interno.', en: 'White-label operations so your agency can scale without expanding your internal team.', fr: 'Operations en marque blanche pour faire evoluer votre agence sans agrandir votre equipe interne.' },
+        { es: 'Produccion mensual multicanal (IG, FB, LinkedIn, Threads, TikTok) con enjambre de IAs.', en: 'Monthly multi-channel production (IG, FB, LinkedIn, Threads, TikTok) with AI swarm workflows.', fr: 'Production mensuelle multicanal (IG, FB, LinkedIn, Threads, TikTok) avec workflow d essaim IA.' },
+        { es: 'SLAs, tablero colaborativo y entregables listos para revender a tus clientes.', en: 'SLAs, collaborative dashboard, and deliverables ready to resell to your clients.', fr: 'SLA, tableau collaboratif et livrables prets a revendre a vos clients.' },
+      ],
+      features: [FEATURE_FLAGS.AGENCY_WHITE_LABEL, FEATURE_FLAGS.AI_CONTENT_SCHEDULER, FEATURE_FLAGS.AI_INSIGHTS_AND_RECOMMENDATIONS],
+      agents: [
+        { id: 'agency_orchestrator', name: 'Agency Orchestrator', enabled: true },
+        { id: 'ai_marketing_assistant', name: 'AI Marketing Assistant', enabled: true },
+      ],
+    },
+    {
+      id: 'solution-on-demand-studio',
+      visible: true,
+      title: { es: 'Studio On Demand (A la Carta)', en: 'On-Demand Studio (A la Carte)', fr: 'Studio On-Demand (A la Carte)' },
+      bullets: [
+        { es: 'Activa sprint creativo por horas o entregables: copies, piezas, micro-videos y anuncios.', en: 'Activate creative sprints by hours or deliverables: copies, assets, micro-videos, and ads.', fr: 'Activez des sprints creatifs par heures ou livrables : copies, visuels, micro-videos et annonces.' },
+        { es: 'Define prioridad, presupuesto y fecha; el sistema arma paquete personalizado automaticamente.', en: 'Set priority, budget, and due date; the system assembles a personalized package automatically.', fr: 'Definissez priorite, budget et date; le systeme assemble automatiquement un package personnalise.' },
+        { es: 'Ideal para lanzamientos, temporadas altas o picos de demanda.', en: 'Ideal for launches, peak seasons, or sudden demand spikes.', fr: 'Ideal pour les lancements, hautes saisons ou pics de demande.' },
+      ],
+      features: [FEATURE_FLAGS.ON_DEMAND_STUDIO, FEATURE_FLAGS.CUSTOM_PACKAGE_BUILDER, FEATURE_FLAGS.ONE_TIME_PAYMENTS],
+      agents: [
+        { id: 'swarm_scheduler', name: 'Swarm Scheduler', enabled: true },
+      ],
     },
   ],
   products: [
@@ -99,6 +170,33 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       features: [FEATURE_FLAGS.AI_MARKETING_ASSISTANT],
       agents: [{ id: 'ai_marketing_assistant', name: 'AI Marketing Assistant', enabled: true }],
     },
+    {
+      id: 'prod_agency_scale_kit',
+      visible: true,
+      type: 'sub',
+      price: 1200,
+      name: { es: 'Agency Scale Kit', en: 'Agency Scale Kit', fr: 'Agency Scale Kit' },
+      badge: { es: 'Agencias', en: 'Agencies', fr: 'Agences' },
+      note: { es: 'White label + gestor dedicado + 5 cuentas cliente incluidas.', en: 'White label + dedicated manager + 5 client accounts included.', fr: 'Marque blanche + gestionnaire dedie + 5 comptes clients inclus.' },
+      description: { es: 'Plan de subscripcion para agencias que quieren revender servicios digitales bajo su marca.', en: 'Subscription plan for agencies that want to resell digital services under their own brand.', fr: 'Abonnement pour les agences qui souhaitent revendre des services numeriques sous leur propre marque.' },
+      features: [FEATURE_FLAGS.AGENCY_WHITE_LABEL, FEATURE_FLAGS.MULTI_USER_ACCOUNTS, FEATURE_FLAGS.CUSTOM_DOMAINS],
+      agents: [
+        { id: 'agency_orchestrator', name: 'Agency Orchestrator', enabled: true },
+      ],
+      bundleId: 'bundle_agency_hub',
+    },
+    {
+      id: 'prod_custom_pack_on_demand',
+      visible: true,
+      type: 'one',
+      price: 450,
+      name: { es: 'Paquete On Demand Personalizado', en: 'Custom On-Demand Package', fr: 'Pack On-Demand Personnalise' },
+      badge: { es: 'A la carta', en: 'A la carte', fr: 'A la carte' },
+      note: { es: 'Pago unico. Define piezas, canales y velocidad de entrega.', en: 'One-time payment. Define assets, channels, and delivery speed.', fr: 'Paiement unique. Definissez livrables, canaux et vitesse de livraison.' },
+      description: { es: 'Configura un paquete a medida para una necesidad puntual sin contratar suscripcion mensual.', en: 'Configure a tailored package for a specific need without a monthly subscription.', fr: 'Configurez un package sur mesure pour un besoin ponctuel sans abonnement mensuel.' },
+      features: [FEATURE_FLAGS.ON_DEMAND_STUDIO, FEATURE_FLAGS.CUSTOM_PACKAGE_BUILDER, FEATURE_FLAGS.ONE_TIME_PAYMENTS],
+      bundleId: 'bundle_agency_hub',
+    },
   ],
   bundles: [
     {
@@ -112,6 +210,26 @@ export const DEFAULT_SITE_CONTENT: SiteData = {
       agents: [
         { id: 'ai_marketing_assistant', name: 'AI Marketing Assistant', enabled: true },
         { id: 'crm_bot', name: 'CRM Bot', enabled: false },
+      ],
+    },
+    {
+      id: 'bundle_agency_hub',
+      visible: true,
+      name: { es: 'Agency Hub + On Demand', en: 'Agency Hub + On Demand', fr: 'Agency Hub + On-Demand' },
+      description: { es: 'Bundle para agencias: operacion white label, studio a la carta y automatizacion multicanal.', en: 'Bundle for agencies: white-label operations, a la carte studio, and multi-channel automation.', fr: 'Bundle pour agences : operations marque blanche, studio a la carte et automatisation multicanal.' },
+      products: ['prod_agency_scale_kit', 'prod_custom_pack_on_demand', 'prod_ai_agent'],
+      services: ['solution-agency-partner', 'solution-on-demand-studio', 'solution-sm'],
+      features: [
+        FEATURE_FLAGS.AGENCY_WHITE_LABEL,
+        FEATURE_FLAGS.ON_DEMAND_STUDIO,
+        FEATURE_FLAGS.CUSTOM_PACKAGE_BUILDER,
+        FEATURE_FLAGS.AI_CONTENT_SCHEDULER,
+        FEATURE_FLAGS.AI_INSIGHTS_AND_RECOMMENDATIONS,
+      ],
+      agents: [
+        { id: 'agency_orchestrator', name: 'Agency Orchestrator', enabled: true },
+        { id: 'swarm_scheduler', name: 'Swarm Scheduler', enabled: true },
+        { id: 'ai_marketing_assistant', name: 'AI Marketing Assistant', enabled: true },
       ],
     },
   ],

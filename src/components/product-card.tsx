@@ -42,6 +42,7 @@ const labels = {
     whatFor: "Para Qué Sirve",
     askMore: "Pregúntame más",
     askMoreInitialMessage: "Hola, me gustaría saber más sobre el plan",
+    askMoreFollowUp: "¿Qué beneficios tiene este plan para mi negocio? ¿Por qué debería elegirlo sobre otros?",
   },
   en: {
     contactUs: "Contact Us",
@@ -57,6 +58,7 @@ const labels = {
     whatFor: "What It's For",
     askMore: "Ask me more",
     askMoreInitialMessage: "Hi, I'd like to know more about the plan",
+    askMoreFollowUp: "What benefits does this plan offer for my business? Why should I choose it over others?",
   },
   fr: {
     contactUs: "Contactez-nous",
@@ -72,6 +74,7 @@ const labels = {
     whatFor: "À quoi ça sert",
     askMore: "Demandez-moi plus",
     askMoreInitialMessage: "Bonjour, j'aimerais en savoir plus sur le forfait",
+    askMoreFollowUp: "Quels bénéfices ce forfait apporte-t-il à mon entreprise ? Pourquoi le choisir plutôt qu'un autre ?",
   }
 };
 
@@ -106,13 +109,13 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   const handleAskMore = () => {
-      const initialMessage = `${t.askMoreInitialMessage} "${productName}". ¿Qué beneficios tiene este plan para mi negocio? ¿Por qué debería elegirlo sobre otros?`;
+      const initialMessage = `${t.askMoreInitialMessage} "${productName}". ${t.askMoreFollowUp}`;
       openChatWidget(initialMessage);
   }
 
   return (
     <Dialog>
-      <Card className="flex flex-col">
+      <Card className="flex flex-col transition-shadow duration-200 hover:shadow-md focus-within:ring-2 focus-within:ring-accent/50">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg">{productName}</CardTitle>
@@ -128,12 +131,12 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardContent>
         <CardFooter className="flex flex-col items-stretch gap-2">
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-full">{t.viewDetails}</Button>
+            <Button variant="outline" className="h-11 w-full focus-visible:ring-accent focus-visible:ring-offset-2">{t.viewDetails}</Button>
             </DialogTrigger>
             {isInfo ? (
-                <Button variant="default" className="w-full" onClick={handleInfoClick}>{t.requestInfo}</Button>
+            <Button variant="default" className="h-11 w-full focus-visible:ring-accent focus-visible:ring-offset-2" onClick={handleInfoClick}>{t.requestInfo}</Button>
             ) : (
-                <Button className="w-full" onClick={handleAddToCart}>
+            <Button className="h-11 w-full focus-visible:ring-accent focus-visible:ring-offset-2" onClick={handleAddToCart}>
                     <ShoppingCart className="mr-2" />
                     {t.addToCart}
                 </Button>
@@ -141,7 +144,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardFooter>
       </Card>
 
-      <DialogContent className="sm:max-w-xl max-h-[80vh] flex flex-col">
+        <DialogContent closeLabel={t.close} className="flex max-h-[85vh] flex-col sm:max-h-[80vh] sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{productName}</DialogTitle>
            <DialogDescription>
@@ -153,7 +156,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
         </DialogHeader>
-        <div className="py-4 overflow-y-auto pr-6 text-sm">
+        <div className="overflow-y-auto py-4 pr-1 text-sm sm:pr-6">
           <p className="text-muted-foreground">{productDescription}</p>
 
           {(longDescription || whatIncludes || whatFor) && <div className="space-y-4 mt-4">
@@ -180,22 +183,24 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.type === 'sub' && <span className="text-sm font-normal text-muted-foreground">{t.monthly}</span>}
           </div>
         </div>
-        <DialogFooter className="mt-auto pt-4 border-t sm:justify-between gap-2">
+        <DialogFooter className="mt-auto flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
           <DialogClose asChild>
-            <Button variant="secondary" onClick={handleAskMore}>
+            <Button variant="secondary" className="h-11 w-full focus-visible:ring-accent focus-visible:ring-offset-2 sm:w-auto" onClick={handleAskMore}>
               <Wand className="mr-2"/>
               {t.askMore}
             </Button>
           </DialogClose>
-            <div className='flex gap-2'>
+            <div className='flex w-full gap-2 sm:w-auto'>
                 <DialogClose asChild>
-                    <Button variant="outline">{t.close}</Button>
+                    <Button variant="outline" className="h-11 flex-1 focus-visible:ring-accent focus-visible:ring-offset-2 sm:flex-none">{t.close}</Button>
                 </DialogClose>
                {isInfo ? (
-                    <Button variant="default" className="w-full" onClick={() => { handleInfoClick(); }}>{t.requestInfo}</Button>
+                    <DialogClose asChild>
+                      <Button variant="default" className="h-11 flex-1 focus-visible:ring-accent focus-visible:ring-offset-2 sm:flex-none" onClick={() => { handleInfoClick(); }}>{t.requestInfo}</Button>
+                    </DialogClose>
                 ) : (
                     <DialogClose asChild>
-                        <Button onClick={handleAddToCart}>
+                        <Button className="h-11 flex-1 focus-visible:ring-accent focus-visible:ring-offset-2 sm:flex-none" onClick={handleAddToCart}>
                             <ShoppingCart className="mr-2" />
                             {t.addToCart}
                         </Button>

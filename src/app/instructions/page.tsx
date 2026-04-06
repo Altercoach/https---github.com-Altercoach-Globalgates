@@ -70,11 +70,11 @@ export default function ClientInstructionsPage() {
                         <CardContent className="space-y-4 text-sm text-muted-foreground">
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">Gestión de Cuenta y Suscripciones</h4>
-                                <p>En tu panel de cliente, en la sección &quot;Configuración&quot;, puedes actualizar tus datos de contacto. La cancelación de suscripciones se gestiona desde el mismo panel, en la sección de &quot;Servicios Activos&quot; (aún no implementado en este prototipo).</p>
+                                <p>En tu panel de cliente, en la sección &quot;Configuración&quot;, puedes actualizar tus datos de contacto. La cancelación o ajuste de suscripciones se gestiona directamente desde tu panel, en la sección de Pagos y Servicios Activos.</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold text-foreground mb-2">Cuestionarios y Estrategia</h4>
-                                <p>Tu participación es clave. Al contratar ciertos planes, se te asignarán cuestionarios en tu panel. Tus respuestas son analizadas por nuestra IA (Doctor RX) para generar un análisis FODA y recomendaciones estratégicas. Podrás ver estos análisis en tu dashboard una vez completados.</p>
+                                <p>Tu participación es clave. Al contratar ciertos planes, se te asignarán cuestionarios en tu panel. Tus respuestas son analizadas por nuestra IA para generar un análisis FODA y recomendaciones estratégicas. Podrás ver estos análisis en tu dashboard una vez completados.</p>
                             </div>
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">Métricas y KPIs</h4>

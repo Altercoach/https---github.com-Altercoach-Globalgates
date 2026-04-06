@@ -135,7 +135,12 @@ export default function SettingsPage() {
                                   <TooltipProvider>
                                       <Tooltip>
                                           <TooltipTrigger asChild>
-                                            <Link href={integration.helpUrl} target="_blank" tabIndex={-1}>
+                                                                                        <Link
+                                                                                            href={integration.helpUrl}
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            aria-label={integration.helpText}
+                                                                                        >
                                                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help"/>
                                             </Link>
                                           </TooltipTrigger>

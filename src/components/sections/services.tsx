@@ -51,24 +51,24 @@ export function Services() {
             </p>
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3 pt-12">
+        <div className="mx-auto grid max-w-5xl items-start gap-5 pt-10 sm:grid-cols-2 md:gap-8 lg:max-w-none lg:grid-cols-3">
           {services.map((service) => {
             const serviceTitle = getTranslation(service.title);
             return (
               <Card key={service.id} className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>{serviceTitle}</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl leading-tight">{serviceTitle}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 flex-grow">
+                <CardContent className="flex-grow space-y-2">
                   {service.bullets.map((bullet, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <Check className="mt-1 h-4 w-4 shrink-0 text-accent" />
-                      <span className="text-muted-foreground">{getTranslation(bullet)}</span>
+                      <span className="text-sm text-muted-foreground sm:text-base">{getTranslation(bullet)}</span>
                     </div>
                   ))}
                 </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full" onClick={() => handleAskMore(serviceTitle)}>
+                <CardFooter className="pt-2">
+                  <Button variant="outline" className="h-11 w-full" onClick={() => handleAskMore(serviceTitle)}>
                     <Wand className="mr-2" />
                     {t.askMore}
                   </Button>

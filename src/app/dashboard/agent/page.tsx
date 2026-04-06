@@ -153,7 +153,8 @@ export default function CustomerAgentConfigPage() {
     
     // Dynamic URL and embed code based on agent name
     const agentSlug = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
-    const agentUrl = `https://goldenkey.website/chat/${agentSlug}`;
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://www.goldenkey.website';
+    const agentUrl = `${currentOrigin}/chat/${agentSlug}`;
     const embedCode = `<iframe src="${agentUrl}" width="100%" height="600" frameborder="0"></iframe>`;
 
 
@@ -189,7 +190,15 @@ export default function CustomerAgentConfigPage() {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                           <Link href={helpUrl} target="_blank" tabIndex={-1} className={disabled ? 'pointer-events-none' : ''}>
+                                                     <Link
+                                                         href={helpUrl}
+                                                         target="_blank"
+                                                         rel="noopener noreferrer"
+                                                         tabIndex={disabled ? -1 : 0}
+                                                         aria-label={helpText}
+                                                         aria-disabled={disabled}
+                                                         className={disabled ? 'pointer-events-none' : ''}
+                                                     >
                                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help"/>
                            </Link>
                         </TooltipTrigger>

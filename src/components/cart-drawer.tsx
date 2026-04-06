@@ -27,6 +27,12 @@ const labels = {
     qty: "Cant:",
     subtotal: "Subtotal:",
     removeItem: "Eliminar artículo",
+    packageBrief: "Brief",
+    packageSla: "SLA",
+    packageEta: "Entrega estimada",
+    packageChannels: "Canales",
+    packageAddons: "Add-ons",
+    none: "Ninguno",
     oneTimePayments: "Pagos únicos",
     subscriptions: "Suscripciones",
     perMonth: "/mes",
@@ -43,6 +49,12 @@ const labels = {
     qty: "Qty:",
     subtotal: "Subtotal:",
     removeItem: "Remove item",
+    packageBrief: "Brief",
+    packageSla: "SLA",
+    packageEta: "Estimated delivery",
+    packageChannels: "Channels",
+    packageAddons: "Add-ons",
+    none: "None",
     oneTimePayments: "One-time payments",
     subscriptions: "Subscriptions",
     perMonth: "/month",
@@ -59,6 +71,12 @@ const labels = {
     qty: "Qté:",
     subtotal: "Sous-total:",
     removeItem: "Retirer l'article",
+    packageBrief: "Brief",
+    packageSla: "SLA",
+    packageEta: "Livraison estimee",
+    packageChannels: "Canaux",
+    packageAddons: "Add-ons",
+    none: "Aucun",
     oneTimePayments: "Paiements uniques",
     subscriptions: "Abonnements",
     perMonth: "/mois",
@@ -105,6 +123,15 @@ export function CartDrawer() {
                           min="1"
                           max="99"
                         />
+                      </div>
+                    )}
+                    {item.metadata?.kind === 'custom_package' && (
+                      <div className="mt-2 space-y-1 rounded-md bg-muted/40 p-2 text-xs text-muted-foreground">
+                        {item.metadata.brief && <p><span className="font-medium text-foreground">{t.packageBrief}:</span> {item.metadata.brief}</p>}
+                        <p><span className="font-medium text-foreground">{t.packageSla}:</span> {item.metadata.slaHours ?? '-'}h</p>
+                        <p><span className="font-medium text-foreground">{t.packageEta}:</span> {item.metadata.etaIso ? new Date(item.metadata.etaIso).toLocaleString() : '-'}</p>
+                        <p><span className="font-medium text-foreground">{t.packageChannels}:</span> {(item.metadata.channels ?? []).join(', ')}</p>
+                        <p><span className="font-medium text-foreground">{t.packageAddons}:</span> {(item.metadata.addons ?? []).length ? (item.metadata.addons ?? []).join(', ') : t.none}</p>
                       </div>
                     )}
                      <p className="mt-2 text-sm text-muted-foreground">

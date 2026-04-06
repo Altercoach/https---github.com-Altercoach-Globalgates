@@ -15,8 +15,29 @@ import { ThemeProvider } from '@/contexts/theme-provider';
 import { FeatureFlagProvider } from '@/contexts/feature-flag-context';
 
 export const metadata: Metadata = {
-  title: 'Golden Key Agency',
-  description: 'Strategic marketing, automation, and AI to unlock your growth.',
+  metadataBase: new URL('https://goldenkey.website'),
+  title: {
+    default: 'Goldek Key International',
+    template: '%s | Goldek Key International',
+  },
+  alternates: {
+    canonical: '/',
+  },
+  description: 'Estrategia de marketing digital, automatización e inteligencia artificial para hacer crecer tu negocio. AI-powered digital strategy to grow your business.',
+  keywords: ['marketing digital', 'inteligencia artificial', 'automatización', 'agencia IA', 'Goldek Key International'],
+  authors: [{ name: 'Goldek Key International', url: 'https://goldenkey.website' }],
+  openGraph: {
+    type: 'website',
+    locale: 'es_MX',
+    alternateLocale: ['en_US', 'fr_FR'],
+    siteName: 'Goldek Key International',
+    title: 'Goldek Key International',
+    description: 'Estrategia digital con IA para hacer crecer tu negocio.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 const inter = Inter({
@@ -31,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
+    <html lang="es" className={`${inter.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased">
         <ThemeProvider
             attribute="class"

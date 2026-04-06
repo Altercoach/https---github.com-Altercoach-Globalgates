@@ -16,7 +16,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, BookOpen, Beaker, User } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, Users, FileText, MessageSquare, BookOpen, Beaker, User, Settings, Bot, Sliders } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSite } from '@/hooks/use-site';
 import { useAuth } from '@/hooks/use-auth';
@@ -31,8 +31,11 @@ const labels = {
     questionnaires: "Cuestionarios",
     teamLab: "Team Lab",
     integrations: "Integraciones",
+    agent: "Agente IA",
     crm: "CRM",
     instructions: "Instrucciones",
+    settings: "Configuración",
+    featureFlags: "Feature Flags",
     customerView: "Vista Cliente",
     loggedInAs: "Conectado como:",
     logout: "Cerrar Sesión",
@@ -40,6 +43,8 @@ const labels = {
     redirecting: "Redirigiendo...",
     loadingOffice: "Cargando Oficina...",
     reviewAndSave: "Revisar y Guardar Cambios",
+    skipToContent: 'Saltar al contenido principal',
+    toggleSidebar: 'Alternar barra lateral',
   },
   en: {
     admin: "Business Admin",
@@ -49,8 +54,11 @@ const labels = {
     questionnaires: "Questionnaires",
     teamLab: "Team Lab",
     integrations: "Integrations",
+    agent: "AI Agent",
     crm: "CRM",
     instructions: "Instructions",
+    settings: "Settings",
+    featureFlags: "Feature Flags",
     customerView: "Customer View",
     loggedInAs: "Logged in as:",
     logout: "Logout",
@@ -58,6 +66,8 @@ const labels = {
     redirecting: "Redirecting...",
     loadingOffice: "Loading Office...",
     reviewAndSave: "Review & Save Changes",
+    skipToContent: 'Skip to main content',
+    toggleSidebar: 'Toggle sidebar',
   },
   fr: {
     admin: "Admin d'Entreprise",
@@ -67,8 +77,11 @@ const labels = {
     questionnaires: "Questionnaires",
     teamLab: "Labo d'Équipe",
     integrations: "Intégrations",
+    agent: "Agent IA",
     crm: "CRM",
     instructions: "Instructions",
+    settings: "Paramètres",
+    featureFlags: "Feature Flags",
     customerView: "Vue Client",
     loggedInAs: "Connecté en tant que:",
     logout: "Se déconnecter",
@@ -76,6 +89,8 @@ const labels = {
     redirecting: "Redirection...",
     loadingOffice: "Chargement du bureau...",
     reviewAndSave: "Réviser et Enregistrer",
+    skipToContent: 'Aller au contenu principal',
+    toggleSidebar: 'Basculer la barre latérale',
   }
 };
 
@@ -107,8 +122,11 @@ export default function MyOfficeLayout({
     { href: '/myoffice/questionnaires', label: t.questionnaires, icon: <FileText /> },
     { href: '/myoffice/team-lab', label: t.teamLab, icon: <Beaker /> },
     { href: '/myoffice/integrations', label: t.integrations, icon: <Puzzle />},
+    { href: '/myoffice/agent', label: t.agent, icon: <Bot /> },
     { href: '/myoffice/crm', label: t.crm, icon: <MessageSquare /> },
+    { href: '/myoffice/features', label: t.featureFlags, icon: <Sliders /> },
     { href: '/myoffice/instructions', label: t.instructions, icon: <BookOpen /> },
+    { href: '/myoffice/settings', label: t.settings, icon: <Settings /> },
   ];
 
   if (auth.isMounted && auth.user?.role !== 'admin') {
@@ -122,7 +140,14 @@ export default function MyOfficeLayout({
   const siteName = getTranslation(site.brand.name);
 
   return (
-    <SidebarProvider>
+    <>
+      <a
+        href="#main-content"
+        className="sr-only z-50 rounded-md bg-accent px-3 py-2 text-accent-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-3"
+      >
+        {t.skipToContent}
+      </a>
+      <SidebarProvider>
       <Sidebar side="left" variant="sidebar" collapsible="icon">
         <SidebarHeader>
           <div className="flex h-14 items-center gap-2 px-2 group-data-[collapsible=icon]:justify-center">
@@ -168,7 +193,7 @@ export default function MyOfficeLayout({
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center justify-between border-b bg-background p-2">
-          <SidebarTrigger />
+          <SidebarTrigger aria-label={t.toggleSidebar} title={t.toggleSidebar} />
            <div>
             <span className="text-sm text-muted-foreground mr-4">{t.loggedInAs} {auth.user?.email}</span>
             <Button onClick={logout} variant="outline" size="sm">{t.logout}</Button>
@@ -177,10 +202,11 @@ export default function MyOfficeLayout({
             </Button>
           </div>
         </header>
-        <main className="relative flex-1 overflow-auto p-4 md:p-6 lg:p-8 bg-muted/20">
+        <main id="main-content" className="relative flex-1 overflow-auto bg-muted/20 p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </SidebarInset>
     </SidebarProvider>
+    </>
   );
 }

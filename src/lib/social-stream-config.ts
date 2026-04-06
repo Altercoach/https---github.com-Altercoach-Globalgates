@@ -43,6 +43,38 @@ export const socialStreamConfig = {
     linkedin: true,
     twitter: true,
     instagram: true,
+    tiktok: true,
+    // Meta ecosystem (Andromeda AI recommendation layer)
+    threads: true,          // Threads by Meta — microblogging (Andromeda ecosystem)
+    facebook: true,
+    messenger: true,
+  },
+
+  // Mixpost integration (self-hosted, MIT — github.com/inovector/mixpost)
+  mixpost: {
+    // Set MIXPOST_BASE_URL and MIXPOST_API_TOKEN in .env.local to enable
+    baseUrl: process.env.MIXPOST_BASE_URL || '',
+    apiToken: process.env.MIXPOST_API_TOKEN || '',
+    enabled: !!(process.env.MIXPOST_BASE_URL && process.env.MIXPOST_API_TOKEN),
+    // When disabled, posts are exported as JSON for manual import
+  },
+
+  // Meta Threads / Andromeda configuration
+  // Andromeda is Meta's AI-powered content recommendation engine used across
+  // Instagram, Facebook, Threads and future Meta surfaces.
+  metaAndromeda: {
+    threadsApiVersion: 'v1.0',
+    // Threads API endpoint (Meta Graph API)
+    threadsEndpoint: 'https://graph.threads.net/v1.0',
+    appId: process.env.META_APP_ID || '',
+    appSecret: process.env.META_APP_SECRET || '',
+    // Andromeda-optimised content hints
+    // (short-form, conversational, high-reply-rate topics)
+    contentHints: {
+      maxLength: 500,
+      preferredFormats: ['text', 'image', 'video'],
+      engagementTriggers: ['question', 'poll', 'hot_take'],
+    },
   },
 
   // Message handling

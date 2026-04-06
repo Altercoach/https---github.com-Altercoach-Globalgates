@@ -9,9 +9,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useLanguage } from '@/hooks/use-language';
+
+const labels = {
+  es: {
+    currency: 'Moneda',
+  },
+  en: {
+    currency: 'Currency',
+  },
+  fr: {
+    currency: 'Devise',
+  },
+};
 
 export function CurrencySwitcher() {
   const { currency, setCurrency } = useCurrency();
+  const { language } = useLanguage();
+  const t = labels[language.code as keyof typeof labels] || labels.en;
 
   const handleValueChange = (currencyCode: string) => {
     const newCurrency = CURRENCIES.find((c) => c.code === currencyCode);
@@ -22,8 +37,11 @@ export function CurrencySwitcher() {
 
   return (
     <Select value={currency.code} onValueChange={handleValueChange}>
-      <SelectTrigger className="w-auto border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0">
-        <SelectValue placeholder="Currency" />
+      <SelectTrigger
+        aria-label={t.currency}
+        className="w-auto border-0 bg-transparent shadow-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+      >
+        <SelectValue placeholder={t.currency} />
       </SelectTrigger>
       <SelectContent>
         {CURRENCIES.map((curr) => (

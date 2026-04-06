@@ -72,10 +72,50 @@ export function AIChatWidget() {
   const { agentPersona } = site;
   const agentName = `${agentPersona.firstName} ${agentPersona.lastName}`;
   const brandName = getTranslation(site.brand.name);
+  const supportEmail = site.agentConfig?.supportEmail || 'atencion@goldenkey.website';
 
 
   const knowledgeBase = useMemo(() => {
-    let base = `SITE_PRODUCTS:\n${JSON.stringify(site.products.map(p => ({...p, name: getTranslation(p.name)})))}\n\nSITE_SOLUTIONS:\n${JSON.stringify(site.services.map(s => ({...s, title: getTranslation(s.title)})))}`;
+    const serializedProducts = JSON.stringify(site.products.map(p => ({
+      ...p,
+      name: getTranslation(p.name),
+      badge: getTranslation(p.badge),
+      note: getTranslation(p.note),
+      description: getTranslation(p.description),
+    })));
+
+    const serializedSolutions = JSON.stringify(site.services.map(s => ({
+      ...s,
+      title: getTranslation(s.title),
+      bullets: s.bullets.map(b => getTranslation(b)),
+    })));
+
+    const serializedBundles = JSON.stringify((site.bundles ?? []).map(bundle => ({
+      ...bundle,
+      name: getTranslation(bundle.name),
+      description: bundle.description ? getTranslation(bundle.description) : '',
+      products: (bundle.products ?? []).map(productId => {
+        const product = site.products.find(p => p.id === productId);
+        return product ? getTranslation(product.name) : productId;
+      }),
+      services: (bundle.services ?? []).map(serviceId => {
+        const service = site.services.find(s => s.id === serviceId);
+        return service ? getTranslation(service.title) : serviceId;
+      }),
+    })));
+
+    let base = `SITE_PRODUCTS:\n${serializedProducts}\n\nSITE_SOLUTIONS:\n${serializedSolutions}\n\nSITE_BUNDLES:\n${serializedBundles}`;
+
+    if (site.agentConfig?.knowledgeBase) {
+      base += `\n\nCUSTOM_AGENT_KNOWLEDGE_BASE:\n${site.agentConfig.knowledgeBase}`;
+    }
+
+    if (site.agentConfig?.exclusionList) {
+      base += `\n\nEXCLUSION_LIST:\n${site.agentConfig.exclusionList}`;
+    }
+
+    base += `\n\nSUPPORT_EMAIL:\n${supportEmail}`;
+
     if(isPayingCustomer && auth.user) {
         const customerData = initialCustomers.find(c => c.email === auth.user!.email);
         const kpis = {
@@ -90,19 +130,22 @@ export function AIChatWidget() {
         base += `CUSTOMER_BUSINESS_ANALYSIS: ${JSON.stringify(customerAnalyses)}\n`;
     }
     return base;
-  }, [site, isPayingCustomer, auth.user, language.code, getTranslation]);
+  }, [site, isPayingCustomer, auth.user, language.code, getTranslation, supportEmail]);
   
   const systemPrompt = useMemo(() => {
-    let prompt = isPayingCustomer ? customerSystemPrompt : leadSystemPrompt;
+    let prompt = site.agentConfig?.systemPrompt?.trim()
+      ? site.agentConfig.systemPrompt
+      : (isPayingCustomer ? customerSystemPrompt : leadSystemPrompt);
     
     prompt = prompt.replace(/\[Agent Name\]/g, agentName);
     prompt = prompt.replace(/\[Brand Name\]/g, brandName);
+    prompt = prompt.replace(/\[Support Email\]/g, supportEmail);
     
     if(isPayingCustomer && auth.user) {
         prompt = prompt.replace('[Nombre Cliente]', auth.user.email);
     }
     return prompt;
-  }, [isPayingCustomer, auth.user, brandName, agentName]);
+  }, [isPayingCustomer, auth.user, brandName, agentName, site.agentConfig?.systemPrompt, supportEmail]);
 
   useEffect(() => {
     if (isWidgetOpen && initialMessage) {

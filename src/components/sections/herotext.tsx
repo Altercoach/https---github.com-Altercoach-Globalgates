@@ -42,17 +42,17 @@ export function HeroText() {
 
   return (
     <section className="bg-background">
-      <div className="container px-4 md:px-6 -mt-20 md:-mt-28 relative z-10">
-            <div className="bg-background p-8 md:p-12 rounded-lg shadow-2xl max-w-4xl mx-auto text-center">
+      <div className="container relative z-10 -mt-14 px-4 md:-mt-28 md:px-6">
+        <div className="mx-auto max-w-4xl rounded-lg bg-background p-6 text-center shadow-2xl md:p-12">
                 <div className="space-y-4">
-                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl font-headline text-foreground">
+            <h1 className="font-headline text-3xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl">
                     {getTranslation(site.brand.heroTitle)}
                     </h1>
-                    <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl">
+            <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base md:text-xl">
                     {getTranslation(site.brand.heroSubtitle)}
                     </p>
                 </div>
-                <ul className="grid gap-4 py-6 text-lg sm:grid-cols-3">
+          <ul className="grid gap-3 py-6 text-left text-base sm:grid-cols-3 sm:text-lg">
                     <li className="flex items-center justify-center sm:justify-start gap-2">
                         <CheckCircle className="h-5 w-5 text-accent" />
                         <span>{t.bullet1}</span>
@@ -66,11 +66,11 @@ export function HeroText() {
                         <span>{t.bullet3}</span>
                     </li>
                 </ul>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-                    <Button asChild size="lg">
+                  <div className="flex flex-col justify-center gap-3 min-[420px]:flex-row">
+                    <Button asChild size="lg" className="w-full min-[420px]:w-auto">
                         <Link href="/signup">{t.signupFree}</Link>
                     </Button>
-                    <Button onClick={scrollToPlans} size="lg" variant="secondary">
+                    <Button onClick={scrollToPlans} size="lg" variant="secondary" className="w-full min-[420px]:w-auto">
                         {t.explorePlans}
                     </Button>
                 </div>

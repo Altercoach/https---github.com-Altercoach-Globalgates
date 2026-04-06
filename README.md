@@ -1,4 +1,4 @@
-# GlobalGate Agency SaaS
+# Goldek Key International SaaS
 
 Plataforma SaaS para gestión de marketing, IA y automatización.
 
@@ -13,6 +13,16 @@ Plataforma SaaS para gestión de marketing, IA y automatización.
 - [Aviso Legal](src/app/legal/page.tsx)
 - [Documentación Técnica](docs/CODEBASE.md)
 - [Changelog](docs/CHANGELOG.md)
+
+## Firebase y Firestore
+- Configuración versionable: [firebase.json](firebase.json), [firestore.rules](firestore.rules), [firestore.indexes.json](firestore.indexes.json)
+- Credenciales locales: usa `FIREBASE_ADMIN_SDK_PATH=./credentials.json` en `.env.local`
+- Las órdenes del checkout se sincronizan por API segura en [src/app/api/orders/route.ts](src/app/api/orders/route.ts) usando Firebase Admin SDK
+- Despliegue de reglas e índices:
+	- `npm install -g firebase-tools`
+	- `firebase login`
+	- `firebase use globalgate-agency`
+	- `firebase deploy --only firestore:rules,firestore:indexes`
 
 ## Licencia
 MIT — ver [LICENSE](LICENSE)

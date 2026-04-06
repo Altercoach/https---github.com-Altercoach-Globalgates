@@ -27,7 +27,9 @@ const labels = {
     customerEmail: "demo@cliente.com",
     demoPassword: "Demo123!",
     adminButtonText: "Demo: Entrar como Administrador",
-    customerButtonText: "Demo: Entrar como Cliente"
+    customerButtonText: "Demo: Entrar como Cliente",
+    showPassword: 'Ver contraseña',
+    hidePassword: 'Ocultar contraseña',
   },
   en: {
     title: "Login",
@@ -43,7 +45,9 @@ const labels = {
     customerEmail: "demo@cliente.com",
     demoPassword: "Demo123!",
     adminButtonText: "Demo: Enter as Administrator",
-    customerButtonText: "Demo: Enter as Customer"
+    customerButtonText: "Demo: Enter as Customer",
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
   fr: {
     title: "Connexion",
@@ -59,7 +63,9 @@ const labels = {
     customerEmail: "demo@cliente.com",
     demoPassword: "Demo123!",
     adminButtonText: "Démo: Entrer en tant qu'administrateur",
-    customerButtonText: "Démo: Entrer en tant que client"
+    customerButtonText: "Démo: Entrer en tant que client",
+    showPassword: 'Afficher le mot de passe',
+    hidePassword: 'Masquer le mot de passe',
   }
 };
 
@@ -158,10 +164,10 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm px-1 text-xs text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                  aria-label={showPassword ? t.hidePassword : t.showPassword}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? '🙈' : '👁️'}
                 </button>

@@ -84,6 +84,33 @@ export type AgentPersona = {
   avatar: string; // URL to the avatar image
 };
 
+export type AgentConfig = {
+  isActive: boolean;
+  gender: 'male' | 'female';
+  systemPrompt: string;
+  knowledgeBase: string;
+  supportEmail: string;
+  exclusionList: string;
+  sharePath: string;
+  apiKeys: {
+    whatsapp: string;
+    instagram: string;
+    messenger: string;
+    linkedin: string;
+    twitter: string;
+  };
+};
+
+export type SocialPlatform =
+  | 'facebook'
+  | 'instagram'
+  | 'x'
+  | 'linkedin'
+  | 'youtube'
+  | 'tiktok'
+  | 'whatsapp'
+  | 'threads';
+
 export interface IntegrationStatus {
   connected: boolean;
   connecting: boolean;
@@ -96,12 +123,15 @@ export type SiteData = {
   products: Product[];
   bundles?: Bundle[];
   agentPersona: AgentPersona;
+  agentConfig?: AgentConfig;
   // Permite alternar modalidad de visualización: 'hierarchical' | 'modular' | 'mixed'
   viewMode?: 'hierarchical' | 'modular' | 'mixed';
   // Estado de integraciones externas (whatsapp, messenger, etc)
   integrationStatus?: Record<string, IntegrationStatus>;
   // Claves de API de integraciones de datos (Facebook, GA4, etc.)
   integrationsKeys?: Record<string, string>;
+  // URLs publicas para iconos de redes en footer
+  socialLinks?: Partial<Record<SocialPlatform, string>>;
   // Email de la cuenta de administrador
   accountEmail?: string;
 };
@@ -112,6 +142,41 @@ export type CartItem = {
   price: number;
   type: 'one' | 'sub';
   qty: number;
+  metadata?: {
+    kind?: 'custom_package';
+    brief?: string;
+    channels?: string[];
+    addons?: string[];
+    urgency?: 'standard' | 'priority' | 'rush';
+    slaHours?: number;
+    etaIso?: string;
+  };
+};
+
+export type PurchaseOrder = {
+  id: string;
+  createdAt: string;
+  invoiceNumber?: string;
+  status?: 'paid' | 'pending' | 'failed';
+  syncState?: 'synced' | 'local_only';
+  customer?: {
+    name?: string;
+    email?: string;
+    plan?: string;
+  };
+  fiscal?: {
+    countryCode: string;
+    taxRate: number;
+    subtotal: number;
+    taxAmount: number;
+    grandTotal: number;
+  };
+  items: CartItem[];
+  totals: {
+    oneTotal: number;
+    subTotal: number;
+    total: number;
+  };
 };
 
 export type AuthRole = 'admin' | 'customer';

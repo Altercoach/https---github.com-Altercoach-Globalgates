@@ -2,7 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, FileText, MessageSquare, BookOpen, ArrowRight, Beaker } from 'lucide-react';
+import { KeyRound, LayoutGrid, ShoppingBag, Store, Puzzle, ShieldCheck, FileText, MessageSquare, BookOpen, ArrowRight, Beaker, Share2, ShieldAlert, Smartphone } from 'lucide-react';
 
 export default function AdminInstructionsPage() {
 
@@ -26,7 +26,7 @@ export default function AdminInstructionsPage() {
                     <CardContent className="text-sm text-muted-foreground space-y-2">
                         <p><strong>Función:</strong> Gestionar la identidad visual y textual principal del sitio web.</p>
                         <p><strong>Uso:</strong> Cambia el nombre de la marca, el eslogan y los textos de la sección &quot;Héroe&quot;. Sube la imagen principal que los visitantes verán al entrar. Todos los cambios aquí son multi-idioma.</p>
-                        <p><strong>Importante:</strong> Los cambios son temporales hasta que los guardes permanentemente desde &quot;Revisar y Guardar&quot;.</p>
+                        <p><strong>Importante:</strong> Los cambios se guardan automáticamente en este entorno. Para respaldo o migración entre entornos, usa la opción de exportar/importar JSON en Configuración.</p>
                     </CardContent>
                 </Card>
 
@@ -72,6 +72,17 @@ export default function AdminInstructionsPage() {
 
                 <Card>
                     <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Share2/> Redes y Footer</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-muted-foreground space-y-2">
+                        <p><strong>Función:</strong> Mostrar iconos de redes sociales en el pie de página con enlaces editables.</p>
+                        <p><strong>Uso:</strong> Ve a <strong>Mi Oficina &gt; Configuración</strong> y captura las URLs públicas de cada red (Facebook, Instagram, X, LinkedIn, YouTube, TikTok, WhatsApp y Threads). Solo se muestran iconos con enlace válido.</p>
+                        <p><strong>Recomendación:</strong> Usa URLs completas con https:// para evitar enlaces rotos.</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Puzzle/> Integraciones</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground space-y-2">
@@ -89,6 +100,28 @@ export default function AdminInstructionsPage() {
                         <p><strong>Uso:</strong> Busca, filtra y realiza acciones en lote sobre tus clientes (suspender, reactivar). Accede a la vista detallada de cada cliente para ver sus servicios activos, analíticas y cuestionarios asignados.</p>
                     </CardContent>
                 </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><ShieldAlert/> Legales y Cumplimiento</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-muted-foreground space-y-2">
+                        <p><strong>Función:</strong> Mantener publicadas y accesibles las políticas legales del sitio.</p>
+                        <p><strong>Uso:</strong> Revisa regularmente las páginas de <strong>Privacidad</strong>, <strong>Términos</strong> y <strong>Aviso Legal / Límites de Responsabilidad</strong>. El footer enlaza estas tres rutas para acceso público.</p>
+                        <p><strong>Importante:</strong> Valida con tu asesor legal local antes de operar campañas o ventas en nuevas jurisdicciones.</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Smartphone/> Acceso Móvil</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-muted-foreground space-y-2">
+                        <p><strong>Función:</strong> Garantizar navegación completa desde celulares.</p>
+                        <p><strong>Uso:</strong> En móvil, el encabezado ahora incluye botón de menú. Desde ahí se puede abrir navegación principal, iniciar sesión y acceder a Panel/Mi Oficina según el rol.</p>
+                        <p><strong>Checklist:</strong> Verifica en cada despliegue que Login y menú estén visibles en resoluciones pequeñas.</p>
+                    </CardContent>
+                </Card>
                 
                 <Card>
                     <CardHeader>
@@ -102,10 +135,10 @@ export default function AdminInstructionsPage() {
 
                 <Card className="bg-destructive/10 border-destructive/20">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-destructive"><KeyRound/> Guardado Permanente</CardTitle>
+                        <CardTitle className="flex items-center gap-2 text-destructive"><KeyRound/> Respaldo y Recuperación</CardTitle>
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground space-y-2">
-                        <p><strong>Crucial:</strong> Cualquier cambio realizado en las secciones de &quot;Marca&quot;, &quot;Soluciones&quot; o &quot;Planes&quot; es temporal. Para hacerlos permanentes, debes ir a la página **&quot;Revisar y Guardar&quot;** (botón flotante) y usar el botón **&quot;Guardar Cambios en el Código&quot;**.</p>
+                        <p><strong>Crucial:</strong> Realiza exportaciones periódicas desde Configuración para tener una copia de seguridad de Marca, Soluciones, Planes, Agente e Integraciones. Si cambias de entorno, importa ese JSON para restaurar todo.</p>
                     </CardContent>
                 </Card>
             </div>
@@ -122,7 +155,7 @@ export default function AdminInstructionsPage() {
                     <Card className="border-primary">
                         <CardHeader>
                             <CardTitle>1. Configuración del Sitio (Contenido Público)</CardTitle>
-                            <CardDescription>Lo que editas aquí define lo que ven tus visitantes en la página principal. Los cambios son temporales hasta que los guardas.</CardDescription>
+                            <CardDescription>Lo que editas aquí define lo que ven tus visitantes en la página principal. Los cambios se aplican y persisten automáticamente en este entorno.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-center gap-4">
@@ -139,8 +172,8 @@ export default function AdminInstructionsPage() {
                                  <ArrowRight className="h-8 w-8 text-muted-foreground shrink-0"/>
                                  <div className="p-3 bg-destructive/10 border border-destructive rounded-lg text-center w-40">
                                     <KeyRound className="mx-auto mb-1 text-destructive"/>
-                                    <p className="font-semibold">Revisar y Guardar</p>
-                                    <p className="text-sm text-muted-foreground">(Paso final para guardar)</p>
+                                    <p className="font-semibold">Backup JSON</p>
+                                    <p className="text-sm text-muted-foreground">(Configura/Importa/Exporta)</p>
                                  </div>
                             </div>
                         </CardContent>

@@ -21,6 +21,8 @@ const labels = {
     backButton: "Volver al Inicio",
     toastTitle: "¡Cuenta Creada!",
     toastDescription: "Hemos creado tu cuenta. Ahora serás dirigido a tu panel de cliente.",
+    showPassword: 'Ver contraseña',
+    hidePassword: 'Ocultar contraseña',
   },
   en: {
     title: "Create Account",
@@ -31,6 +33,8 @@ const labels = {
     backButton: "Back to Home",
     toastTitle: "Account Created!",
     toastDescription: "We've created your account. You will now be directed to your customer dashboard.",
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
   fr: {
     title: "Créer un Compte",
@@ -41,6 +45,8 @@ const labels = {
     backButton: "Retour à l'accueil",
     toastTitle: "Compte Créé !",
     toastDescription: "Nous avons créé votre compte. Vous allez maintenant être redirigé vers votre tableau de bord client.",
+    showPassword: 'Afficher le mot de passe',
+    hidePassword: 'Masquer le mot de passe',
   }
 }
 
@@ -57,12 +63,10 @@ export default function SignupPage() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would call an API endpoint to register the user
     toast({
       title: t.toastTitle,
       description: t.toastDescription,
     });
-    // Log the user in as a 'customer' role but they won't have paid status yet.
     login(email, 'customer');
   };
 
@@ -102,10 +106,10 @@ export default function SignupPage() {
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs focus:outline-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm px-1 text-xs text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                  aria-label={showPassword ? t.hidePassword : t.showPassword}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? '🙈' : '👁️'}
                 </button>
